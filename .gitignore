@@ -8,6 +8,8 @@ App/build/
 App/ios/Pods/
 App/pubspec.lock
 App/.env
+App/ios/Runner/Info.plist
+
 
 # Next.js 관련 파일
 Web/.next/

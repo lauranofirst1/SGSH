@@ -1,0 +1,54 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.example.yourapp">
+
+    <!-- 위치 권한 설정 -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/> 
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+
+    <!-- 위치 권한 외 필요한 권한들도 여기에 추가 -->
+
+    <application
+        android:label="app"
+        android:name="${applicationName}"
+        android:icon="@mipmap/ic_launcher">
+
+        <!-- Google Maps API Key -->
+        <meta-data 
+            android:name="com.google.android.geo.API_KEY"
+            android:value="${API_KEY_ANDROID}" /> <!-- android API Key -->
+
+        <!-- Flutter 엔진 관련 메타데이터 -->
+        <meta-data
+            android:name="flutterEmbedding"
+            android:value="2" />
+
+        <!-- 런처 액티비티 -->
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:launchMode="singleTop"
+            android:taskAffinity=""
+            android:theme="@style/LaunchTheme"
+            android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
+            android:hardwareAccelerated="true"
+            android:windowSoftInputMode="adjustResize">
+
+            <meta-data
+                android:name="io.flutter.embedding.android.NormalTheme"
+                android:resource="@style/NormalTheme" />
+
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity>
+    </application>
+
+    <!-- Flutter Text Plugin 관련 쿼리 설정 -->
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.PROCESS_TEXT"/>
+            <data android:mimeType="text/plain"/>
+        </intent>
+    </queries>
+</manifest>
