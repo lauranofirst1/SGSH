@@ -90,18 +90,21 @@ class _SearchPageState extends State<SearchPage> {
           Padding(
             padding: EdgeInsets.all(12.0),
             child: TextField(
-              controller: _searchController,
-              onChanged: filterStores,
-              decoration: InputDecoration(
-                prefixIcon: Icon(Icons.search, color: Colors.black54),
-                hintText: '검색어를 입력하세요...',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                filled: true,
-                fillColor: Colors.grey[200],
-              ),
-            ),
+  controller: _searchController,
+  onSubmitted: (value) {
+    filterStores(value);  // 엔터 키 입력 시 검색 실행
+  },
+  decoration: InputDecoration(
+    prefixIcon: Icon(Icons.search, color: Colors.black54),
+    hintText: '검색어를 입력하세요...',
+    border: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(10),
+    ),
+    filled: true,
+    fillColor: Colors.grey[200],
+  ),
+)
+
           ),
 
           if (_searchController.text.isEmpty) ...[
