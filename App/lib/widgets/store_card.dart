@@ -1,4 +1,3 @@
-import 'package:app/pages/storedetail.dart';
 import 'package:flutter/material.dart';
 import '../models/business.dart';
 
@@ -16,12 +15,12 @@ class StoreCard extends StatelessWidget {
         color: Colors.white,
         elevation: 0,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        margin: EdgeInsets.symmetric(vertical: 8),
+        margin: EdgeInsets.symmetric(vertical: 1),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
-              padding: const EdgeInsets.all(12.0),
+              padding: const EdgeInsets.all(8.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
