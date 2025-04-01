@@ -7,7 +7,8 @@ import 'package:app/pages/mainpage.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-void main() async {
+void main() async {  WidgetsFlutterBinding.ensureInitialized(); // 중요!
+
   WidgetsFlutterBinding.ensureInitialized();
 
   try {
