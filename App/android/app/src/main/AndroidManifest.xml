@@ -15,7 +15,7 @@
         <!-- Google Maps API Key -->
         <meta-data 
             android:name="com.google.android.geo.API_KEY"
-            android:value="${API_KEY_ANDROID}" /> <!-- android API Key -->
+            android:value="${SGSH_API_KEY}" /> <!-- android API Key -->
 
         <!-- Flutter 엔진 관련 메타데이터 -->
         <meta-data

@@ -291,6 +291,8 @@ class _StoreDetailPageState extends State<StoreDetailPage>
               _buildInfoRow('주소:', widget.store.address),
               _buildInfoRow('전화:', widget.store.number),
               _buildInfoRow('영업시간:', widget.store.time),
+              _buildInfoRow('위도:', widget.store.lat),
+              _buildInfoRow('경도:', widget.store.lng),
 
               SizedBox(height: 8),
             ],
