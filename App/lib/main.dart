@@ -1,14 +1,15 @@
+import 'package:app/models/business.dart';
 import 'package:app/pages/likepage.dart';
 import 'package:app/pages/mappage.dart';
 import 'package:app/pages/mypage.dart';
 import 'package:app/pages/searchpage.dart';
+import 'package:app/widgets/storedetailbottomsheet.dart';
 import 'package:flutter/material.dart';
 import 'package:app/pages/mainpage.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-void main() async {  WidgetsFlutterBinding.ensureInitialized(); // 중요!
-
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   try {
@@ -23,8 +24,15 @@ void main() async {  WidgetsFlutterBinding.ensureInitialized(); // 중요!
     anonKey: dotenv.env["PROJECT_API_KEY"] ?? "",
   );
 
-  runApp(MyApp());
+  runApp(
+    MaterialApp(
+      theme: ThemeData(scaffoldBackgroundColor: Color(0xFFF2F2F7)),
+      debugShowCheckedModeBanner: false,
+      home: MyApp(), // ✅ 여기서 MyApp을 화면 자체로 쓸 것
+    ),
+  );
 }
+
 
 class MyApp extends StatefulWidget {
   @override
@@ -32,21 +40,48 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  int _selectedIndex = 0; // 현재 선택된 인덱스
+  int _selectedIndex = 2;
+  bool _isBottomNavVisible = true;
 
-  final List<Widget> _pages = [
-    Mainpage(),
-    SearchPage(),
-    MapPage(),
-    LikesPage(),
-    MyPage(),
-  ];
+  final List<Widget> _pages = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _pages.addAll([
+      Mainpage(),
+      SearchPage(),
+      MapPage(onMarkerTap: _handleMarkerTap), // 💡 여기 중요!
+      LikesPage(),
+      MyPage(),
+    ]);
+  }
+
+void _handleMarkerTap(String name, String address, business_data? store) {
+  setState(() => _isBottomNavVisible = false);
+
+  final controller = _scaffoldKey.currentState!.showBottomSheet(
+    (context) => StoreDetailBottomSheet(
+      name: name,
+      address: address,
+      store: store,
+    ),
+    backgroundColor: Colors.transparent,
+  );
+
+  controller.closed.then((_) {
+    setState(() => _isBottomNavVisible = true);
+  });
+}
+
+
 
   void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
+    setState(() => _selectedIndex = index);
   }
+
+
+final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   Widget build(BuildContext context) {
@@ -54,24 +89,26 @@ class _MyAppState extends State<MyApp> {
       theme: ThemeData(scaffoldBackgroundColor: Color(0xFFF2F2F7)),
       debugShowCheckedModeBanner: false,
       home: Scaffold(
-        backgroundColor: Color(0xFFF2F2F7), // iOS systemGroupedBackground 느낌
-
+          key: _scaffoldKey, // 🔥 여기!
+        backgroundColor: Color(0xFFF2F2F7),
         body: IndexedStack(index: _selectedIndex, children: _pages),
-        bottomNavigationBar: BottomNavigationBar(
-          currentIndex: _selectedIndex,
-          onTap: _onItemTapped,
-          backgroundColor: Colors.white,
-          selectedItemColor: Colors.black, // 선택된 아이콘 색상
-          unselectedItemColor: Colors.grey, // 선택되지 않은 아이콘 색상
-          type: BottomNavigationBarType.fixed, // 5개 아이콘을 사용할 때 필요
-          items: [
-            BottomNavigationBarItem(icon: Icon(Icons.home), label: '홈'),
-            BottomNavigationBarItem(icon: Icon(Icons.search), label: '검색'),
-            BottomNavigationBarItem(icon: Icon(Icons.map), label: '지도'),
-            BottomNavigationBarItem(icon: Icon(Icons.favorite), label: '즐겨찾기'),
-            BottomNavigationBarItem(icon: Icon(Icons.person), label: '나의페이지'),
-          ],
-        ),
+        bottomNavigationBar: _isBottomNavVisible
+            ? BottomNavigationBar(
+                currentIndex: _selectedIndex,
+                onTap: _onItemTapped,
+                backgroundColor: Colors.white,
+                selectedItemColor: Colors.black,
+                unselectedItemColor: Colors.grey,
+                type: BottomNavigationBarType.fixed,
+                items: const [
+                  BottomNavigationBarItem(icon: Icon(Icons.home), label: '홈'),
+                  BottomNavigationBarItem(icon: Icon(Icons.search), label: '검색'),
+                  BottomNavigationBarItem(icon: Icon(Icons.map), label: '지도'),
+                  BottomNavigationBarItem(icon: Icon(Icons.favorite), label: '즐겨찾기'),
+                  BottomNavigationBarItem(icon: Icon(Icons.person), label: '나의페이지'),
+                ],
+              )
+            : null,
       ),
     );
   }

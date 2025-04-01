@@ -16,7 +16,6 @@ class StoreDetailBottomSheet extends StatelessWidget {
   }) : super(key: key);
 
   @override
-  @override
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
@@ -27,7 +26,7 @@ class StoreDetailBottomSheet extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // 상단 회색 바
+            // 상단 회색 바 (드래그 핸들 느낌)
             Center(
               child: Container(
                 height: 4,
@@ -40,14 +39,11 @@ class StoreDetailBottomSheet extends StatelessWidget {
               ),
             ),
 
+            // 가게 정보 카드
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 10),
-
-              child:
-              // StoreCard
-              StoreCard(
-                store:
-                    store ??
+              child: StoreCard(
+                store: store ??
                     business_data(
                       id: -1,
                       name: name,
@@ -73,9 +69,10 @@ class StoreDetailBottomSheet extends StatelessWidget {
                 },
               ),
             ),
-            // 아이콘 Row - 작고 깔끔하게
+
+            // 아이콘 버튼 Row
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+              padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
@@ -100,6 +97,7 @@ class StoreDetailBottomSheet extends StatelessWidget {
                 ],
               ),
             ),
+
             SizedBox(height: 20),
           ],
         ),
