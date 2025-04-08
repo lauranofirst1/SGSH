@@ -252,7 +252,7 @@ export default function ManageMenu() {
                                     {menus.map((menu) => (
                                         <button
                                             type="button" key={menu.name} onClick={(e) => openEditModal(menu)}>
-                                            <div className="w-full my-1 bg-white border rounded-lg shadow-xl flex" >
+                                            <div className="w-full my-1 bg-white border border-gray-300 rounded-lg shadow-xl flex" >
                                                 {(menu.image != "" && menu.image) &&
                                                     <Image
                                                         src={menu.image}
@@ -285,7 +285,7 @@ export default function ManageMenu() {
             </div>
 
             {showModal ?
-                <div className="w-full h-screen bg-black bg-opacity-75 fixed top-0 z-40">
+                <div className="w-full h-screen bg-black/75 fixed top-0 z-40">
                     <div tabIndex={-1} aria-hidden="true" className="flex items-center justify-center pb-20 w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] md:h-full">
                         <div className="relative w-full h-auto max-w-2xl">
                             <div className="relative bg-white rounded-lg shadow dark:bg-gray-700">
@@ -301,7 +301,7 @@ export default function ManageMenu() {
                                 </div>
                                 <div className="p-6">
                                     <p className="block text-sm font-medium text-gray-900 dark:text-white" >메뉴 이미지</p>
-                                    <input name="menu_image" onChange={(e) => { handleInputImageChange(e) }} type="file" accept="image/*" className="block mt-2 w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400" />
+                                    <input name="menu_image" onChange={(e) => { handleInputImageChange(e) }} type="file" accept="image/*" className="block mt-2 w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 file:bg-blue-200 file:text-blue-700 file:font-semibold file:border-none file:px-4 file:py-1 file:mr-6 file:rounded " />
 
                                     <p className="block mt-5 text-sm font-medium text-gray-900 dark:text-white" >메뉴 이름</p>
                                     <input type="text" onChange={handleInputChange} name="menu_name" className="mt-2 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="메뉴 이름" required />
@@ -321,7 +321,7 @@ export default function ManageMenu() {
                 </div> : null}
 
             {showEditModal ?
-                <div className="w-full h-screen bg-black bg-opacity-75 fixed top-0 z-40">
+                <div className="w-full h-screen bg-black/75 fixed top-0 z-40">
                     <div tabIndex={-1} aria-hidden="true" className="flex items-center justify-center w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] md:h-full">
                         <div className="relative w-full h-auto max-w-2xl">
                             <div className="relative bg-white rounded-lg shadow dark:bg-gray-700">
@@ -338,7 +338,7 @@ export default function ManageMenu() {
                                 <form onSubmit={(e) => { handleEditSubmit(e) }}>
                                     <div className="p-6">
                                         {photoToAddPreview()}
-                                        <input name="menu_image" ref={photoInput} onChange={(e) => { handleInputImageChange(e) }} type="file" accept="image/*" className="block mt-2 w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400" />
+                                        <input name="menu_image" ref={photoInput} onChange={(e) => { handleInputImageChange(e) }} type="file" accept="image/*" className="block mt-2 w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 file:bg-blue-200 file:text-blue-700 file:font-semibold file:border-none file:px-4 file:py-1 file:mr-6 file:rounded " />
 
                                         {/* <p className="block text-sm font-medium text-gray-900 dark:text-white" >메뉴 이미지</p>
                                 <input name="menu_image" onChange={(e) => {handleInputImageChange(e)}} type="file" accept="image/*" className="block mt-2 w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400" /> */}

@@ -95,7 +95,7 @@ export default function ManageOrder() {
                                     totalAmount += parseInt(tmpPrice[i]) * parseInt(tmpCount[i]);
                                 }
                                 return (
-                                    <div key={order.id} className="flex flex-col justify-between p-2 border-2 rounded-xl">
+                                    <div key={order.id} className={`flex flex-col justify-between p-2 rounded-xl border-2 ${order.status == "order" ? "border-red-300" : "border-gray-300"}`}>
                                         <div>
                                             <div className="flex justify-between mb-4">
                                                 <p className="font-bold">{order.table_no}번 테이블</p>
