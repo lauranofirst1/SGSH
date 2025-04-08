@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from 'next/link'
 
 export default function Home() {
   return (
@@ -8,7 +9,7 @@ export default function Home() {
       <div className="flex flex-col justify-center items-center bg-pink-50 py-20 md:py-30 px-4 bg-linear-to-b from-purple-200 to-pink-100">
         <p className="mt-10 text-3xl font-black">서비스 설명글</p>
         <p className="mt-6 text-4xl font-bold">서비스 이름</p>
-        <button className="mt-10 px-10 py-3 bg-purple-600 rounded-full text-white text-lg font-extrabold">지금 신청하기</button>
+        <Link className="mt-10" href="/contact"><button className="px-10 py-3 bg-purple-600 rounded-full text-white text-lg font-extrabold">지금 신청하기</button></Link>
         <Image className="my-10" width={600} height={500} src={"https://picsum.photos/1200/1000"} alt={"logo"} />
       </div>
 
@@ -52,14 +53,14 @@ export default function Home() {
       </div>
 
       <div className="flex flex-col mt-8 py-10 pl-14 text-start bg-slate-50">
-        <p className="font-bold leading-7">서비스명</p>
-        <p className="leading-7">위치</p>
-        <p className="leading-7">사업자등록번호</p>
-        <p className="leading-7">통신판매업 신고번호</p>
-        <p className="leading-7">제휴문의</p>
+        <p className="font-extrabold leading-7">서비스명</p>
+        <p className="leading-7">팀 HAH, 강원특별자치도 춘천시 한림대학길 1</p>
+        <p className="leading-7">000-00-000000</p>
+        <p className="leading-7">통신판매업 신고번호 2025-강원춘천-0000호</p>
+        <p className="leading-7">제휴문의 010-0000-0000</p>
 
       </div>
 
-    </div>
+    </div >
   );
 }
