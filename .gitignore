@@ -27,7 +27,8 @@ Kiosk/.env
 
 
 # Python 관련 파일
-AI/venv/
-AI/__pycache__/
-AI/.venv/
-AI/.venv/
+Core/venv/
+Core/__pycache__/
+Core/util/__pycache__/
+Core/.venv/
+Core/.env
