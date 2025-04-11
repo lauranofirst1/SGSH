@@ -1,11 +1,12 @@
 import 'package:app/models/business.dart';
-import 'package:app/pages/likepage.dart';
+import 'package:app/pages/adpage.dart';
 import 'package:app/pages/mappage.dart';
 import 'package:app/pages/mypage.dart';
 import 'package:app/pages/searchpage.dart';
 import 'package:app/widgets/storedetailbottomsheet.dart';
 import 'package:flutter/material.dart';
 import 'package:app/pages/mainpage.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -40,7 +41,7 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  int _selectedIndex = 2;
+  int _selectedIndex = 0;
   bool _isBottomNavVisible = true;
 
   final List<Widget> _pages = [];
@@ -52,7 +53,7 @@ class _MyAppState extends State<MyApp> {
       Mainpage(),
       SearchPage(),
       MapPage(onMarkerTap: _handleMarkerTap), // 💡 여기 중요!
-      LikesPage(),
+      AdPage(),
       MyPage(),
     ]);
   }
@@ -85,7 +86,14 @@ final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   Widget build(BuildContext context) {
+     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+      statusBarColor: Colors.white, // 상태바 배경색
+      statusBarIconBrightness: Brightness.dark, // 아이콘 색상 (검정)
+      statusBarBrightness: Brightness.light, // iOS용
+    ));
+
     return MaterialApp(
+      
       theme: ThemeData(scaffoldBackgroundColor: Color(0xFFF2F2F7)),
       debugShowCheckedModeBanner: false,
       home: Scaffold(
