@@ -1,4 +1,3 @@
-
 class business_data {
   final int id;
   final String name;
@@ -8,6 +7,8 @@ class business_data {
   final String description;
   final String image;
   final String url;
+  final String lat;
+  final String lng;
 
   business_data({
     required this.id,
@@ -18,6 +19,8 @@ class business_data {
     required this.description,
     required this.image,
     required this.url,
+    required this.lat,
+    required this.lng,
   });
 
   // 🔥 Supabase에서 가져온 `Map<String, dynamic>` 데이터를 `business_data` 객체로 변환
@@ -31,6 +34,8 @@ class business_data {
       description: data["description"] ?? "설명 없음",
       image: data["image"] ?? "이미지 없음",
       url: data["url"] ?? "https://via.placeholder.com/300", // 기본 이미지
+      lat: data["lat"] ?? 0.0,
+      lng: data["lng"] ?? 0.0,
     );
   }
 }
