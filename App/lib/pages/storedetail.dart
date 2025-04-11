@@ -1,12 +1,18 @@
+import 'dart:ffi';
+
 import 'package:app/data/dummy_menudetail.dart';
 import 'package:app/pages/imageviewpage.dart';
+import 'package:app/widgets/menudetail_modal.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:app/models/business.dart';
 import 'package:app/models/menu.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:app/services/slivertabbardelegate.dart';
+import 'package:share_plus/share_plus.dart'; // 앱 공유
 
 class StoreDetailPage extends StatefulWidget {
   final business_data store;
@@ -23,6 +29,76 @@ class _StoreDetailPageState extends State<StoreDetailPage>
   late Future<SharedPreferences> prefsFuture;
   final supabase = Supabase.instance.client;
   late TabController _tabController;
+  bool isBookmarked = false;
+
+  void toggleBookmark() {
+    setState(() {
+      isBookmarked = !isBookmarked;
+    });
+
+    print(
+      isBookmarked
+          ? "🔖 북마크 추가됨: ${widget.store.name}"
+          : "❌ 북마크 해제됨: ${widget.store.name}",
+    );
+  }
+
+  void shareStore() {
+    showModalBottomSheet(
+      context: context,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      backgroundColor: Colors.white,
+      builder: (context) {
+        return Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                '공유하기',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              SizedBox(height: 16),
+              ListTile(
+                leading: Icon(Icons.link),
+                title: Text('링크 복사'),
+                onTap: () {
+                  final link = widget.store.url;
+                  Clipboard.setData(ClipboardData(text: link));
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(
+                    context,
+                  ).showSnackBar(SnackBar(content: Text('링크가 복사되었습니다')));
+                },
+              ),
+              ListTile(
+                leading: Icon(Icons.open_in_browser),
+                title: Text('링크 열기'),
+                onTap: () async {
+                  final url = Uri.parse(widget.store.url);
+                  if (await canLaunchUrl(url)) {
+                    await launchUrl(url, mode: LaunchMode.externalApplication);
+                  }
+                  Navigator.pop(context);
+                },
+              ),
+              ListTile(
+                leading: Icon(Icons.share),
+                title: Text('기타 앱으로 공유'),
+                onTap: () {
+                  final text = '${widget.store.name}\n${widget.store.url}';
+                  Share.share(text); // share_plus 필요
+                  Navigator.pop(context);
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
 
   @override
   void initState() {
@@ -32,6 +108,14 @@ class _StoreDetailPageState extends State<StoreDetailPage>
     saveToRecentStores(widget.store.name);
 
     _tabController = TabController(length: 5, vsync: this);
+
+    SystemChrome.setSystemUIOverlayStyle(
+      SystemUiOverlayStyle(
+        statusBarColor: Colors.white,
+        statusBarIconBrightness: Brightness.dark,
+        statusBarBrightness: Brightness.light,
+      ),
+    );
   }
 
   void saveToRecentStores(String storeName) async {
@@ -64,64 +148,264 @@ class _StoreDetailPageState extends State<StoreDetailPage>
     }
   }
 
+  Widget _circleIconButton({
+    required IconData icon,
+    required VoidCallback onTap,
+  }) {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 4),
+      child: GestureDetector(
+        onTap: onTap,
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            shape: BoxShape.circle,
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black12,
+                blurRadius: 4,
+                offset: Offset(0, 2),
+              ),
+            ],
+          ),
+          padding: EdgeInsets.all(8),
+          child: Icon(icon, size: 20, color: Colors.black87),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
-      length: 5,
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
+        statusBarIconBrightness: Brightness.dark,
+        statusBarBrightness: Brightness.light,
+      ),
       child: Scaffold(
+        extendBodyBehindAppBar: true,
         backgroundColor: Colors.white,
         appBar: AppBar(
-          title: Text(
-            widget.store.name,
-            style: TextStyle(
-              fontWeight: FontWeight.w600,
-              fontSize: 18,
-              color: Colors.black,
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          leading: Padding(
+            padding: EdgeInsets.only(left: 16),
+            child: _circleIconButton(
+              icon: Icons.arrow_back_ios_new,
+              onTap: () => Navigator.pop(context),
             ),
           ),
-          backgroundColor: Colors.white,
-          elevation: 0.5, // 약간의 그림자
-          iconTheme: IconThemeData(color: Colors.black),
+          actions: [
+            _circleIconButton(
+              icon: Icons.home,
+              onTap: () {
+                Navigator.popUntil(context, (route) => route.isFirst); // 홈으로
+              },
+            ),
+            _circleIconButton(
+              icon: isBookmarked ? Icons.bookmark : Icons.bookmark_border,
+              onTap: toggleBookmark,
+            ),
+            _circleIconButton(icon: Icons.share, onTap: shareStore),
+            SizedBox(width: 12),
+          ],
+        ),
+        body: Column(
+          children: [
+            Container(
+              height: MediaQuery.of(context).padding.top,
+              color: Colors.white,
+            ),
+
+            Expanded(
+              child: NestedScrollView(
+                headerSliverBuilder: (context, innerBoxIsScrolled) {
+                  return [
+                    SliverToBoxAdapter(child: buildStoreHeader()),
+
+                    // ✅ 회색 여백 추가
+                    SliverToBoxAdapter(
+                      child: Container(height: 8, color: Colors.grey[200]),
+                    ),
+
+                    SliverPersistentHeader(
+                      delegate: SliverTabBarDelegate(
+                        TabBar(
+                          controller: _tabController,
+                          labelColor: Colors.black,
+                          unselectedLabelColor: Colors.black54,
+                          indicatorColor: Colors.black,
+                          indicatorWeight: 2,
+                          tabs: [
+                            Tab(text: '홈'),
+                            Tab(text: '소식'),
+                            Tab(text: '메뉴'),
+                            Tab(text: '사진'),
+                            Tab(text: '리뷰'),
+                          ],
+                        ),
+                      ),
+                      pinned: true,
+                    ),
+                  ];
+                },
+                body: TabBarView(
+                  controller: _tabController,
+                  children: [
+                    buildHomeTab(),
+                    buildInfoTab(),
+                    buildMenuTab(menuList),
+                    buildPhotoTab(),
+                    buildReviewTab(),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+
+    // 나머지 위젯 함수들은 생략. buildStoreHeader, buildHomeTab, buildInfoTab 등등
+  }
+
+  Widget buildStoreHeader() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        GestureDetector(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder:
+                    (_) => ImageViewPage(
+                      imageUrl: widget.store.image,
+                      // ✅ 고유한 tag 넘기기
+                    ),
+              ),
+            );
+          },
+
+          child: AspectRatio(
+            aspectRatio: 16 / 9,
+            child: ClipRRect(
+              child: Image.network(
+                widget.store.image,
+                fit: BoxFit.cover,
+                width: double.infinity,
+                errorBuilder:
+                    (_, __, ___) => Container(
+                      color: Colors.grey[300],
+                      child: Icon(
+                        Icons.image_not_supported,
+                        size: 50,
+                        color: Colors.grey[600],
+                      ),
+                    ),
+              ),
+            ),
+          ),
         ),
 
-        body: NestedScrollView(
-          headerSliverBuilder: (context, innerBoxIsScrolled) {
-            return [
-              SliverToBoxAdapter(child: buildStoreHeader()), // 상단 가게 정보 전체
-              SliverPersistentHeader(
-                delegate: _SliverTabBarDelegate(
-                  TabBar(
-                    controller: _tabController,
-                    labelColor: Colors.black,
-                    unselectedLabelColor: Colors.black54,
-
-                    indicatorColor: Colors.black,
-                    indicatorWeight: 2,
-
-                    tabs: [
-                      Tab(text: '홈'),
-                      Tab(text: '소식'),
-                      Tab(text: '메뉴'),
-                      Tab(text: '사진'),
-                      Tab(text: '리뷰'),
-                    ],
-                  ),
-                ),
-                pinned: true, // 탭바 고정
-              ),
-            ];
-          },
-          body: TabBarView(
-            controller: _tabController,
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              buildHomeTab(),
-              buildInfoTab(),
-              buildMenuTab(menuList),
-              buildPhotoTab(),
-              buildReviewTab(),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    '춘천 | 파스타',
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontFamily: 'pretendard',
+                      fontWeight: FontWeight.w100,
+                    ),
+                  ),
+                  linkbutton(),
+                ],
+              ),
+              Text(
+                widget.store.name,
+                style: TextStyle(
+                  fontFamily: 'Pretendard',
+                  fontSize: 25,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              SizedBox(height: 2),
+
+              Row(
+                children: [
+                  Icon(
+                    Icons.star,
+                    color: Color.fromARGB(255, 238, 200, 49),
+                    size: 22,
+                  ),
+                  SizedBox(width: 2),
+                  Text(
+                    "4.7",
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontFamily: 'pretendard',
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: 10),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.start, // 텍스트 줄바꿈 시 위쪽 정렬
+                children: [
+                  Text(
+                    widget.store.description,
+                    style: TextStyle(
+                      fontFamily: 'Pretendard',
+                      fontSize: 15,
+                      fontWeight: FontWeight.w300,
+                    ),
+                  ),
+                ],
+              ),
+
+              Divider(
+                height: 20,
+                thickness: 1,
+                color: const Color.fromARGB(255, 234, 234, 234),
+              ),
+              _buildInfoRow(Icons.location_on, widget.store.address),
+              _buildInfoRow(Icons.phone, widget.store.number),
+              _buildInfoRow(Icons.access_time, widget.store.time),
+
+              SizedBox(height: 8),
             ],
           ),
         ),
+      ],
+    );
+  }
+
+  InkWell linkbutton() {
+    return InkWell(
+      onTap: () async {
+        final rawUrl = widget.store.url;
+        final validUrl = rawUrl.startsWith('http') ? rawUrl : 'https://$rawUrl';
+        final Uri uri = Uri.parse(validUrl);
+
+        if (await canLaunchUrl(uri)) {
+          await launchUrl(uri, mode: LaunchMode.externalApplication);
+        } else {
+          print("❌ URL을 열 수 없습니다: $validUrl");
+        }
+      },
+      child: Icon(
+        Icons.public, // 또는 Icons.link
+        color: const Color.fromARGB(255, 90, 90, 90),
+        size: 24,
       ),
     );
   }
@@ -232,98 +516,35 @@ class _StoreDetailPageState extends State<StoreDetailPage>
     );
   }
 
-  Widget buildStoreHeader() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+  Widget _buildInfoRow(IconData icon, String value) {
+  return Padding(
+    padding: EdgeInsets.symmetric(vertical: 6.0),
+    child: Row(
+      crossAxisAlignment: CrossAxisAlignment.center, // 👈 중앙 정렬
       children: [
-        GestureDetector(
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder:
-                    (_) => ImageViewPage(
-                      imageUrl: widget.store.image,
-                      // ✅ 고유한 tag 넘기기
-                    ),
-              ),
-            );
-          },
-
-          child: AspectRatio(
-            aspectRatio: 16 / 9,
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(12),
-              child: Image.network(
-                widget.store.image,
-                fit: BoxFit.cover,
-                width: double.infinity,
-                errorBuilder:
-                    (_, __, ___) => Container(
-                      color: Colors.grey[300],
-                      child: Icon(
-                        Icons.image_not_supported,
-                        size: 50,
-                        color: Colors.grey[600],
-                      ),
-                    ),
-              ),
+        SizedBox(
+          height: 20,
+          child: Align(
+            alignment: Alignment.centerLeft,
+            child: Icon(icon, size: 16, color: Colors.black54),
+          ),
+        ),
+        SizedBox(width: 12),
+        Expanded(
+          child: Text(
+            value,
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w400,
+              color: Colors.black87,
             ),
           ),
         ),
-
-        Padding(
-          padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.start, // 텍스트 줄바꿈 시 위쪽 정렬
-                children: [
-                  Text(
-                    widget.store.description,
-                    style: TextStyle(fontSize: 16, height: 1.5),
-                  ),
-                  linkbutton(),
-                ],
-              ),
-
-              Divider(height: 20, thickness: 1),
-              _buildInfoRow('주소:', widget.store.address),
-              _buildInfoRow('전화:', widget.store.number),
-              _buildInfoRow('영업시간:', widget.store.time),
-              _buildInfoRow('위도:', widget.store.lat),
-              _buildInfoRow('경도:', widget.store.lng),
-
-              SizedBox(height: 8),
-            ],
-          ),
-        ),
       ],
-    );
-  }
+    ),
+  );
+}
 
-  InkWell linkbutton() {
-    return InkWell(
-      onTap: () async {
-        final rawUrl = widget.store.url;
-        final validUrl = rawUrl.startsWith('http') ? rawUrl : 'https://$rawUrl';
-        final Uri uri = Uri.parse(validUrl);
-
-        if (await canLaunchUrl(uri)) {
-          await launchUrl(uri, mode: LaunchMode.externalApplication);
-        } else {
-          print("❌ URL을 열 수 없습니다: $validUrl");
-        }
-      },
-      child: Icon(
-        Icons.public, // 또는 Icons.link
-        color: const Color.fromARGB(255, 90, 90, 90),
-        size: 24,
-      ),
-    );
-  }
 
   Widget buildHomeTab() {
     return SingleChildScrollView(
@@ -494,39 +715,6 @@ class _StoreDetailPageState extends State<StoreDetailPage>
     );
   }
 
-  Widget _buildInfoRow(String label, String value) {
-    return Padding(
-      padding: EdgeInsets.symmetric(vertical: 6.0),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(
-            width: 100, // label 너비 고정 → 정렬 예쁘게
-            child: Text(
-              label,
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-                color: Colors.black87,
-              ),
-            ),
-          ),
-          Expanded(
-            child: Text(
-              value,
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w400,
-                color: Colors.black87,
-                height: 1.4, // 줄 간격 넉넉하게
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
   Widget buildMenuTab(List<menu_data> menus) {
     return GridView.count(
       padding: EdgeInsets.all(20),
@@ -604,115 +792,33 @@ class _StoreDetailPageState extends State<StoreDetailPage>
       ),
     );
   }
-
-  void _showImagePopup(String imageUrl) {
-    showDialog(
-      context: context,
-      builder:
-          (context) => Dialog(
-            backgroundColor: Colors.transparent,
-            child: Stack(
-              children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(12),
-                  child: Image.network(imageUrl, fit: BoxFit.contain),
-                ),
-                Positioned(
-                  top: 10,
-                  right: 10,
-                  child: IconButton(
-                    icon: Icon(Icons.close, color: Colors.white, size: 30),
-                    onPressed: () => Navigator.pop(context),
-                  ),
-                ),
-              ],
-            ),
-          ),
-    );
-  }
 }
 
-class _SliverTabBarDelegate extends SliverPersistentHeaderDelegate {
-  final TabBar tabBar;
-  _SliverTabBarDelegate(this.tabBar);
 
-  @override
-  Widget build(
-    BuildContext context,
-    double shrinkOffset,
-    bool overlapsContent,
-  ) {
-    return Container(color: Colors.white, child: tabBar);
-  }
 
-  @override
-  double get maxExtent => tabBar.preferredSize.height;
 
-  @override
-  double get minExtent => tabBar.preferredSize.height;
+ // void _showImagePopup(String imageUrl) {
+  //   showDialog(
+  //     context: context,
+  //     builder:
+  //         (context) => Dialog(
+  //           backgroundColor: Colors.transparent,
+  //           child: Stack(
+  //             children: [
+  //               ClipRRect(
+  //                 borderRadius: BorderRadius.circular(12),
+  //                 child: Image.network(imageUrl, fit: BoxFit.contain),
+  //               ),
+  //               Positioned(
+  //                 top: 10,
+  //                 right: 10,
+  //                 child: IconButton(
+  //                   icon: Icon(Icons.close, color: Colors.white, size: 30),
+  //                   onPressed: () => Navigator.pop(context),
+  //                 ),
+  //               ),
+  //             ],
+  //           ),
+  //         ),
+  //   );}
 
-  @override
-  bool shouldRebuild(covariant SliverPersistentHeaderDelegate oldDelegate) {
-    return false;
-  }
-}
-
-class MenuDetailModal extends StatelessWidget {
-  final menu_data menu;
-
-  const MenuDetailModal({required this.menu});
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Container(
-        margin: EdgeInsets.symmetric(horizontal: 20, vertical: 60),
-        padding: EdgeInsets.all(20),
-        // decoration: BoxDecoration(
-        //   color: Colors.white,
-        //   borderRadius: BorderRadius.circular(20),
-        // ),
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min, // 내용만큼만 높이
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              ClipRRect(
-                borderRadius: BorderRadius.circular(16),
-                child: Image.network(
-                  menu.image,
-                  width: double.infinity,
-                  height: 180,
-                  fit: BoxFit.cover,
-                ),
-              ),
-              SizedBox(height: 16),
-              Text(
-                menu.name,
-                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-              ),
-              SizedBox(height: 8),
-              Text(
-                '${menu.price}원',
-                style: TextStyle(fontSize: 18, color: Colors.black54),
-              ),
-              SizedBox(height: 16),
-              Text(
-                menu.description,
-                style: TextStyle(fontSize: 16, height: 1.5),
-              ),
-              SizedBox(height: 20),
-              Align(
-                alignment: Alignment.centerRight,
-                child: TextButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  child: Text('닫기', style: TextStyle(fontSize: 14)),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}

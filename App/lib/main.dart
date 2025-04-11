@@ -6,6 +6,7 @@ import 'package:app/pages/searchpage.dart';
 import 'package:app/widgets/storedetailbottomsheet.dart';
 import 'package:flutter/material.dart';
 import 'package:app/pages/mainpage.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -85,7 +86,14 @@ final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   Widget build(BuildContext context) {
+     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+      statusBarColor: Colors.white, // 상태바 배경색
+      statusBarIconBrightness: Brightness.dark, // 아이콘 색상 (검정)
+      statusBarBrightness: Brightness.light, // iOS용
+    ));
+
     return MaterialApp(
+      
       theme: ThemeData(scaffoldBackgroundColor: Color(0xFFF2F2F7)),
       debugShowCheckedModeBanner: false,
       home: Scaffold(
