@@ -21,6 +21,9 @@ dependencies:
   json_serializable: ^6.9.4
   google_maps_flutter: ^2.11.0
   url_launcher: ^6.3.1
+  geolocator: ^13.0.4
+  intl: ^0.20.2
+  share_plus: ^10.1.4
 
 dev_dependencies:
   flutter_test:
@@ -32,8 +35,29 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
-
+  fonts:
+    - family: Pretendard
+      fonts:
+        - asset: assets/fonts/Pretendard-Thin.ttf
+          weight: 100
+        - asset: assets/fonts/Pretendard-ExtraLight.ttf
+          weight: 200
+        - asset: assets/fonts/Pretendard-Light.ttf
+          weight: 300
+        - asset: assets/fonts/Pretendard-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/Pretendard-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/Pretendard-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/Pretendard-Bold.ttf
+          weight: 700
+        - asset: assets/fonts/Pretendard-ExtraBold.ttf
+          weight: 800
+        - asset: assets/fonts/Pretendard-Black.ttf
+          weight: 900
   assets:
     - .env
-    - assets/images/sushi.png
-    - assets/images/japanese_food.png
+    - assets/images/dummy_image/
+    - assets/images/adimage/
+

@@ -1,3 +1,4 @@
+import 'package:app/pages/likepage.dart';
 import 'package:flutter/material.dart';
 import 'package:app/models/user.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -68,6 +69,25 @@ class _MyPageState extends State<MyPage> {
               ],
             ),
             SizedBox(height: 20),
+            Center(
+              child: ElevatedButton.icon(
+                onPressed: (){
+                 Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => LikesPage(),
+                        ),
+                      );},
+                label: Text(
+                  "즐겨찾기",
+                  style: TextStyle(fontSize: 16, color: Colors.white),
+                ),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color.fromARGB(255, 145, 145, 145),
+                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                ),
+              ),
+            ),
             Center(
               child: ElevatedButton.icon(
                 onPressed: clearRecentStores,

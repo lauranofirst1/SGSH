@@ -19,7 +19,7 @@ class _StoreListPageState extends State<StoreListPage> {
   @override
   void initState() {
     super.initState();
-    fetchStores();  
+    fetchStores();
   }
 
   void fetchStores() async {
@@ -55,26 +55,24 @@ class _StoreListPageState extends State<StoreListPage> {
           storeList.isEmpty
               ? Center(child: CircularProgressIndicator()) // 🔥 로딩 표시
               : ListView.builder(
-  padding: const EdgeInsets.all(12.0),
-  itemCount: storeList.length,
-  itemBuilder: (context, index) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 12.0),
-      child: StoreCard(
-        store: storeList[index],
-        onTap: () async {
-          print("가게 클릭됨: ${storeList[index].name}"); // ✅ 클릭 로그
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => StoreDetailPage(store: storeList[index]),
-            ),
-          );
-        },
-      ),
-    );
-  },
-),
+                itemCount: storeList.length,
+                itemBuilder: (context, index) {
+                  return StoreCard(
+                    store: storeList[index],
+                    onTap: () async {
+                      print("가게 클릭됨: ${storeList[index].name}"); // ✅ 클릭 로그
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder:
+                              (context) =>
+                                  StoreDetailPage(store: storeList[index]),
+                        ),
+                      );
+                    },
+                  );
+                },
+              ),
     );
   }
 }
