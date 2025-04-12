@@ -1,6 +1,7 @@
 'use client'
 
 import Manage from "../page";
+import ManageNavBar from "@/components/feature/manage_navbar";
 import React, { useEffect, useState } from 'react';
 import { supabaseClient } from '@/lib/supabase';
 
@@ -72,78 +73,81 @@ export default function ManageOrder() {
 
     return (
         <Manage>
-            <div className="w-full p-4 md:ml-64">
-                <div className="p-4 border-2 border-gray-200 border-dashed rounded-lg dark:border-gray-700">
-                    <h2 className="mb-5 font-bold text-xl text-3xl mb-2 text-black">주문 관리</h2>
-                    {isLoading ?
-                        <div className="flex flex-row mx-auto my-20 md:-my-20 h-screen justify-center md:items-center">
-                            <div className="w-40 h-40 rounded-full animate-spin 
+            <div className="w-full md:ml-64">
+                <ManageNavBar />
+                <div className="p-4">
+                    <div className="p-4 border-2 border-gray-200 border-dashed rounded-lg dark:border-gray-700">
+                        <h2 className="mb-5 font-bold text-xl text-3xl mb-2 text-black">주문 관리</h2>
+                        {isLoading ?
+                            <div className="flex flex-row mx-auto my-20 md:-my-20 h-screen justify-center md:items-center">
+                                <div className="w-40 h-40 rounded-full animate-spin 
                         border-2 border-solid border-blue-500 border-t-transparent"></div>
-                        </div>
-                        :
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mt-4">
-                            {orders.length == 0 &&
-                                <div>
-                                    <p>현재 주문 데이터가 없습니다</p>
-                                </div>}
-                            {orders.map((order) => {
-                                var tmpName = order.name.split(",");
-                                var tmpPrice = order.price.split(",");
-                                var tmpCount = order.count.split(",");
-                                var totalAmount = 0;
-                                for (let i = 0; i < tmpPrice.length - 1; i++) {
-                                    totalAmount += parseInt(tmpPrice[i]) * parseInt(tmpCount[i]);
-                                }
-                                return (
-                                    <div key={order.id} className={`flex flex-col justify-between p-2 rounded-xl border-2 ${order.status == "order" ? "border-red-300" : "border-gray-300"}`}>
-                                        <div>
-                                            <div className="flex justify-between mb-4">
-                                                <p className="font-bold">{order.table_no}번 테이블</p>
-                                                <p>{order.time.substring(5)}</p>
+                            </div>
+                            :
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mt-4">
+                                {orders.length == 0 &&
+                                    <div>
+                                        <p>현재 주문 데이터가 없습니다</p>
+                                    </div>}
+                                {orders.map((order) => {
+                                    var tmpName = order.name.split(",");
+                                    var tmpPrice = order.price.split(",");
+                                    var tmpCount = order.count.split(",");
+                                    var totalAmount = 0;
+                                    for (let i = 0; i < tmpPrice.length - 1; i++) {
+                                        totalAmount += parseInt(tmpPrice[i]) * parseInt(tmpCount[i]);
+                                    }
+                                    return (
+                                        <div key={order.id} className={`flex flex-col justify-between p-2 rounded-xl border-2 ${order.status == "order" ? "border-red-300" : "border-gray-300"}`}>
+                                            <div>
+                                                <div className="flex justify-between mb-4">
+                                                    <p className="font-bold">{order.table_no}번 테이블</p>
+                                                    <p>{order.time.substring(5)}</p>
+                                                </div>
+                                                {tmpName.map((menuName, index) => menuName.length != 0 &&
+                                                    <div key={index} className="flex justify-between">
+                                                        <p>{menuName}</p>
+                                                        <p className="font-bold">{tmpCount[index]}개</p>
+                                                    </div>)}
                                             </div>
-                                            {tmpName.map((menuName, index) => menuName.length != 0 &&
-                                                <div key={index} className="flex justify-between">
-                                                    <p>{menuName}</p>
-                                                    <p className="font-bold">{tmpCount[index]}개</p>
-                                                </div>)}
+
+                                            <div className="mt-4 mb-2">
+                                                <div className="flex justify-between mb-2 mx-2">
+                                                    {order.status == "order" && <p className="text-blue-500 font-bold">주문 대기</p>}
+                                                    {order.status == "check" && <p className="text-green-500 font-bold">주문 확인</p>}
+                                                    {order.status == "cancel" && <p className="text-red-500 font-bold">주문 취소</p>}
+                                                    <p className="font-bold">{totalAmount.toLocaleString()}원</p>
+                                                </div>
+                                                <div className="flex items-center">
+                                                    {
+                                                        order.status == "order" &&
+                                                        <div className="flex w-full">
+                                                            <button onClick={() => checkOrder(order.id)} className="flex-1 px-4 py-2 bg-green-100 font-bold rounded-l-lg">확인</button>
+                                                            <button onClick={() => cancelOrder(order.id)} className="flex-1 px-4 py-2 bg-red-100 font-bold rounded-r-lg">취소</button>
+                                                        </div>
+                                                    }
+                                                    {
+                                                        order.status == "check" &&
+                                                        <div className="flex w-full">
+                                                            <button className="flex-1 px-4 py-2 bg-green-100 font-bold rounded-lg" disabled>확인</button>
+                                                        </div>
+                                                    }
+                                                    {
+                                                        order.status == "cancel" &&
+                                                        <div className="flex w-full">
+                                                            <button className="flex-1 px-4 py-2 bg-red-100 font-bold rounded-lg" disabled>취소</button>
+                                                        </div>
+                                                    }
+                                                </div>
+
+                                            </div>
                                         </div>
+                                    )
+                                })}
 
-                                        <div className="mt-4 mb-2">
-                                            <div className="flex justify-between mb-2 mx-2">
-                                                {order.status == "order" && <p className="text-blue-500 font-bold">주문 대기</p>}
-                                                {order.status == "check" && <p className="text-green-500 font-bold">주문 확인</p>}
-                                                {order.status == "cancel" && <p className="text-red-500 font-bold">주문 취소</p>}
-                                                <p className="font-bold">{totalAmount.toLocaleString()}원</p>
-                                            </div>
-                                            <div className="flex items-center">
-                                                {
-                                                    order.status == "order" &&
-                                                    <div className="flex w-full">
-                                                        <button onClick={() => checkOrder(order.id)} className="flex-1 px-4 py-2 bg-green-100 font-bold rounded-l-lg">확인</button>
-                                                        <button onClick={() => cancelOrder(order.id)} className="flex-1 px-4 py-2 bg-red-100 font-bold rounded-r-lg">취소</button>
-                                                    </div>
-                                                }
-                                                {
-                                                    order.status == "check" &&
-                                                    <div className="flex w-full">
-                                                        <button className="flex-1 px-4 py-2 bg-green-100 font-bold rounded-lg" disabled>확인</button>
-                                                    </div>
-                                                }
-                                                {
-                                                    order.status == "cancel" &&
-                                                    <div className="flex w-full">
-                                                        <button className="flex-1 px-4 py-2 bg-red-100 font-bold rounded-lg" disabled>취소</button>
-                                                    </div>
-                                                }
-                                            </div>
-
-                                        </div>
-                                    </div>
-                                )
-                            })}
-
-                        </div>
-                    }
+                            </div>
+                        }
+                    </div>
                 </div>
             </div>
         </Manage>
