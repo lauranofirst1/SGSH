@@ -6,6 +6,7 @@ import 'package:app/pages/storelist.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:carousel_slider/carousel_slider.dart';
 
 class Mainpage extends StatefulWidget {
   @override
@@ -199,28 +200,27 @@ class _MainpageState extends State<Mainpage> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          
-   // ✅ 고유한 태그로 설정
- ClipRRect(
-    borderRadius: BorderRadius.vertical(
-      top: Radius.circular(16),
-    ),
-    child: Image.network(
-      store.image,
-      height: 90,
-      width: double.infinity,
-      fit: BoxFit.cover,
-      errorBuilder: (_, __, ___) => Container(
-        height: 90,
-        color: Colors.grey[300],
-        child: Icon(
-          Icons.store,
-          color: Colors.grey[600],
-        ),
-      ),
-    ),
-  ),
-
+                          // ✅ 고유한 태그로 설정
+                          ClipRRect(
+                            borderRadius: BorderRadius.vertical(
+                              top: Radius.circular(16),
+                            ),
+                            child: Image.network(
+                              store.image,
+                              height: 90,
+                              width: double.infinity,
+                              fit: BoxFit.cover,
+                              errorBuilder:
+                                  (_, __, ___) => Container(
+                                    height: 90,
+                                    color: Colors.grey[300],
+                                    child: Icon(
+                                      Icons.store,
+                                      color: Colors.grey[600],
+                                    ),
+                                  ),
+                            ),
+                          ),
 
                           Padding(
                             padding: EdgeInsets.symmetric(
@@ -277,6 +277,7 @@ class _MainpageState extends State<Mainpage> {
 }
 
 //===============Article===============
+
 class Article extends StatelessWidget {
   const Article({super.key, required this.article});
 
@@ -284,38 +285,61 @@ class Article extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 200,
-      width: double.infinity,
-      margin: const EdgeInsets.all(12.0),
-      decoration: BoxDecoration(
-        color: const Color.fromARGB(255, 160, 160, 160),
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: PageView(
-        children:
-            article
-                .map(
-                  (article) => InkWell(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => Articlepage(article: article),
-                        ),
-                      );
-                    },
-                    child: Center(
-                      child: Text(
-                        article.title, // 제목을 표시
-                        style: TextStyle(color: Colors.white, fontSize: 16),
-                        textAlign: TextAlign.center,
+    if (article.isEmpty) {
+      return Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: Center(
+          child: Text(
+            "게시물이 없습니다.",
+            style: TextStyle(color: Colors.grey, fontSize: 16),
+          ),
+        ),
+      );
+    }
+
+    return CarouselSlider(
+        options: CarouselOptions(
+          height: 200,
+          autoPlay: true,
+          enlargeCenterPage: true,
+          viewportFraction: 0.85,
+        ),
+        items: article.map((article) {
+          return Builder(
+            builder: (BuildContext context) {
+              return InkWell(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => Articlepage(article: article),
+                    ),
+                  );
+                },
+                child: Container(
+                  width: MediaQuery.of(context).size.width,
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: const Color.fromARGB(255, 194, 194, 194),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Center(
+                    child: Text(
+                      article.title,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
                       ),
+                      textAlign: TextAlign.center,
                     ),
                   ),
-                )
-                .toList(),
-      ),
+                ),
+              );
+            },
+          );
+        }).toList(),
+      
     );
   }
 }

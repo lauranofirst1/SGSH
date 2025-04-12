@@ -23,19 +23,21 @@ class business_data {
     required this.lng,
   });
 
-  // 🔥 Supabase에서 가져온 `Map<String, dynamic>` 데이터를 `business_data` 객체로 변환
   factory business_data.fromMap(Map<String, dynamic> data) {
-    return business_data(
-      id: data["id"] ?? 0,
-      name: data["name"] ?? "이름 없음",
-      address: data["address"] ?? "주소 없음",
-      time: data["time"] ?? "운영 시간 없음",
-      number: data["number"] ?? "전화번호 없음",
-      description: data["description"] ?? "설명 없음",
-      image: data["image"] ?? "이미지 없음",
-      url: data["url"] ?? "https://via.placeholder.com/300", // 기본 이미지
-      lat: data["lat"] ?? 0.0,
-      lng: data["lng"] ?? 0.0,
-    );
-  }
+  String clean(String? value, String fallback) =>
+      (value != null && value.trim().isNotEmpty) ? value : fallback;
+
+  return business_data(
+    id: data["id"] ?? 0,
+    name: clean(data["name"], "이름 없음"),
+    address: clean(data["address"], "주소 없음"),
+    time: clean(data["time"], "운영 시간 없음"),
+    number: clean(data["number"], "전화번호 없음"),
+    description: clean(data["description"], "설명 없음"),
+    image: clean(data["image"], "이미지 없음"),
+    url: clean(data["url"], "https://via.placeholder.com/300"),
+    lat: (data["lat"] ?? 0.0).toString(),
+    lng: (data["lng"] ?? 0.0).toString(),
+  );
+}
 }

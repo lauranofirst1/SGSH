@@ -20,28 +20,26 @@ class enroll_data {
   });
 
   factory enroll_data.fromMap(Map<String, dynamic> data) {
-    return enroll_data(
-      id: data['id'] as int,
-      check: data['check'] as bool,
-      name: data['name'] as String,
-      phone: data['phone'] as String,
-      businessName: data['business_name'] as String,
-      address: data['address'] as String,
-      time: data['time'] as String,
-      image: data['image'] as String,
-    );
-  }
+    String safeString(dynamic val, [String fallback = '정보 없음']) {
+      return (val is String && val.trim().isNotEmpty) ? val : fallback;
+    }
 
-  Map<String, dynamic> toMap() {
-    return {
-      'id': id,
-      'check': check,
-      'name': name,
-      'phone': phone,
-      'business_name': businessName,
-      'address': address,
-      'time': time,
-      'image': image,
-    };
+    String safeImage(dynamic val) {
+      final url = val?.toString() ?? '';
+      return url.startsWith('http')
+          ? url
+          : "assets/images/noimage.png";
+    }
+
+    return enroll_data(
+      id: data['id'] is int ? data['id'] : 0,
+      check: data['check'] is bool ? data['check'] : false,
+      name: safeString(data['name'], '이름 없음'),
+      phone: safeString(data['phone'], '전화번호 없음'),
+      businessName: safeString(data['business_name'], '가게 이름 없음'),
+      address: safeString(data['address'], '주소 없음'),
+      time: safeString(data['time'], '운영 시간 없음'),
+      image: safeImage(data['image']),
+    );
   }
 }
