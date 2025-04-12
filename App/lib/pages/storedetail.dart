@@ -174,51 +174,51 @@ class _StoreDetailPageState extends State<StoreDetailPage>
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: SystemUiOverlayStyle(
-        statusBarColor: Colors.transparent,
-        statusBarIconBrightness: Brightness.dark,
-        statusBarBrightness: Brightness.light,
-      ),
-      child: Scaffold(
-        backgroundColor: Colors.white,
-        body: NestedScrollView(
-          controller: _scrollController,
-          headerSliverBuilder: (context, innerBoxIsScrolled) {
-            return [
-              SliverAppBar(
-                pinned: true,
-                expandedHeight: 200,
-                backgroundColor: Colors.white,
-                scrolledUnderElevation: 0,
-
-                elevation: 0,
-                leading: Padding(
-                  padding: EdgeInsets.only(left: 16),
-                  child: _circleIconButton(
-                    icon: Icons.arrow_back_ios_new,
-                    onTap: () => Navigator.pop(context),
+ @override
+Widget build(BuildContext context) {
+  return AnnotatedRegion<SystemUiOverlayStyle>(
+    value: SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent, // ✅ 배경 직접 덮을 거라서 transparent
+      statusBarIconBrightness: Brightness.dark, // ✅ 검정 아이콘
+      statusBarBrightness: Brightness.light, // ✅ iOS용
+    ),
+    child: Scaffold(
+      backgroundColor: Colors.white,
+      body: Stack(
+        children: [
+          NestedScrollView(
+            controller: _scrollController,
+            headerSliverBuilder: (context, innerBoxIsScrolled) {
+              return [
+                SliverAppBar(
+                  pinned: true,
+                  expandedHeight: 200,
+                  backgroundColor: Colors.white,
+                  scrolledUnderElevation: 0,
+                  elevation: 0,
+                  leading: Padding(
+                    padding: EdgeInsets.only(left: 16),
+                    child: _circleIconButton(
+                      icon: Icons.arrow_back_ios_new,
+                      onTap: () => Navigator.pop(context),
+                    ),
                   ),
-                ),
-                actions: [
-                  _circleIconButton(
-                    icon: Icons.home,
-                    onTap: () {
-                      Navigator.popUntil(context, (route) => route.isFirst);
-                    },
-                  ),
-                  _circleIconButton(
-                    icon: isBookmarked ? Icons.bookmark : Icons.bookmark_border,
-                    onTap: toggleBookmark,
-                  ),
-                  _circleIconButton(icon: Icons.share, onTap: shareStore),
-                  SizedBox(width: 12),
-                ],
-                title:
-                    showTitle
-                        ? Text(
+                  actions: [
+                    _circleIconButton(
+                      icon: Icons.home,
+                      onTap: () {
+                        Navigator.popUntil(context, (route) => route.isFirst);
+                      },
+                    ),
+                    _circleIconButton(
+                      icon: isBookmarked ? Icons.bookmark : Icons.bookmark_border,
+                      onTap: toggleBookmark,
+                    ),
+                    _circleIconButton(icon: Icons.share, onTap: shareStore),
+                    SizedBox(width: 12),
+                  ],
+                  title: showTitle
+                      ? Text(
                           widget.store.name,
                           style: TextStyle(
                             color: Colors.black,
@@ -226,64 +226,75 @@ class _StoreDetailPageState extends State<StoreDetailPage>
                             fontSize: 22,
                           ),
                         )
-                        : null,
-                flexibleSpace: FlexibleSpaceBar(
-                  collapseMode: CollapseMode.pin,
-                  background: GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder:
-                              (_) =>
-                                  ImageViewPage(imageUrl: widget.store.image),
-                        ),
-                      );
-                    },
-                    child: Image.network(
-                      widget.store.image,
-                      fit: BoxFit.cover,
-                      width: double.infinity,
-                      errorBuilder:
-                          (_, __, ___) => Container(
-                            color: Colors.grey[300],
-                            child: Icon(Icons.image_not_supported, size: 50),
+                      : null,
+                  flexibleSpace: FlexibleSpaceBar(
+                    collapseMode: CollapseMode.pin,
+                    background: GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => ImageViewPage(imageUrl: widget.store.image),
                           ),
+                        );
+                      },
+                      child: Image.network(
+                        widget.store.image,
+                        fit: BoxFit.cover,
+                        width: double.infinity,
+                        errorBuilder: (_, __, ___) => Container(
+                          color: Colors.grey[300],
+                          child: Icon(Icons.image_not_supported, size: 50),
+                        ),
+                      ),
                     ),
                   ),
                 ),
-              ),
-              SliverToBoxAdapter(child: buildStoreHeader()),
-              SliverToBoxAdapter(
-                child: Container(height: 8, color: Colors.grey[200]),
-              ),
-              SliverPersistentHeader(
-                delegate: SliverTabBarDelegate(
-                  TabBar(
-                    controller: _tabController,
-                    labelColor: Colors.black,
-                    unselectedLabelColor: Colors.black54,
-                    indicatorColor: Colors.black,
-                    indicatorWeight: 2,
-                    tabs: [Tab(text: '홈'), Tab(text: '메뉴')],
-                  ),
+                SliverToBoxAdapter(child: buildStoreHeader()),
+                SliverToBoxAdapter(
+                  child: Container(height: 8, color: Colors.grey[200]),
                 ),
-                pinned: true,
-              ),
-            ];
-          },
-          body: TabBarView(
-            controller: _tabController,
-            children: [buildHomeTab(), buildMenuTab(menuList)],
+                SliverPersistentHeader(
+                  delegate: SliverTabBarDelegate(
+                    TabBar(
+                      controller: _tabController,
+                      labelColor: Colors.black,
+                      unselectedLabelColor: Colors.black54,
+                      indicatorColor: Colors.black,
+                      indicatorWeight: 2,
+                      tabs: [Tab(text: '홈'), Tab(text: '메뉴')],
+                    ),
+                  ),
+                  pinned: true,
+                ),
+              ];
+            },
+            body: TabBarView(
+              controller: _tabController,
+              children: [buildHomeTab(), buildMenuTab(menuList)],
+            ),
           ),
-        ),
+
+          // ✅ 상태바 영역만 흰색으로 덮기
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            child: Container(
+              height: MediaQuery.of(context).padding.top, // 상태바 높이만큼
+              color: Colors.white, // 너가 원하는 흰색
+            ),
+          ),
+        ],
       ),
-    );
-  }
+    ),
+  );
+}
+
 
   Widget buildStoreHeader() {
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
+      padding: EdgeInsets.only(right: 16.0,left: 16.0, top: 16.0,bottom: 5),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -374,7 +385,7 @@ class _StoreDetailPageState extends State<StoreDetailPage>
 
   Widget _buildInfoRow(IconData icon, String value) {
     return Padding(
-      padding: EdgeInsets.symmetric(vertical: 6.0),
+      padding: EdgeInsets.symmetric(vertical: 3.0),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center, // 👈 중앙 정렬
         children: [
@@ -493,17 +504,30 @@ class _StoreDetailPageState extends State<StoreDetailPage>
   }
 
   Widget buildMenuTab(List<menu_data> menus) {
-    return ListView.separated(
-      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-      itemCount: menus.length,
-      shrinkWrap: true, // ✅ 자식들 크기만큼만 렌더링
-      physics: NeverScrollableScrollPhysics(), // ✅ NestedScrollView와의 스크롤 충돌 방지
-      separatorBuilder: (_, __) => SizedBox(height: 12),
-      itemBuilder: (context, index) {
-        return _buildMenuCard(menus[index]);
-      },
+  if (menus.isEmpty) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 40),
+        child: Text(
+          '메뉴가 등록되지 않았습니다.',
+          style: TextStyle(fontSize: 16, color: Colors.grey),
+        ),
+      ),
     );
   }
+
+  return ListView.separated(
+    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+    itemCount: menus.length,
+    shrinkWrap: true, // ✅ 자식들 크기만큼만 렌더링
+    physics: NeverScrollableScrollPhysics(), // ✅ NestedScrollView와의 스크롤 충돌 방지
+    separatorBuilder: (_, __) => SizedBox(height: 12),
+    itemBuilder: (context, index) {
+      return _buildMenuCard(menus[index]);
+    },
+  );
+}
+
 
   Widget _buildMenuCard(menu_data menu) {
     return GestureDetector(
