@@ -4,6 +4,8 @@ import Manage from "../page";
 import { supabaseClient } from '@/lib/supabase';
 import React, { useEffect, useState, useRef } from 'react';
 import Image from 'next/image';
+import ManageNavBar from "@/components/feature/manage_navbar";
+
 
 export default function ManageMenu() {
 
@@ -227,58 +229,62 @@ export default function ManageMenu() {
     }
     return (
         <Manage>
-            <div className="w-full p-4 md:ml-64">
-                <div className="p-4 border-2 border-gray-200 border-dashed rounded-lg dark:border-gray-700">
-                    <h2 className="mb-5 font-bold text-xl text-3xl mb-2 text-black">메뉴 관리</h2>
-                    <div className="flex md:justify-start justify-center">
-                        <button
-                            onClick={() => openModal()}
-                            type="button"
-                            className="text-center py-2.5 px-5 ml-2 mt-2 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700"
-                        >
-                            메뉴 추가
-                        </button>
-                    </div>
+            <div className="w-full md:ml-64 ">
+                <ManageNavBar />
+                <div className="p-4">
 
-                    {isLoading ?
-                        <div className="flex flex-row mx-auto my-20 md:-my-20 h-screen justify-center md:items-center">
-                            <div className="w-40 h-40 rounded-full animate-spin 
+                    <div className="p-4 border-2 border-gray-200 border-dashed rounded-lg dark:border-gray-700">
+                        <h2 className="mb-5 font-bold text-xl text-3xl mb-2 text-black">메뉴 관리</h2>
+                        <div className="flex md:justify-start justify-center">
+                            <button
+                                onClick={() => openModal()}
+                                type="button"
+                                className="text-center py-2.5 px-5 ml-2 mt-2 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700"
+                            >
+                                메뉴 추가
+                            </button>
+                        </div>
+
+                        {isLoading ?
+                            <div className="flex flex-row mx-auto my-20 md:-my-20 h-screen justify-center md:items-center">
+                                <div className="w-40 h-40 rounded-full animate-spin 
                         border-2 border-solid border-blue-500 border-t-transparent"></div>
-                        </div>
-                        :
-                        <div>
-                            {menus != null && menus.length > 0 ?
-                                <div className='mt-5 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-2 md:gap-3'>
-                                    {menus.map((menu) => (
-                                        <button
-                                            type="button" key={menu.name} onClick={(e) => openEditModal(menu)}>
-                                            <div className="w-full my-1 bg-white border border-gray-300 rounded-lg shadow-xl flex" >
-                                                {(menu.image != "" && menu.image) &&
-                                                    <Image
-                                                        src={menu.image}
-                                                        width={150}
-                                                        height={150}
-                                                        alt={''}
-                                                        style={{ objectFit: "cover" }}
-                                                        className="w-1/3 min-w-[100px] aspect-square object-none rounded-t-lg rounded-l-lg">
-                                                    </Image>
-                                                }
-                                                <div className="py-6 px-3 text-left">
-                                                    <h2 className="font-bold text-lg mb-2 text-orange-700">{menu.name}</h2>
-                                                    <p className="text-orange-700 px-1">
-                                                        {menu.price.toLocaleString()} 원
-                                                    </p>
+                            </div>
+                            :
+                            <div>
+                                {menus != null && menus.length > 0 ?
+                                    <div className='mt-5 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-2 md:gap-3'>
+                                        {menus.map((menu) => (
+                                            <button
+                                                type="button" key={menu.name} onClick={(e) => openEditModal(menu)}>
+                                                <div className="w-full my-1 bg-white border border-gray-300 rounded-lg shadow-xl flex" >
+                                                    {(menu.image != "" && menu.image) &&
+                                                        <Image
+                                                            src={menu.image}
+                                                            width={150}
+                                                            height={150}
+                                                            alt={''}
+                                                            style={{ objectFit: "cover" }}
+                                                            className="w-1/3 min-w-[100px] aspect-square object-none rounded-t-lg rounded-l-lg">
+                                                        </Image>
+                                                    }
+                                                    <div className="py-6 px-3 text-left">
+                                                        <h2 className="font-bold text-lg mb-2 text-orange-700">{menu.name}</h2>
+                                                        <p className="text-orange-700 px-1">
+                                                            {menu.price.toLocaleString()} 원
+                                                        </p>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                        </button>
+                                            </button>
 
-                                    ))}
-                                </div>
-                                :
-                                <p className="mt-5 ml-5">등록된 메뉴가 없습니다.</p>}
+                                        ))}
+                                    </div>
+                                    :
+                                    <p className="mt-5 ml-5">등록된 메뉴가 없습니다.</p>}
 
-                        </div>
-                    }
+                            </div>
+                        }
+                    </div>
                 </div>
 
 

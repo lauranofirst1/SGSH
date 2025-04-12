@@ -7,8 +7,8 @@ export default function ManageNavBar() {
   const [navbar, setNavbar] = useState(false);
 
   return (
-    <nav className="w-full bg-white shadow sticky top-0 z-10">
-      <div className="justify-center px-4 mx-auto lg:max-w-7xl md:items-center md:flex md:px-8">
+    <nav className="w-full bg-white border-b border-[#e4e7ec] sticky top-0 z-10">
+      <div className="justify-start pl-6 pr-2 md:px-2 lg:max-w-7xl md:items-center md:flex md:px-8">
         <div>
           <div className="flex items-center justify-between py-3 md:py-5 md:block ">
             <Link href="/">
