@@ -1,0 +1,30 @@
+final List<Map<String, dynamic>> reservations = [
+  {
+    'id': 1,
+    'storeName': '하이디라오 코엑스점',
+    'category': '중식',
+    'location': '코엑스',
+    'date': '2025.05.18',
+    'dayOfWeek': '일',
+    'time': '오후 12:30',
+    'people': 3,
+    'dday': 18,
+    'image': 'assets/images/dummy_image/sushi.png',
+    'status': 'upcoming', // upcoming, completed, canceled
+    'showInviteBanner': true,
+  },
+  {
+    'id': 2,
+    'storeName': '하이디라오 대학로점',
+    'category': '중식',
+    'location': '혜화',
+    'date': '2025.04.06',
+    'dayOfWeek': '일',
+    'time': '오후 5:00',
+    'people': 2,
+    'dday': -3,
+    'image': 'assets/images/dummy_image/sushi.png',
+    'status': 'completed',
+    'showInviteBanner': false,
+  },
+];

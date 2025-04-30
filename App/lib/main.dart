@@ -1,5 +1,5 @@
 import 'package:app/models/business.dart';
-import 'package:app/pages/adpage.dart';
+import 'package:app/pages/mydiningpage.dart';
 import 'package:app/pages/mappage.dart';
 import 'package:app/pages/mypage.dart';
 import 'package:app/pages/searchpage.dart';
