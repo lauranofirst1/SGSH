@@ -1,3 +1,4 @@
+import 'package:app/widgets/store_bottom_bar.dart';
 import 'package:flutter/material.dart';
 import '../data/dummy_reservations.dart';
 import '../data/dummy_completed_info.dart';
@@ -27,76 +28,97 @@ class _MyDiningPageState extends State<MyDiningPage> {
 
   @override
   Widget build(BuildContext context) {
-    final filtered = reservations.where((r) => r['status'] == currentStatus).toList();
+    final filtered =
+        reservations.where((r) => r['status'] == currentStatus).toList();
 
     return Scaffold(
+      backgroundColor: Colors.white, // 항상 흰색 유지
+
       appBar: AppBar(
-        title: const Text(
-          '마이다이닝',
-          style: TextStyle(
-            color: Colors.black,
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        backgroundColor: Colors.white,
+        backgroundColor: Colors.white, // 항상 흰색 유지
         elevation: 0.5,
         centerTitle: false,
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(48),
-          child: Row(
-            children: [
-              _buildTopTab('나의 예약', true),
-              _buildTopTab('나의 알림', false),
-            ],
+        title: const Text(
+          '나의 예약',
+          style: TextStyle(
+            fontSize: 20,
+            fontFamily: 'Pretendard',
+            fontWeight: FontWeight.bold,
+            color: Colors.black,
           ),
         ),
+
+        foregroundColor: Colors.black, // 버튼색이 스크롤에 의해 바뀌지 않도록
+        surfaceTintColor: Colors.white, // 머티리얼 3 대응용 (앱바 배경 흐림 방지)
+        shadowColor: Colors.transparent, // 그림자 투명화(선택)
       ),
+     
       body: ListView(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: List.generate(categories.length, (index) {
-              return GestureDetector(
-                onTap: () {
-                  setState(() {
-                    _selectedCategory = index;
-                  });
-                },
-                child: Column(
-                  children: [
-                    Text(
-                      categories[index],
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: _selectedCategory == index ? Colors.black : Colors.grey,
-                      ),
-                    ),
-                    if (index == 1)
-                      const Padding(
-                        padding: EdgeInsets.only(top: 4),
-                        child: CircleAvatar(
-                          radius: 3,
-                          backgroundColor: Colors.red,
+          // 🔻 카테고리 탭: 작대기로 선택 상태 표현
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: List.generate(categories.length, (index) {
+                final bool isSelected = _selectedCategory == index;
+                return GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      _selectedCategory = index;
+                    });
+                  },
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        categories[index],
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: isSelected ? Colors.black : Colors.grey,
                         ),
                       ),
-                  ],
-                ),
-              );
-            }),
+                      const SizedBox(height: 6),
+                      AnimatedContainer(
+                        duration: const Duration(milliseconds: 200),
+                        height: 2,
+                        width: 32,
+                        decoration: BoxDecoration(
+                          color: isSelected ? Colors.black : Colors.transparent,
+                          borderRadius: BorderRadius.circular(1),
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              }),
+            ),
           ),
           const SizedBox(height: 20),
+
+          // 🔻 필터링된 카드 출력
           if (filtered.isEmpty)
-            const Center(child: Text('예약 내역이 없습니다.'))
+            const Center(
+              child: Padding(
+                padding: EdgeInsets.only(top: 40),
+                child: Text(
+                  '예약 내역이 없습니다.',
+                  style: TextStyle(fontSize: 14, color: Colors.grey),
+                ),
+              ),
+            )
           else
-            ...filtered.map((data) =>
-              _selectedCategory == 1
-                ? _buildCompletedCard(data)
-                : _selectedCategory == 2
-                  ? _buildCanceledCard(data)
-                  : _buildReservationCard(data)
-            ).toList(),
+            ...filtered.map((data) {
+              if (_selectedCategory == 1) {
+                return _buildCompletedCard(data);
+              } else if (_selectedCategory == 2) {
+                return _buildCanceledCard(data);
+              } else {
+                return _buildReservationCard(data);
+              }
+            }).toList(),
         ],
       ),
     );
@@ -127,7 +149,11 @@ class _MyDiningPageState extends State<MyDiningPage> {
     );
   }
 
-  Widget _buildBadge(String text, {Color color = Colors.red, Color textColor = Colors.white}) {
+  Widget _buildBadge(
+    String text, {
+    Color color = Colors.red,
+    Color textColor = Colors.white,
+  }) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
@@ -161,7 +187,11 @@ class _MyDiningPageState extends State<MyDiningPage> {
                 if (data['status'] == 'upcoming')
                   _buildBadge('D-${data['dday']}'),
                 const SizedBox(width: 8),
-                _buildBadge('예약', color: Colors.grey[300]!, textColor: Colors.black),
+                _buildBadge(
+                  '예약',
+                  color: Colors.grey[300]!,
+                  textColor: Colors.black,
+                ),
                 const Spacer(),
                 const Icon(Icons.calendar_today_outlined, color: Colors.red),
               ],
@@ -183,12 +213,26 @@ class _MyDiningPageState extends State<MyDiningPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(data['storeName'], style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                      Text(
+                        data['storeName'],
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
                       const SizedBox(height: 4),
-                      Text('${data['category']} · ${data['location']}', style: const TextStyle(color: Colors.grey)),
+                      Text(
+                        '${data['category']} · ${data['location']}',
+                        style: const TextStyle(color: Colors.grey),
+                      ),
                       const SizedBox(height: 4),
-                      Text('${data['date']} (${data['dayOfWeek']}) · ${data['time']} · ${data['people']}명',
-                          style: const TextStyle(color: Colors.red, fontWeight: FontWeight.w600)),
+                      Text(
+                        '${data['date']} (${data['dayOfWeek']}) · ${data['time']} · ${data['people']}명',
+                        style: const TextStyle(
+                          color: Colors.red,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -201,10 +245,18 @@ class _MyDiningPageState extends State<MyDiningPage> {
                 onPressed: () {},
                 style: OutlinedButton.styleFrom(
                   side: const BorderSide(color: Color(0xFFD1D1D6), width: 1),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(6),
+                  ),
                   foregroundColor: Colors.black,
                 ),
-                child: const Text('초대장 보내기', style: TextStyle(color: Colors.black, fontWeight: FontWeight.w600)),
+                child: const Text(
+                  '초대장 보내기',
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
               ),
             ),
           ],
@@ -230,9 +282,16 @@ class _MyDiningPageState extends State<MyDiningPage> {
           children: [
             Row(
               children: [
-                _buildBadge('예약', color: const Color.fromARGB(255, 243, 243, 243), textColor: Colors.black),
+                _buildBadge(
+                  '예약',
+                  color: const Color.fromARGB(255, 243, 243, 243),
+                  textColor: Colors.black,
+                ),
                 const SizedBox(width: 6),
-                Text('총 ${visitCount}회 방문', style: TextStyle(color: Colors.grey[600], fontSize: 12)),
+                Text(
+                  '총 ${visitCount}회 방문',
+                  style: TextStyle(color: Colors.grey[600], fontSize: 12),
+                ),
                 const Spacer(),
                 Icon(Icons.close, color: Colors.grey[400]),
               ],
@@ -254,28 +313,50 @@ class _MyDiningPageState extends State<MyDiningPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(data['storeName'], style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                      Text(
+                        data['storeName'],
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
                       const SizedBox(height: 4),
-                      Text('${data['category']} · ${data['location']}', style: const TextStyle(color: Colors.grey)),
+                      Text(
+                        '${data['category']} · ${data['location']}',
+                        style: const TextStyle(color: Colors.grey),
+                      ),
                       const SizedBox(height: 4),
-                      Text('${data['date']} (${data['dayOfWeek']}) · ${data['time']} · ${data['people']}명',
-                          style: const TextStyle(color: Colors.black, fontWeight: FontWeight.w600)),
+                      Text(
+                        '${data['date']} (${data['dayOfWeek']}) · ${data['time']} · ${data['people']}명',
+                        style: const TextStyle(
+                          color: Colors.black,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
                     ],
                   ),
                 ),
               ],
             ),
-            const Divider(height: 24, color: Color.fromARGB(255, 229, 229, 229)),
+            const Divider(
+              height: 24,
+              color: Color.fromARGB(255, 229, 229, 229),
+            ),
             const SizedBox(height: 8),
             const Center(
-              child: Text('별점으로 평가해주세요', style: TextStyle(fontWeight: FontWeight.bold)),
+              child: Text(
+                '별점으로 평가해주세요',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: List.generate(5, (index) {
                 return IconButton(
                   icon: Icon(
-                    index < (starRatings[id] ?? 0) ? Icons.star : Icons.star_border,
+                    index < (starRatings[id] ?? 0)
+                        ? Icons.star
+                        : Icons.star_border,
                     size: 32,
                     color: Colors.grey[600],
                   ),
@@ -288,7 +369,11 @@ class _MyDiningPageState extends State<MyDiningPage> {
               }),
             ),
             Center(
-              child: _buildBadge('잊기 전에 남겨보세요', color: const Color.fromARGB(255, 238, 238, 238), textColor: Colors.black),
+              child: _buildBadge(
+                '잊기 전에 남겨보세요',
+                color: const Color.fromARGB(255, 238, 238, 238),
+                textColor: Colors.black,
+              ),
             ),
           ],
         ),
@@ -309,7 +394,11 @@ class _MyDiningPageState extends State<MyDiningPage> {
           children: [
             Row(
               children: [
-                _buildBadge('취소됨', color: Colors.grey[300]!, textColor: Colors.black),
+                _buildBadge(
+                  '취소됨',
+                  color: Colors.grey[300]!,
+                  textColor: Colors.black,
+                ),
                 const Spacer(),
                 Icon(Icons.info_outline, color: Colors.grey[400]),
               ],
@@ -331,12 +420,26 @@ class _MyDiningPageState extends State<MyDiningPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(data['storeName'], style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                      Text(
+                        data['storeName'],
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
                       const SizedBox(height: 4),
-                      Text('${data['category']} · ${data['location']}', style: const TextStyle(color: Colors.grey)),
+                      Text(
+                        '${data['category']} · ${data['location']}',
+                        style: const TextStyle(color: Colors.grey),
+                      ),
                       const SizedBox(height: 4),
-                      Text('${data['date']} (${data['dayOfWeek']}) · ${data['time']} · ${data['people']}명',
-                          style: const TextStyle(color: Colors.grey, fontWeight: FontWeight.w600)),
+                      Text(
+                        '${data['date']} (${data['dayOfWeek']}) · ${data['time']} · ${data['people']}명',
+                        style: const TextStyle(
+                          color: Colors.grey,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -350,8 +453,11 @@ class _MyDiningPageState extends State<MyDiningPage> {
                 color: const Color.fromARGB(255, 245, 245, 245),
                 borderRadius: BorderRadius.circular(8),
               ),
-              child: const Text('사정이 생겨 방문하지 못했어요', style: TextStyle(color: Colors.black54)),
-            )
+              child: const Text(
+                '사정이 생겨 방문하지 못했어요',
+                style: TextStyle(color: Colors.black54),
+              ),
+            ),
           ],
         ),
       ),

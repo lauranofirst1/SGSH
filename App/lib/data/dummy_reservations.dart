@@ -27,4 +27,31 @@ final List<Map<String, dynamic>> reservations = [
     'status': 'completed',
     'showInviteBanner': false,
   },
+
+  {
+    'id': 201,
+    'storeName': '취소된 스시집',
+    'category': '스시 · 일식',
+    'location': '신사',
+    'date': '2025.05.12',
+    'dayOfWeek': '월',
+    'time': '18:00',
+    'people': 2,
+    'image': 'assets/images/dummy_image/sushi.png',
+    'status': 'canceled',  // ✅ 핵심
+  },
+  {
+    'id': 202,
+    'storeName': '노쇼된 브런치카페',
+    'category': '브런치 · 카페',
+    'location': '성수',
+    'date': '2025.04.28',
+    'dayOfWeek': '일',
+    'time': '11:30',
+    'people': 3,
+    'image': 'assets/images/dummy_image/sushi.png',
+    'status': 'canceled',  // ✅ 핵심
+  },
+
+
 ];

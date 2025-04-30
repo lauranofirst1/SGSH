@@ -1,6 +1,8 @@
 import 'package:app/data/dummy_article.dart';
 import 'package:app/pages/imageviewpage.dart';
 import 'package:app/widgets/menudetail_modal.dart';
+import 'package:app/widgets/reservation_bottom_sheet.dart';
+import 'package:app/widgets/store_bottom_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -183,6 +185,20 @@ Widget build(BuildContext context) {
       statusBarBrightness: Brightness.light, // ✅ iOS용
     ),
     child: Scaffold(
+       bottomNavigationBar: StoreBottomBar(
+  bookmarkCount: 5012,
+  onReservePressed: () {
+    // 예약하기 눌렀을 때
+  showReservationBottomSheet(context);
+  },
+  onCallPressed: () {
+    // 전화 버튼 눌렀을 때
+    print("전화 클릭!");
+  },
+  onBookmarkPressed: () {
+  
+  },
+),
       backgroundColor: Colors.white,
       body: Stack(
         children: [

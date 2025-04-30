@@ -62,38 +62,42 @@ class _MyPageState extends State<MyPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+  backgroundColor: Colors.white,
+  appBar: AppBar(
+    backgroundColor: Colors.white,        // 항상 흰색 유지
+    elevation: 0.5,
+    centerTitle: false,
+    title: const Text(
+      '마이페이지',
+      style: TextStyle(
+        fontSize: 20,
+        fontFamily: 'Pretendard',
+        fontWeight: FontWeight.bold,
+        color: Colors.black,
+      ),
+    ),
+    actions: [
+      IconButton(
+        icon: const Icon(Icons.notifications_none, color: Colors.black),
+        onPressed: () {
+          _showSnackbar('알림 설정 이동');
+        },
+      ),
+      IconButton(
+        icon: const Icon(Icons.settings, color: Colors.black),
+        onPressed: () {
+          _showSnackbar('설정 이동');
+        },
+      ),
+    ],
+    foregroundColor: Colors.black,         // 버튼색이 스크롤에 의해 바뀌지 않도록
+    surfaceTintColor: Colors.white,        // 머티리얼 3 대응용 (앱바 배경 흐림 방지)
+    shadowColor: Colors.transparent,       // 그림자 투명화(선택)
+  ),
       body: SafeArea(
         child: ListView(
-          padding: EdgeInsets.all(20),
+          padding: const EdgeInsets.all(20),
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  '마이페이지',
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontFamily: 'Pretendard', // ✅ 패밀리명만 써야 함
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Padding(
-                      padding: EdgeInsets.only(left: 10),
-                      child: Icon(Icons.notifications, color: Colors.black),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.only(left: 10),
-                      child: Icon(Icons.settings, color: Colors.black),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-            SizedBox(height: 20),
             Row(
               children: [
                 Padding(
