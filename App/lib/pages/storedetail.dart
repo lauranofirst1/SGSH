@@ -226,7 +226,7 @@ Widget build(BuildContext context) {
                             fontSize: 22,
                           ),
                         )
-                      : null,
+                      : null, 
                   flexibleSpace: FlexibleSpaceBar(
                     collapseMode: CollapseMode.pin,
                     background: GestureDetector(

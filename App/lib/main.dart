@@ -53,7 +53,7 @@ class _MyAppState extends State<MyApp> {
       Mainpage(),
       SearchPage(),
       MapPage(onMarkerTap: _handleMarkerTap), // 💡 여기 중요!
-      AdPage(),
+      MyDiningPage(),
       MyPage(),
     ]);
   }
