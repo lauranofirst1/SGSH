@@ -3,12 +3,12 @@ import 'package:flutter/material.dart';
 class DiningMagazineSection extends StatelessWidget {
   final List<Map<String, String>> magazineItems = [
     {
-      'image': 'assets/images/magazine_burger.jpg',
+      'image': 'assets/images/dummy_image/japanese_food.png',
       'title': '버거하면\n더백이지',
       'desc': '용리단길 핫플에서 만난 햄버거 밥친구'
     },
     {
-      'image': 'assets/images/japanese_food.jpg',
+      'image': 'assets/images/dummy_image/japanese_food.png',
       'title': '반할 수밖에 없는\n모던 스시집',
       'desc': '한강 뷰에 취하고 회에 반하다'
     },
@@ -22,7 +22,7 @@ class DiningMagazineSection extends StatelessWidget {
         const Padding(
           padding: EdgeInsets.fromLTRB(16, 24, 16, 12),
           child: Text(
-            '다이닝 매거진',
+            '가치가게 매거진',
             style: TextStyle(
               fontWeight: FontWeight.bold,
               fontSize: 18,

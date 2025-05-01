@@ -41,7 +41,7 @@ class StoreDetailBottomSheet extends StatelessWidget {
 
             // 가게 정보 카드
             Padding(
-              padding: EdgeInsets.symmetric(horizontal: 10),
+              padding: EdgeInsets.symmetric(horizontal: 0),
               child: StoreCard(
                 store: store ??
                     business_data(
@@ -82,12 +82,7 @@ class StoreDetailBottomSheet extends StatelessWidget {
                       // 전화 기능
                     },
                   ),
-                  IconButton(
-                    icon: Icon(Icons.favorite_border, size: 17),
-                    onPressed: () {
-                      // 즐겨찾기 기능
-                    },
-                  ),
+                
                   IconButton(
                     icon: Icon(Icons.share, size: 17),
                     onPressed: () {

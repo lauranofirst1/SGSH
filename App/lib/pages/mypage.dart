@@ -1,4 +1,5 @@
 import 'package:app/pages/likepage.dart';
+import 'package:app/pages/setting/settings_page.dart';
 import 'package:app/widgets/memoinputcard.dart';
 import 'package:flutter/material.dart';
 
@@ -62,38 +63,43 @@ class _MyPageState extends State<MyPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-  backgroundColor: Colors.white,
-  appBar: AppBar(
-    backgroundColor: Colors.white,        // 항상 흰색 유지
-    elevation: 0.5,
-    centerTitle: false,
-    title: const Text(
-      '마이페이지',
-      style: TextStyle(
-        fontSize: 20,
-        fontFamily: 'Pretendard',
-        fontWeight: FontWeight.bold,
-        color: Colors.black,
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        backgroundColor: Colors.white, // 항상 흰색 유지
+        elevation: 0.5,
+        centerTitle: false,
+        title: const Text(
+          '마이페이지',
+          style: TextStyle(
+            fontSize: 20,
+            fontFamily: 'Pretendard',
+            fontWeight: FontWeight.bold,
+            color: Colors.black,
+          ),
+        ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.notifications_none, color: Colors.black),
+            onPressed: () {
+              _showSnackbar('알림 설정 이동');
+            },
+          ),
+          IconButton(
+  icon: const Icon(Icons.settings, color: Colors.black),
+  onPressed: () {
+    _showSnackbar('설정 이동');
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => SettingsPage()),
+    );
+  },
+)
+
+        ],
+        foregroundColor: Colors.black, // 버튼색이 스크롤에 의해 바뀌지 않도록
+        surfaceTintColor: Colors.white, // 머티리얼 3 대응용 (앱바 배경 흐림 방지)
+        shadowColor: Colors.transparent, // 그림자 투명화(선택)
       ),
-    ),
-    actions: [
-      IconButton(
-        icon: const Icon(Icons.notifications_none, color: Colors.black),
-        onPressed: () {
-          _showSnackbar('알림 설정 이동');
-        },
-      ),
-      IconButton(
-        icon: const Icon(Icons.settings, color: Colors.black),
-        onPressed: () {
-          _showSnackbar('설정 이동');
-        },
-      ),
-    ],
-    foregroundColor: Colors.black,         // 버튼색이 스크롤에 의해 바뀌지 않도록
-    surfaceTintColor: Colors.white,        // 머티리얼 3 대응용 (앱바 배경 흐림 방지)
-    shadowColor: Colors.transparent,       // 그림자 투명화(선택)
-  ),
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.all(20),
@@ -128,7 +134,7 @@ class _MyPageState extends State<MyPage> {
                       ),
                       SizedBox(height: 5),
                       Text(
-                        '이메일 없음',
+                        '포인트 : 605p',
                         style: TextStyle(fontSize: 14, color: Colors.grey[600]),
                       ),
                     ],

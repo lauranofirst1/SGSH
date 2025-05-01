@@ -52,28 +52,28 @@ class _MyAppState extends State<MyApp> {
     _pages.addAll([
       Mainpage(),
       SearchPage(),
-      MapPage(onMarkerTap: _handleMarkerTap), // 💡 여기 중요!
+      MapPage(), // 💡 여기 중요!
       MyDiningPage(),
       MyPage(),
     ]);
   }
 
-void _handleMarkerTap(String name, String address, business_data? store) {
-  setState(() => _isBottomNavVisible = false);
+// void _handleMarkerTap(String name, String address, business_data? store) {
+//   setState(() => _isBottomNavVisible = false);
 
-  final controller = _scaffoldKey.currentState!.showBottomSheet(
-    (context) => StoreDetailBottomSheet(
-      name: name,
-      address: address,
-      store: store,
-    ),
-    backgroundColor: Colors.transparent,
-  );
+//   final controller = _scaffoldKey.currentState!.showBottomSheet(
+//     (context) => StoreDetailBottomSheet(
+//       name: name,
+//       address: address,
+//       store: store,
+//     ),
+//     backgroundColor: Colors.transparent,
+//   );
 
-  controller.closed.then((_) {
-    setState(() => _isBottomNavVisible = true);
-  });
-}
+//   controller.closed.then((_) {
+//     setState(() => _isBottomNavVisible = true);
+//   });
+// }
 
 
 
