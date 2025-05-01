@@ -4,10 +4,10 @@ class SearchBar extends StatelessWidget {
   final TextEditingController controller;
   final ValueChanged<String> onSubmitted;
 
-  const SearchBar({
+  SearchBar({
     required this.controller,
     required this.onSubmitted,
-    super.key,
+    super.key, required void Function(String query) onChanged,
   });
 
   @override
