@@ -1,4 +1,4 @@
-import 'package:app/data/dummy_article.dart';
+import 'package:app/models/article.dart';
 import 'package:app/pages/imageviewpage.dart';
 import 'package:app/widgets/menudetail_modal.dart';
 import 'package:app/widgets/reservation_bottom_sheet.dart';
@@ -25,11 +25,34 @@ class StoreDetailPage extends StatefulWidget {
 class _StoreDetailPageState extends State<StoreDetailPage>
     with SingleTickerProviderStateMixin {
   List<menu_data> menuList = [];
+  List<article_data> storeArticles = []; // 🔍 스토어 전용 아티클 목록
+
   late Future<SharedPreferences> prefsFuture;
   final supabase = Supabase.instance.client;
   late TabController _tabController;
   bool isBookmarked = false;
   bool showTitle = false;
+  void fetchStoreArticles() async {
+    try {
+      final response = await supabase
+          .from('article_data')
+          .select()
+          .eq('b_id', widget.store.id) // store.id와 연결
+          .eq('type', 1) // type == 1
+          .order('id', ascending: false); // 원하는 정렬 방식 (ex. 최신순)
+
+      if (response.isEmpty) return;
+
+      setState(() {
+        storeArticles =
+            response
+                .map<article_data>((item) => article_data.fromMap(item))
+                .toList();
+      });
+    } catch (e) {
+      print("❌ [article_data] 불러오기 실패: $e");
+    }
+  }
 
   void toggleBookmark() {
     setState(() {
@@ -102,22 +125,25 @@ class _StoreDetailPageState extends State<StoreDetailPage>
 
   final ScrollController _scrollController = ScrollController();
 
-  @override
-  void initState() {
-    super.initState();
-    _scrollController.addListener(() {
-      if (_scrollController.offset > 150 && !showTitle) {
-        setState(() => showTitle = true);
-      } else if (_scrollController.offset <= 150 && showTitle) {
-        setState(() => showTitle = false);
-      }
-    });
+ @override
+void initState() {
+  super.initState();
+  _tabController = TabController(length: 2, vsync: this);
+  prefsFuture = SharedPreferences.getInstance();
 
-    _tabController = TabController(length: 2, vsync: this);
-    prefsFuture = SharedPreferences.getInstance();
-    fetchMenuData();
-    saveToRecentStores(widget.store.name);
-  }
+  _scrollController.addListener(() {
+    if (_scrollController.offset > 150 && !showTitle) {
+      setState(() => showTitle = true);
+    } else if (_scrollController.offset <= 150 && showTitle) {
+      setState(() => showTitle = false);
+    }
+  });
+
+  fetchMenuData();
+  fetchStoreArticles(); // ✅ 여기!
+  saveToRecentStores(widget.store.name);
+}
+
 
   void saveToRecentStores(String storeName) async {
     final prefs = await prefsFuture;
@@ -437,95 +463,98 @@ class _StoreDetailPageState extends State<StoreDetailPage>
   }
 
   Widget buildHomeTab() {
-    return ListView.builder(
-      padding: EdgeInsets.all(16),
-      itemCount: dummyArticles.length,
-      itemBuilder: (context, index) {
-        final article = dummyArticles[index];
-        return Container(
-          margin: EdgeInsets.only(bottom: 20),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(20),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black12,
-                blurRadius: 10,
-                offset: Offset(0, 4),
-              ),
-            ],
-            border: Border.all(color: Colors.grey.shade200),
-          ),
-          child: Padding(
-            padding: EdgeInsets.all(20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                /// 🔔 Title with icon
-                Row(
-                  children: [
-                    Icon(Icons.campaign, color: Colors.orange, size: 20),
-                    SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        article.title,
-                        style: TextStyle(
-                          fontSize: 17,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black87,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-
-                SizedBox(height: 12),
-
-                /// 📝 Content
-                Text(
-                  article.content,
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.black87,
-                    height: 1.5,
-                  ),
-                ),
-
-                SizedBox(height: 16),
-
-                /// 🧑‍💼 Author & 🕒 Time
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Row(
-                      children: [
-                        Icon(Icons.person, size: 14, color: Colors.grey),
-                        SizedBox(width: 4),
-                        Text(
-                          article.author,
-                          style: TextStyle(fontSize: 12, color: Colors.black54),
-                        ),
-                      ],
-                    ),
-                    Row(
-                      children: [
-                        Icon(Icons.access_time, size: 14, color: Colors.grey),
-                        SizedBox(width: 4),
-                        Text(
-                          article.time,
-                          style: TextStyle(fontSize: 12, color: Colors.black45),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        );
-      },
+  if (storeArticles.isEmpty) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(32),
+        child: Text("이 가게에 등록된 아티클이 없습니다."),
+      ),
     );
   }
+
+  return ListView.builder(
+    padding: EdgeInsets.all(16),
+    itemCount: storeArticles.length,
+    itemBuilder: (context, index) {
+      final article = storeArticles[index];
+      return Container(
+        margin: EdgeInsets.only(bottom: 20),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black12,
+              blurRadius: 10,
+              offset: Offset(0, 4),
+            ),
+          ],
+          border: Border.all(color: Colors.grey.shade200),
+        ),
+        child: Padding(
+          padding: EdgeInsets.all(20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Icon(Icons.campaign, color: Colors.orange, size: 20),
+                  SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      article.title,
+                      style: TextStyle(
+                        fontSize: 17,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black87,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: 12),
+              Text(
+                article.content,
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.black87,
+                  height: 1.5,
+                ),
+              ),
+              SizedBox(height: 16),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    children: [
+                      Icon(Icons.person, size: 14, color: Colors.grey),
+                      SizedBox(width: 4),
+                      Text(
+                        article.author,
+                        style: TextStyle(fontSize: 12, color: Colors.black54),
+                      ),
+                    ],
+                  ),
+                  Row(
+                    children: [
+                      Icon(Icons.access_time, size: 14, color: Colors.grey),
+                      SizedBox(width: 4),
+                      Text(
+                        article.time,
+                        style: TextStyle(fontSize: 12, color: Colors.black45),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      );
+    },
+  );
+}
+
 
   Widget buildMenuTab(List<menu_data> menus) {
     if (menus.isEmpty) {

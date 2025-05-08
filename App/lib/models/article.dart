@@ -11,6 +11,9 @@ class article_data {
   final String content;
   final String author;
   final String time;
+  final int type;
+  final String image;
+  final String desc;
 
   article_data({
     required this.id,
@@ -18,6 +21,9 @@ class article_data {
     required this.content,
     required this.author,
     required this.time,
+    required this.type,
+    required this.image,
+    required this.desc,
   });
 
   factory article_data.fromMap(Map<String, dynamic> data) {
@@ -31,6 +37,9 @@ class article_data {
       content: safeString(data["content"], "내용 없음"),
       author: safeString(data["author"], "작성자 없음"),
       time: safeString(data["time"], "시간 없음"),
+      type: data["type"] is int ? data["type"] : 0,
+      image: safeString(data["image"], "사진 없음"),
+      desc: safeString(data["desc"], "부제목 없음"),
     );
   }
 }

@@ -5,6 +5,8 @@ import 'package:app/widgets/search_bar.dart' as custom; // 커스텀 SearchBar
 import 'package:app/models/business.dart';
 import 'package:app/pages/storedetail.dart';
 import 'package:app/widgets/store_card.dart';
+import 'package:app/models/article.dart';
+import 'package:app/pages/articlepage.dart'; // 클릭 시 상세 페이지 이동
 
 class SearchPage extends StatefulWidget {
   @override
@@ -18,13 +20,33 @@ class _SearchPageState extends State<SearchPage> {
   List<business_data> storeList = [];
   List<business_data> filteredList = [];
   List<String> recentStores = [];
+  List<article_data> magazineArticles = [];
+
   bool hasSearched = false;
 
   @override
   void initState() {
     super.initState();
     fetchStores();
+    fetchMagazineArticles(); // ← 추가
+
     loadRecentStores();
+  }
+
+  void fetchMagazineArticles() async {
+    try {
+      final response = await supabase
+          .from('article_data')
+          .select()
+          .eq('type', 4); // 타입 4만 가져오기
+
+      setState(() {
+        magazineArticles =
+            response.map((e) => article_data.fromMap(e)).toList();
+      });
+    } catch (e) {
+      print('❌ 매거진 로딩 실패: $e');
+    }
   }
 
   void fetchStores() async {
@@ -74,7 +96,7 @@ class _SearchPageState extends State<SearchPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar:  AppBar(
+      appBar: AppBar(
         backgroundColor: Colors.white, // 항상 흰색 유지
         elevation: 0.5,
         centerTitle: false,
@@ -102,13 +124,74 @@ class _SearchPageState extends State<SearchPage> {
                 filterStores(value);
                 FocusScope.of(context).unfocus();
               },
-              onChanged: filterStores, // 🔥 추가!
+              onChanged: filterStores,
             ),
           ),
 
           if (!hasSearched) ...[
-       
-             Padding(
+            // ✅ 매거진 아티클이 있으면 먼저 보여주기
+            if (magazineArticles.isNotEmpty) ...[
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    '추천 매거진',
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                  ),
+                ),
+              ),
+              SizedBox(
+                height: 200,
+                child: ListView.separated(
+                  padding: EdgeInsets.symmetric(horizontal: 16),
+                  scrollDirection: Axis.horizontal,
+                  itemCount: magazineArticles.length,
+                  separatorBuilder: (_, __) => SizedBox(width: 12),
+                  itemBuilder: (context, index) {
+                    final article = magazineArticles[index];
+                    return GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => ArticlePage(article: article),
+                          ),
+                        );
+                      },
+                      child: Container(
+                        width: 160,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(12),
+                          image: DecorationImage(
+                            image: NetworkImage(article.image ?? ''),
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                        alignment: Alignment.bottomLeft,
+                        padding: EdgeInsets.all(12),
+                        child: Text(
+                          article.title,
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            shadows: [
+                              Shadow(blurRadius: 4, color: Colors.black),
+                            ],
+                          ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+              const SizedBox(height: 16),
+            ],
+
+            // ✅ 추천 해시태그는 항상 표시
+            Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12.0),
               child: Align(
                 alignment: Alignment.centerLeft,
@@ -118,86 +201,46 @@ class _SearchPageState extends State<SearchPage> {
                 ),
               ),
             ),
-          SingleChildScrollView(
-  scrollDirection: Axis.horizontal,
-  padding: EdgeInsets.symmetric(horizontal: 12.0),
-  child: Row(
-    children: [
-      '#학생단골',
-      '#춘천맛집',
-      '#스시오마카세',
-      '#강원도맛집',
-      '#감자',
-    ].map((tag) {
-      return Padding(
-        padding: const EdgeInsets.only(right: 8),
-        child: GestureDetector(
-          onTap: () {
-            _searchController.text = tag; // 입력창에 텍스트 반영
-            filterStores(tag); // 검색 실행
-            FocusScope.of(context).unfocus(); // 키보드 닫기
-          },
-          child: Chip(
-            label: Text(
-              tag,
-              style: const TextStyle(
-                color: Colors.black,
-                fontWeight: FontWeight.w500,
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              padding: EdgeInsets.symmetric(horizontal: 12.0),
+              child: Row(
+                children:
+                    ['#학생단골', '#춘천맛집', '#스시오마카세', '#강원도맛집', '#감자'].map((tag) {
+                      return Padding(
+                        padding: const EdgeInsets.only(right: 8),
+                        child: GestureDetector(
+                          onTap: () {
+                            _searchController.text = tag;
+                            filterStores(tag);
+                            FocusScope.of(context).unfocus();
+                          },
+                          child: Chip(
+                            label: Text(
+                              tag,
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            backgroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(
+                              side: BorderSide(color: Colors.black12),
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                          ),
+                        ),
+                      );
+                    }).toList(),
               ),
             ),
-            backgroundColor: Colors.white,
-            shape: RoundedRectangleBorder(
-              side: const BorderSide(color: Colors.black12),
-              borderRadius: BorderRadius.circular(20),
-            ),
-            elevation: 0,
-          ),
-        ),
-      );
-    }).toList(),
-  ),
-),
-
-
-
-
-            const SizedBox(height: 12),
-
-            const SizedBox(height: 16),
-
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12.0),
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  '어떤 매장을 찾으세요?',
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-              ),
-            ),
-            const SizedBox(height: 8),
-            SizedBox(
-              height: 160,
-              child: ListView(
-                padding: EdgeInsets.only(left: 15),
-                scrollDirection: Axis.horizontal,
-                children: [
-                  _buildPromoCard('룸이 있는', '#조용한 #프라이빗한'),
-                  _buildPromoCard('전국 맛집 라인업 공개!', '#핫플 #유명맛집'),
-                ],
-              ),
-            ),
-
-            const SizedBox(height: 16),
-
-           
           ],
 
           if (hasSearched)
             Expanded(
               child:
                   filteredList.isEmpty
-                      ? const Center(child: Text('검색 결과가 없습니다.'))
+                      ? Center(child: Text('검색 결과가 없습니다.'))
                       : ListView.builder(
                         itemCount: filteredList.length,
                         itemBuilder: (context, index) {
@@ -224,47 +267,6 @@ class _SearchPageState extends State<SearchPage> {
                       ),
             ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildPromoCard(String title, String subtitle) {
-    return Container(
-      width: 200,
-      margin: const EdgeInsets.symmetric(horizontal: 8),
-      decoration: BoxDecoration(
-        color: Colors.grey[300],
-        borderRadius: BorderRadius.circular(12),
-        image: const DecorationImage(
-          image: AssetImage('assets/images/dummy_image/sushi.png'),
-          fit: BoxFit.cover,
-        ),
-      ),
-      child: Container(
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12),
-          color: Colors.black.withOpacity(0.3),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [
-            Text(
-              title,
-              style: const TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-                fontSize: 16,
-              ),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              subtitle,
-              style: const TextStyle(color: Colors.white70, fontSize: 12),
-            ),
-          ],
-        ),
       ),
     );
   }

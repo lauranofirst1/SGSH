@@ -1,21 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:app/models/article.dart';
+import 'package:app/pages/articlepage.dart';
 
 class DiningMagazineSection extends StatelessWidget {
-  final List<Map<String, String>> magazineItems = [
-    {
-      'image': 'assets/images/dummy_image/japanese_food.png',
-      'title': '버거하면\n더백이지',
-      'desc': '용리단길 핫플에서 만난 햄버거 밥친구'
-    },
-    {
-      'image': 'assets/images/dummy_image/japanese_food.png',
-      'title': '반할 수밖에 없는\n모던 스시집',
-      'desc': '한강 뷰에 취하고 회에 반하다'
-    },
-  ];
+  final List<article_data> magazineArticles;
+
+  const DiningMagazineSection({Key? key, required this.magazineArticles}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    if (magazineArticles.isEmpty) return SizedBox.shrink();
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -34,54 +29,69 @@ class DiningMagazineSection extends StatelessWidget {
           child: ListView.separated(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             scrollDirection: Axis.horizontal,
-            itemCount: magazineItems.length,
+            itemCount: magazineArticles.length,
             separatorBuilder: (_, __) => const SizedBox(width: 12),
             itemBuilder: (context, index) {
-              final item = magazineItems[index];
-              return Container(
-                width: 200,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(16),
-                  image: DecorationImage(
-                    image: AssetImage(item['image']!),
-                    fit: BoxFit.cover,
-                  ),
-                ),
+              final article = magazineArticles[index];
+              return GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => ArticlePage(article: article),
+                    ),
+                  );
+                },
                 child: Container(
-                  padding: const EdgeInsets.all(12),
+                  width: 200,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(16),
-                    gradient: LinearGradient(
-                      begin: Alignment.bottomCenter,
-                      end: Alignment.topCenter,
-                      colors: [
-                        Colors.black.withOpacity(0.6),
-                        Colors.transparent,
-                      ],
+                    image: DecorationImage(
+                      image: NetworkImage(article.image ?? ''),
+                      fit: BoxFit.cover,
+                      onError: (e, s) {}, // 생략 가능
                     ),
                   ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        item['title']!,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          height: 1.4,
-                        ),
+                  child: Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(16),
+                      gradient: LinearGradient(
+                        begin: Alignment.bottomCenter,
+                        end: Alignment.topCenter,
+                        colors: [
+                          Colors.black.withOpacity(0.6),
+                          Colors.transparent,
+                        ],
                       ),
-                      const SizedBox(height: 4),
-                      Text(
-                        item['desc']!,
-                        style: const TextStyle(
-                          color: Colors.white70,
-                          fontSize: 12,
+                    ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          article.title,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            height: 1.4,
+                          ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
                         ),
-                      ),
-                    ],
+                        const SizedBox(height: 4),
+                        Text(
+                          article.desc ?? '',
+                          style: const TextStyle(
+                            color: Colors.white70,
+                            fontSize: 12,
+                          ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               );

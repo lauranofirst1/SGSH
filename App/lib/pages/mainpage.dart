@@ -24,7 +24,11 @@ class _MainpageState extends State<Mainpage> {
     {'emoji': '🍔', 'label': "버거"},
   ];
 
-  List<article_data> article = [];
+  // List<article_data> article = [];
+  List<article_data> bannerArticles = [];
+  List<article_data> newsArticles = [];
+  List<article_data> magazineArticles = [];
+
   final supabase = Supabase.instance.client;
   late Future<SharedPreferences> prefsFuture;
 
@@ -41,11 +45,17 @@ class _MainpageState extends State<Mainpage> {
   void fetchStores() async {
     try {
       var response = await supabase.from("article_data").select();
+      List<article_data> allArticles =
+          response
+              .map<article_data>((data) => article_data.fromMap(data))
+              .toList();
+
       setState(() {
-        article =
-            response
-                .map<article_data>((data) => article_data.fromMap(data))
-                .toList();
+        bannerArticles = allArticles.where((a) => a.type == 2).toList();
+        newsArticles = allArticles.where((a) => a.type == 3).toList();
+        magazineArticles = allArticles.where((a) => a.type == 4).toList();
+
+        print(response.map((e) => e['type']).toList());
       });
     } catch (e) {
       print("❌ 오류 발생: $e");
@@ -77,7 +87,7 @@ class _MainpageState extends State<Mainpage> {
       body: SingleChildScrollView(
         child: Column(
           children: <Widget>[
-            Article(article: article),
+            Article(article: bannerArticles),
             Padding(
               padding: EdgeInsets.all(8).copyWith(top: 20),
               child: Wrap(
@@ -110,8 +120,8 @@ class _MainpageState extends State<Mainpage> {
 
             buildRecentItems(),
             const SizedBox(height: 20),
-            DummyArticleList(),
-            DiningMagazineSection(),
+            DummyArticleList(newsArticles: newsArticles),
+            DiningMagazineSection(magazineArticles: magazineArticles),
           ],
         ),
       ),
@@ -298,27 +308,69 @@ class Article extends StatelessWidget {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => Articlepage(article: article),
+                        builder: (context) => ArticlePage(article: article),
                       ),
                     );
                   },
-                  child: Container(
-                    width: MediaQuery.of(context).size.width,
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: const Color.fromARGB(255, 194, 194, 194),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Center(
-                      child: Text(
-                        article.title,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(12),
+                    child: Stack(
+                      fit: StackFit.expand,
+                      children: [
+                        // 배경 이미지
+                        Image.network(
+                          article.image ?? '',
+                          fit: BoxFit.cover,
+                          errorBuilder:
+                              (_, __, ___) => Container(
+                                color: Colors.grey[300],
+                                child: Icon(Icons.broken_image, size: 40),
+                              ),
                         ),
-                        textAlign: TextAlign.center,
-                      ),
+
+                        // 반투명 오버레이 + 텍스트
+                        Container(
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [
+                                Colors.black.withOpacity(0.7),
+                                Colors.transparent,
+                              ],
+                              begin: Alignment.bottomCenter,
+                              end: Alignment.topCenter,
+                            ),
+                          ),
+                          alignment: Alignment.bottomLeft,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                article.title,
+                                style: const TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                article.desc ?? '',
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.white70,
+                                ),
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 );
@@ -330,23 +382,9 @@ class Article extends StatelessWidget {
 }
 
 class DummyArticleList extends StatelessWidget {
-  final List<Map<String, String>> dummyArticles = [
-    {
-      'image': 'assets/images/dummy_image/japanese_food.png',
-      'title': '매장 오픈 소식! 🎉',
-      'desc': '신규 매장이 오픈했습니다. 이벤트 확인하세요!',
-    },
-    {
-      'image': 'assets/images/dummy_image/japanese_food.png',
-      'title': '예약 꿀팁',
-      'desc': '예약 성공률을 높이는 방법은?',
-    },
-    {
-      'image': 'assets/images/dummy_image/japanese_food.png',
-      'title': '고객 후기 베스트',
-      'desc': '실제 방문 고객들의 생생한 리뷰!',
-    },
-  ];
+  final List<article_data> newsArticles;
+
+  const DummyArticleList({super.key, required this.newsArticles});
 
   @override
   Widget build(BuildContext context) {
@@ -360,7 +398,7 @@ class DummyArticleList extends StatelessWidget {
             style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
           ),
         ),
-        ...dummyArticles.map((data) {
+        ...newsArticles.map((article) {
           return ListTile(
             contentPadding: const EdgeInsets.symmetric(
               horizontal: 16,
@@ -368,18 +406,33 @@ class DummyArticleList extends StatelessWidget {
             ),
             leading: ClipRRect(
               borderRadius: BorderRadius.circular(8),
-              child: Image.asset(
-                data['image']!,
+              child: Image.network(
+                article.image ?? '',
                 width: 64,
                 height: 64,
                 fit: BoxFit.cover,
+                errorBuilder:
+                    (_, __, ___) => Container(
+                      width: 64,
+                      height: 64,
+                      color: Colors.grey[300],
+                      child: Icon(Icons.image, size: 32),
+                    ),
               ),
             ),
             title: Text(
-              data['title']!,
+              article.title,
               style: const TextStyle(fontWeight: FontWeight.bold),
             ),
-            subtitle: Text(data['desc']!),
+            subtitle: Text(article.desc ?? ''),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => ArticlePage(article: article),
+                ),
+              );
+            },
           );
         }).toList(),
       ],

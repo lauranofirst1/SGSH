@@ -322,6 +322,7 @@ class _ReservationConfirmPageState extends State<ReservationConfirmPage> {
                     ],
                   ),
                 ),
+                SizedBox(height: 80,)
               ],
             ),
           ),
