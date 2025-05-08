@@ -132,10 +132,6 @@ class _MainpageState extends State<Mainpage> {
         List<String> recentStores =
             snapshot.data!.getStringList('recentStores') ?? [];
 
-        if (recentStores.isEmpty) {
-          return Center(child: Text("최근 본 가게가 없습니다."));
-        }
-
         return FutureBuilder<List<business_data>>(
           future: Future.wait(
             recentStores.map((storeName) async {
