@@ -1,5 +1,6 @@
 import 'package:app/models/article.dart';
 import 'package:app/pages/imageviewpage.dart';
+import 'package:app/services/bookmark_service.dart';
 import 'package:app/widgets/menudetail_modal.dart';
 import 'package:app/widgets/reservation_bottom_sheet.dart';
 import 'package:app/widgets/store_bottom_bar.dart';
@@ -32,6 +33,9 @@ class _StoreDetailPageState extends State<StoreDetailPage>
   late TabController _tabController;
   bool isBookmarked = false;
   bool showTitle = false;
+static const String bookmarkKey = 'bookmarkedStores';
+
+
   void fetchStoreArticles() async {
     try {
       final response = await supabase
@@ -54,17 +58,26 @@ class _StoreDetailPageState extends State<StoreDetailPage>
     }
   }
 
-  void toggleBookmark() {
-    setState(() {
-      isBookmarked = !isBookmarked;
-    });
+  void toggleBookmark() async {
+  await BookmarkService.toggleBookmark(widget.store.id.toString());
+  await checkBookmarkStatus(); // 북마크 상태를 정확히 다시 읽어옴
 
-    print(
-      isBookmarked
-          ? "🔖 북마크 추가됨: ${widget.store.name}"
-          : "❌ 북마크 해제됨: ${widget.store.name}",
-    );
-  }
+  print(
+    isBookmarked
+        ? "🔖 북마크 추가됨: ${widget.store.name}"
+        : "❌ 북마크 해제됨: ${widget.store.name}",
+  );
+}
+
+Future<void> checkBookmarkStatus() async {
+  final isMarked = await BookmarkService.isBookmarked(widget.store.id.toString());
+  setState(() {
+    isBookmarked = isMarked;
+  });
+}
+
+
+
 
   void shareStore() {
     showModalBottomSheet(
@@ -142,7 +155,12 @@ void initState() {
   fetchMenuData();
   fetchStoreArticles(); // ✅ 여기!
   saveToRecentStores(widget.store.name);
+    checkBookmarkStatus(); // ✅ 여기!
+
 }
+
+
+
 
 
   void saveToRecentStores(String storeName) async {

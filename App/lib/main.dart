@@ -110,10 +110,10 @@ class _MyAppState extends State<MyApp> {
                       label: '검색',
                     ),
                     BottomNavigationBarItem(icon: Icon(Icons.map), label: '지도'),
-                    BottomNavigationBarItem(
-                      icon: Icon(Icons.favorite),
-                      label: '즐겨찾기',
-                    ),
+                    BottomNavigationBarItem( // ✅ 여기만 변경됨!
+      icon: Icon(Icons.event_note), // 아이콘 교체
+      label: '나의 예약',
+    ),
                     BottomNavigationBarItem(
                       icon: Icon(Icons.person),
                       label: '나의페이지',

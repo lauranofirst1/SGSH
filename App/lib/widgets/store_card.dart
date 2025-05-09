@@ -1,3 +1,4 @@
+import 'package:app/services/bookmark_service.dart';
 import 'package:app/services/getstorestate.dart';
 import 'package:flutter/material.dart';
 import '../models/business.dart';
@@ -14,6 +15,19 @@ class StoreCard extends StatefulWidget {
 
 class _StoreCardState extends State<StoreCard> {
   bool isBookmarked = false;
+
+@override
+void initState() {
+  super.initState();
+  loadBookmarkStatus();
+}
+
+void loadBookmarkStatus() async {
+  final isMarked = await BookmarkService.isBookmarked(widget.store.id.toString());
+  setState(() {
+    isBookmarked = isMarked;
+  });
+}
 
   @override
   Widget build(BuildContext context) {
@@ -56,7 +70,9 @@ class _StoreCardState extends State<StoreCard> {
                                 isBookmarked ? Icons.bookmark : Icons.bookmark_border,
                                 color: isBookmarked ? const Color.fromARGB(255, 255, 85, 0) : Colors.grey,
                               ),
-                              onPressed: () {
+                              onPressed : () async {
+                                  await BookmarkService.toggleBookmark(store.id.toString()); // 실제 저장/취소 로직
+
                                 setState(() {
                                   isBookmarked = !isBookmarked;
                                 });

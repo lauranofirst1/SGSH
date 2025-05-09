@@ -16,6 +16,32 @@ void showReservationBottomSheet(BuildContext context) {
       int? selectedPeople;
       String? selectedTime;
 
+      // ✅ 과거 시간인지 확인하는 함수
+      bool isPastTime(String timeStr, DateTime selectedDate) {
+        final now = DateTime.now();
+
+        final isPm = timeStr.contains('오후');
+        final parts = timeStr.replaceAll(RegExp(r'[^\d:]'), '').split(':');
+        int hour = int.parse(parts[0]);
+        int minute = int.parse(parts[1]);
+
+        if (isPm && hour != 12) hour += 12;
+        if (!isPm && hour == 12) hour = 0;
+
+        final time = DateTime(
+          selectedDate.year,
+          selectedDate.month,
+          selectedDate.day,
+          hour,
+          minute,
+        );
+
+        return selectedDate.year == now.year &&
+            selectedDate.month == now.month &&
+            selectedDate.day == now.day &&
+            time.isBefore(now);
+      }
+
       return StatefulBuilder(
         builder: (context, setState) {
           return DraggableScrollableSheet(
@@ -30,9 +56,8 @@ void showReservationBottomSheet(BuildContext context) {
 
               return Stack(
                 children: [
-                  // 상단 콘텐츠
                   Padding(
-                    padding: const EdgeInsets.only(bottom: 80), // 버튼 높이 확보
+                    padding: const EdgeInsets.only(bottom: 80),
                     child: SingleChildScrollView(
                       controller: scrollController,
                       padding: const EdgeInsets.fromLTRB(16, 20, 16, 30),
@@ -61,32 +86,38 @@ void showReservationBottomSheet(BuildContext context) {
                             ),
                           ),
                           TableCalendar(
-                            firstDay: DateTime.utc(2020, 1, 1),
-                            lastDay: DateTime.utc(2030, 12, 31),
-                            focusedDay: focusedDay,
-                            selectedDayPredicate: (day) =>
-                                isSameDay(selectedDay, day),
-                            onDaySelected: (selected, focused) {
-                              setState(() {
-                                selectedDay = selected;
-                                focusedDay = focused;
-                              });
-                            },
-                            calendarStyle: const CalendarStyle(
-                              todayDecoration: BoxDecoration(
-                                color: Color.fromARGB(255, 183, 183, 183),
-                                shape: BoxShape.circle,
-                              ),
-                              selectedDecoration: BoxDecoration(
-                                color: Colors.black,
-                                shape: BoxShape.circle,
-                              ),
-                            ),
-                            headerStyle: const HeaderStyle(
-                              formatButtonVisible: false,
-                              titleCentered: true,
-                            ),
-                          ),
+  firstDay: DateTime.now(), // ✅ 오늘 이후만 선택 가능
+  lastDay: DateTime.utc(2030, 12, 31),
+  focusedDay: focusedDay,
+  selectedDayPredicate: (day) => isSameDay(selectedDay, day),
+  onDaySelected: (selected, focused) {
+    setState(() {
+      selectedDay = selected;
+      focusedDay = focused;
+    });
+  },
+  enabledDayPredicate: (day) {
+    // ✅ 오늘보다 이전은 비활성화
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    return !day.isBefore(today);
+  },
+  calendarStyle: const CalendarStyle(
+    todayDecoration: BoxDecoration(
+      color: Color.fromARGB(255, 183, 183, 183),
+      shape: BoxShape.circle,
+    ),
+    selectedDecoration: BoxDecoration(
+      color: Colors.black,
+      shape: BoxShape.circle,
+    ),
+  ),
+  headerStyle: const HeaderStyle(
+    formatButtonVisible: false,
+    titleCentered: true,
+  ),
+),
+
 
                           const SizedBox(height: 20),
 
@@ -150,8 +181,12 @@ void showReservationBottomSheet(BuildContext context) {
                                 '오후 12:00',
                                 '오후 12:30',
                                 '오후 1:00',
+                                '오후 2:00',
                               ].map((time) {
                                 final isSelected = selectedTime == time;
+                                final isDisabled = selectedDay != null &&
+                                    isPastTime(time, selectedDay!);
+
                                 return Padding(
                                   padding: const EdgeInsets.symmetric(horizontal: 4.0),
                                   child: ElevatedButton(
@@ -169,17 +204,19 @@ void showReservationBottomSheet(BuildContext context) {
                                       ),
                                       elevation: 0,
                                     ),
-                                    onPressed: () {
-                                      setState(() {
-                                        selectedTime = time;
-                                      });
-                                    },
+                                    onPressed: isDisabled
+                                        ? null
+                                        : () {
+                                            setState(() {
+                                              selectedTime = time;
+                                            });
+                                          },
                                     child: Text(
                                       time,
                                       style: TextStyle(
-                                        color: isSelected
-                                            ? Colors.white
-                                            : Colors.black,
+                                        color: isDisabled
+                                            ? Colors.grey
+                                            : (isSelected ? Colors.white : Colors.black),
                                       ),
                                     ),
                                   ),
@@ -194,7 +231,7 @@ void showReservationBottomSheet(BuildContext context) {
                     ),
                   ),
 
-                  /// 하단 예약하기 버튼
+                  /// 예약하기 버튼
                   Positioned(
                     bottom: 20,
                     left: 16,
@@ -221,7 +258,6 @@ void showReservationBottomSheet(BuildContext context) {
                           backgroundColor:
                               isComplete ? Colors.black : Colors.grey.shade300,
                           padding: const EdgeInsets.symmetric(vertical: 10),
-  
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10),
                           ),
