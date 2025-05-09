@@ -1,7 +1,9 @@
+import 'package:app/models/userprofile.dart';
 import 'package:app/pages/likepage.dart';
 import 'package:app/pages/setting/settings_page.dart';
 import 'package:app/services/bookmark_service.dart';
 import 'package:app/models/business.dart';
+import 'package:app/services/supabase_service.dart';
 import 'package:flutter/material.dart';
 import 'package:app/widgets/memoinputcard.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -13,11 +15,14 @@ class MyPage extends StatefulWidget {
 }
 
 class _MyPageState extends State<MyPage> {
-  final String userName = '화려한 식객_84866';
+  // final String userName = '화려한 식객_84866';
   List<business_data> bookmarkedStores = [];
+  UserProfile? currentUserProfile;
 
   void _showSnackbar(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
   }
 
   void _navigateToLikePage() {
@@ -30,7 +35,15 @@ class _MyPageState extends State<MyPage> {
   @override
   void initState() {
     super.initState();
+    loadUserProfile(); // ✅ 추가
     loadBookmarkedStores();
+  }
+
+  Future<void> loadUserProfile() async {
+    final profile = await SupabaseService().getUserProfile();
+    setState(() {
+      currentUserProfile = profile;
+    });
   }
 
   Future<void> loadBookmarkedStores() async {
@@ -38,7 +51,10 @@ class _MyPageState extends State<MyPage> {
     final ids = await BookmarkService.getBookmarkedIds();
 
     setState(() {
-      bookmarkedStores = allStores.where((store) => ids.contains(store.id.toString())).toList();
+      bookmarkedStores =
+          allStores
+              .where((store) => ids.contains(store.id.toString()))
+              .toList();
     });
   }
 
@@ -53,7 +69,9 @@ class _MyPageState extends State<MyPage> {
 
       if (response.isEmpty) return [];
 
-      return response.map<business_data>((data) => business_data.fromMap(data)).toList();
+      return response
+          .map<business_data>((data) => business_data.fromMap(data))
+          .toList();
     } catch (e) {
       print("❌ [fetchAllStores] 에러 발생: $e");
       return [];
@@ -113,15 +131,18 @@ class _MyPageState extends State<MyPage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      userName,
-                      style: TextStyle(
+                      currentUserProfile?.email ?? '로그인 유저 없음',
+                      style: const TextStyle(
                         fontFamily: 'Pretendard',
                         fontWeight: FontWeight.bold,
                         fontSize: 17,
                       ),
                     ),
                     const SizedBox(height: 5),
-                    Text('포인트 : 605p', style: TextStyle(fontSize: 14, color: Colors.grey[600])),
+                    Text(
+                      '포인트 : ${currentUserProfile?.point ?? 0}p',
+                      style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+                    ),
                   ],
                 ),
               ],
@@ -166,7 +187,9 @@ class _MyPageState extends State<MyPage> {
                 onTap: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (_) => StoreDetailPage(store: store)),
+                    MaterialPageRoute(
+                      builder: (_) => StoreDetailPage(store: store),
+                    ),
                   );
                 },
                 child: Container(
@@ -189,9 +212,15 @@ class _MyPageState extends State<MyPage> {
                               width: 70,
                               height: 90,
                               fit: BoxFit.cover,
-                              loadingBuilder: (context, child, loadingProgress) {
+                              loadingBuilder: (
+                                context,
+                                child,
+                                loadingProgress,
+                              ) {
                                 if (loadingProgress == null) return child;
-                                return Center(child: CircularProgressIndicator());
+                                return Center(
+                                  child: CircularProgressIndicator(),
+                                );
                               },
                               errorBuilder: (context, error, stackTrace) {
                                 return Container(
@@ -227,31 +256,60 @@ class _MyPageState extends State<MyPage> {
                                 const SizedBox(height: 6),
                                 const Row(
                                   children: [
-                                    Icon(Icons.star, color: Colors.orange, size: 16),
+                                    Icon(
+                                      Icons.star,
+                                      color: Colors.orange,
+                                      size: 16,
+                                    ),
                                     SizedBox(width: 4),
-                                    Text('4.7',
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.bold, fontSize: 14)),
-                                    Text('(220)',
-                                        style: TextStyle(fontSize: 13, color: Colors.grey)),
+                                    Text(
+                                      '4.7',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                    Text(
+                                      '(220)',
+                                      style: TextStyle(
+                                        fontSize: 13,
+                                        color: Colors.grey,
+                                      ),
+                                    ),
                                   ],
                                 ),
                                 const SizedBox(height: 4),
                                 Text(
                                   store.address,
-                                  style: const TextStyle(fontSize: 10, color: Colors.grey),
+                                  style: const TextStyle(
+                                    fontSize: 10,
+                                    color: Colors.grey,
+                                  ),
                                 ),
-                                const Text('점심 1.5만원 · 저녁 2.5만원',
-                                    style: TextStyle(fontSize: 10, color: Colors.grey)),
+                                const Text(
+                                  '점심 1.5만원 · 저녁 2.5만원',
+                                  style: TextStyle(
+                                    fontSize: 10,
+                                    color: Colors.grey,
+                                  ),
+                                ),
                               ],
                             ),
                           ),
                           const SizedBox(width: 8),
                           IconButton(
                             icon: const Icon(Icons.bookmark, color: Colors.red),
-                            onPressed: () {
-                              BookmarkService.toggleBookmark(store.id.toString());
-                              loadBookmarkedStores(); // 즉시 반영
+                            onPressed: () async {
+                              await BookmarkService.toggleBookmark(
+                                store.id.toString(),
+                              );
+                              // 북마크 ID만 최신화
+                              
+
+                              setState(() {
+                                        loadBookmarkedStores();
+
+                              });
                             },
                           ),
                         ],

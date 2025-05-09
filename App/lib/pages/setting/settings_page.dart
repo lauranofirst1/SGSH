@@ -1,5 +1,7 @@
+import 'package:app/auth/loginpage.dart';
 import 'package:app/pages/setting/qna_page.dart';
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'account_page.dart';
 import 'reservation_settings_page.dart';
 import 'service_settings_page.dart';
@@ -44,8 +46,16 @@ class SettingsPage extends StatelessWidget {
           ListTile(
             leading: const Icon(Icons.logout, color: Colors.red),
             title: const Text('로그아웃', style: TextStyle(color: Colors.red)),
-            onTap: () {
-              // TODO: 로그아웃 기능 추가
+            onTap: () async {
+              await Supabase.instance.client.auth.signOut();
+
+              if (context.mounted) {
+                Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(builder: (context) => LoginPage()),
+                  (route) => false,
+                );
+              }
+
               ScaffoldMessenger.of(
                 context,
               ).showSnackBar(const SnackBar(content: Text('로그아웃 되었습니다')));

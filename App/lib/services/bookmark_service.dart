@@ -10,13 +10,13 @@ class BookmarkService {
 
   static Future<void> toggleBookmark(String storeId) async {
     final prefs = await SharedPreferences.getInstance();
-    final ids = await _getStoredIds();
+    final ids = List<String>.from(await _getStoredIds()); // 반드시 복사본 사용
     if (ids.contains(storeId)) {
       ids.remove(storeId);
     } else {
       ids.add(storeId);
     }
-    await prefs.setStringList(_key, ids);
+    await prefs.setStringList(_key, ids); // 꼭 await
   }
 
   static Future<bool> isBookmarked(String storeId) async {

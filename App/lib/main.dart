@@ -1,9 +1,10 @@
-import 'package:app/models/business.dart';
+import 'package:app/auth/loginpage.dart';
+import 'package:app/models/userprofile.dart';
 import 'package:app/pages/mydiningpage.dart';
 import 'package:app/pages/mappage.dart';
 import 'package:app/pages/mypage.dart';
 import 'package:app/pages/searchpage.dart';
-import 'package:app/widgets/storedetailbottomsheet.dart';
+import 'package:app/services/supabase_service.dart';
 import 'package:flutter/material.dart';
 import 'package:app/pages/mainpage.dart';
 import 'package:flutter/services.dart';
@@ -12,24 +13,24 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
-  try {
-    await dotenv.load(fileName: ".env");
-    print("✅ .env 파일 로드 완료!");
-  } catch (e) {
-    print("❌ .env 파일 로드 실패: $e");
-  }
-
+  await dotenv.load(fileName: ".env");
   await Supabase.initialize(
-    url: dotenv.env["PROJECT_URL"] ?? "",
-    anonKey: dotenv.env["PROJECT_API_KEY"] ?? "",
+    url: dotenv.env['PROJECT_URL'] ?? '',
+    anonKey: dotenv.env['PROJECT_API_KEY'] ?? '',
   );
+
+  final user = Supabase.instance.client.auth.currentUser;
+
+  if (user != null) {
+    print("✅ 로그인 유지됨: ${user.email}");
+  } else {
+    print("❌ 로그인 안됨. LoginPage로 이동.");
+  }
 
   runApp(
     MaterialApp(
-      theme: ThemeData(scaffoldBackgroundColor: Color(0xFFF2F2F7)),
       debugShowCheckedModeBanner: false,
-      home: MyApp(), // ✅ 여기서 MyApp을 화면 자체로 쓸 것
+      home: user == null ? LoginPage() : MyApp(),
     ),
   );
 }
@@ -42,6 +43,7 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   int _selectedIndex = 0;
   bool _isBottomNavVisible = true;
+  UserProfile? _userProfile; // 꼭 추가하세요!
 
   final List<Widget> _pages = [];
 
@@ -55,6 +57,14 @@ class _MyAppState extends State<MyApp> {
       MyDiningPage(),
       MyPage(),
     ]);
+    _loadUserProfile(); // 🔥 유저 정보 불러오기
+  }
+
+  Future<void> _loadUserProfile() async {
+    final profile = await SupabaseService().getUserProfile();
+    setState(() {
+      _userProfile = profile;
+    });
   }
 
   // void _handleMarkerTap(String name, String address, business_data? store) {
@@ -87,6 +97,13 @@ class _MyAppState extends State<MyApp> {
       ),
     );
 
+    final user = Supabase.instance.client.auth.currentUser;
+
+    if (user != null) {
+      print('🟢 사용자 UID: ${user.id}');
+      print('🟢 사용자 이메일: ${user.email}');
+    }
+
     return MaterialApp(
       theme: ThemeData(scaffoldBackgroundColor: Color(0xFFF2F2F7)),
       debugShowCheckedModeBanner: false,
@@ -110,10 +127,11 @@ class _MyAppState extends State<MyApp> {
                       label: '검색',
                     ),
                     BottomNavigationBarItem(icon: Icon(Icons.map), label: '지도'),
-                    BottomNavigationBarItem( // ✅ 여기만 변경됨!
-      icon: Icon(Icons.event_note), // 아이콘 교체
-      label: '나의 예약',
-    ),
+                    BottomNavigationBarItem(
+                      // ✅ 여기만 변경됨!
+                      icon: Icon(Icons.event_note), // 아이콘 교체
+                      label: '나의 예약',
+                    ),
                     BottomNavigationBarItem(
                       icon: Icon(Icons.person),
                       label: '나의페이지',
