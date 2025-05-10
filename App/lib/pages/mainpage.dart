@@ -173,53 +173,121 @@ class _MainpageState extends State<Mainpage> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        automaticallyImplyLeading: false, // <-- 이 줄을 추가
-        backgroundColor: Colors.white, // 항상 흰색 유지
-        elevation: 0.5,
+        automaticallyImplyLeading: false,
+        backgroundColor: Colors.white,
+        elevation: 0,
         centerTitle: false,
-        title: const Text(
-          '가치가게',
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            color: Colors.black,
-          ),
+        title: Row(
+          children: [
+            Text(
+              '가치가게',
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.w700,
+                color: Colors.black,
+              ),
+            ),
+            SizedBox(width: 8),
+            Container(
+              padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              decoration: BoxDecoration(
+                color: Colors.orange.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Text(
+                'BETA',
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.orange,
+                ),
+              ),
+            ),
+          ],
         ),
-
-        foregroundColor: Colors.black, // 버튼색이 스크롤에 의해 바뀌지 않도록
-        surfaceTintColor: Colors.white, // 머티리얼 3 대응용 (앱바 배경 흐림 방지)
-        shadowColor: Colors.transparent, // 그림자 투명화(선택)
+        actions: [
+          IconButton(
+            icon: Icon(Icons.notifications_outlined, color: Colors.black87),
+            onPressed: () {},
+          ),
+          SizedBox(width: 8),
+        ],
+        foregroundColor: Colors.black,
+        surfaceTintColor: Colors.white,
+        shadowColor: Colors.transparent,
       ),
       body: SingleChildScrollView(
         child: Column(
           children: <Widget>[
             Article(article: bannerArticles),
             Padding(
-              padding: EdgeInsets.all(8).copyWith(top: 20),
-              child: Wrap(
-                alignment: WrapAlignment.start,
-                spacing: 8,
-                runSpacing: 12,
-                children:
-                    items.map((item) {
-                      return SizedBox(
-                        width: MediaQuery.of(context).size.width / 6 - 12,
-                        child: _buildEmojiText(
-                          item['emoji'],
-                          item['label'],
-                          context,
+              padding: EdgeInsets.all(16).copyWith(top: 24),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '카테고리',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w700,
+                      color: Colors.black87,
+                    ),
+                  ),
+                  SizedBox(height: 16),
+                  Container(
+                    padding: EdgeInsets.symmetric(vertical: 24, horizontal: 8),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(24),
+                      border: Border.all(color: Colors.grey[200]!),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.06),
+                          blurRadius: 16,
+                          offset: Offset(0, 4),
                         ),
-                      );
-                    }).toList(),
+                      ],
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: items.map((item) {
+                        return Expanded(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                item['emoji'],
+                                style: const TextStyle(
+                                  fontFamily: 'TossFace',
+                                  fontSize: 44,
+                                ),
+                              ),
+                              SizedBox(height: 10),
+                              Text(
+                                item['label'],
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.black87,
+                                  height: 1.2,
+                                ),
+                                maxLines: 2,
+                              ),
+                            ],
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                ],
               ),
             ),
-
             buildRecentItems(),
             RecommendedStoreSection(
               userName: userName.isNotEmpty ? userName : '회원',
               stores: recommendedStores,
             ),
-
             DummyArticleList(newsArticles: newsArticles),
             DiningMagazineSection(magazineArticles: magazineArticles),
           ],
@@ -293,14 +361,15 @@ class _MainpageState extends State<Mainpage> {
                     itemBuilder: (context, index) {
                       final store = stores[index];
                       return GestureDetector(
-                        onTap: () {
-                          Navigator.push(
+                        onTap: () async {
+                          final result = await Navigator.push(
                             context,
                             MaterialPageRoute(
                               builder:
                                   (context) => StoreDetailPage(store: store),
                             ),
                           );
+                          if (result == true) setState(() {}); // 돌아올 때 새로고침
                         },
                         child: Container(
                           width: 180,
@@ -378,32 +447,6 @@ class _MainpageState extends State<Mainpage> {
           },
         );
       },
-    );
-  }
-
-  Widget _buildEmojiText(String emoji, String label, BuildContext context) {
-    return InkWell(
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => StoreListPage()),
-        ).then((_) {
-          setState(() {
-            prefsFuture = SharedPreferences.getInstance();
-          });
-        });
-      },
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          Text(emoji, style: const TextStyle(
-            fontFamily: 'TossFace', // pubspec.yaml에서 등록한 폰트 이름
-            fontSize: 28,
-          ),),
-          SizedBox(height: 4),
-          Text(label),
-        ],
-      ),
     );
   }
 }

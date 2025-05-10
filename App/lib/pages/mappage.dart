@@ -184,34 +184,55 @@ class _MapPageState extends State<MapPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12),
+              height: 48,
+              padding: const EdgeInsets.symmetric(horizontal: 16),
               decoration: BoxDecoration(
                 color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
-                boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 8)],
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.05),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
               ),
               child: Row(
                 children: [
-                  const Icon(Icons.search, color: Colors.grey),
-                  const SizedBox(width: 8),
+                  const Icon(Icons.search, color: Colors.grey, size: 20),
+                  const SizedBox(width: 12),
                   Expanded(
                     child: TextField(
                       controller: _searchController,
+                      style: const TextStyle(
+                        fontSize: 15,
+                        color: Colors.black87,
+                      ),
                       decoration: const InputDecoration(
                         hintText: '가게 이름 검색',
+                        hintStyle: TextStyle(
+                          color: Colors.grey,
+                          fontSize: 15,
+                        ),
                         border: InputBorder.none,
+                        contentPadding: EdgeInsets.symmetric(vertical: 12),
                       ),
                       onSubmitted: (query) => _searchAndMove(query),
                     ),
                   ),
-                  IconButton(
-                    icon: const Icon(Icons.close),
-                    onPressed: () => _searchController.clear(),
-                  ),
+                  if (_searchController.text.isNotEmpty)
+                    IconButton(
+                      icon: const Icon(Icons.close, size: 20),
+                      color: Colors.grey,
+                      onPressed: () {
+                        _searchController.clear();
+                        setState(() {});
+                      },
+                    ),
                 ],
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 12),
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: Row(

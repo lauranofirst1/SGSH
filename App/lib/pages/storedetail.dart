@@ -298,7 +298,7 @@ class _StoreDetailPageState extends State<StoreDetailPage>
                         padding: EdgeInsets.only(left: 12), // 적당한 좌측 여백
                         child: _circleIconButton(
                           icon: Icons.arrow_back_ios_new,
-                          onTap: () => Navigator.pop(context),
+                          onTap: () => Navigator.pop(context, true),
                         ),
                       ),
                     ),
@@ -307,7 +307,7 @@ class _StoreDetailPageState extends State<StoreDetailPage>
                       _circleIconButton(
                         icon: Icons.home,
                         onTap: () {
-                          Navigator.popUntil(context, (route) => route.isFirst);
+                          Navigator.pop(context, true);
                         },
                       ),
                       _circleIconButton(
