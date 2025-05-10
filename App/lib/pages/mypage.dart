@@ -1,6 +1,6 @@
 import 'package:app/models/userprofile.dart';
 import 'package:app/pages/likepage.dart';
-import 'package:app/pages/setting/settings_page.dart';
+import 'package:app/setting/settings_page.dart';
 import 'package:app/services/bookmark_service.dart';
 import 'package:app/models/business.dart';
 import 'package:app/services/supabase_service.dart';
@@ -40,11 +40,44 @@ class _MyPageState extends State<MyPage> {
   }
 
   Future<void> loadUserProfile() async {
-    final profile = await SupabaseService().getUserProfile();
-    setState(() {
-      currentUserProfile = profile;
-    });
+  UserProfile? profile = await SupabaseService().getUserProfile();
+
+  if (profile?.code == null) {
+    final randomCode = (1000 + (DateTime.now().millisecondsSinceEpoch % 9000)).toString();
+
+    // 중복 방지: 해당 코드가 이미 존재하는지 확인
+    final isDuplicate = await Supabase.instance.client
+        .from('profile_data')
+        .select('code')
+        .eq('code', randomCode)
+        .maybeSingle();
+
+    if (isDuplicate == null) {
+      // Supabase에 랜덤 코드 저장
+      await Supabase.instance.client
+          .from('profile_data')
+          .update({'code': randomCode})
+          .eq('id', profile!.id);
+
+      // 메모리에 반영
+      profile = UserProfile(
+        id: profile.id,
+        email: profile.email,
+        point: profile.point,
+        bId: profile.bId,
+        code: randomCode, // ✅ 제대로 전달
+      );
+    }
   }
+
+  setState(() {
+    currentUserProfile = profile;
+  });
+  print('👤 사용자 코드: ${profile?.code}');
+
+}
+
+
 
   Future<void> loadBookmarkedStores() async {
     final allStores = await fetchAllStores();
@@ -83,6 +116,8 @@ class _MyPageState extends State<MyPage> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
+                  automaticallyImplyLeading: false, // <-- 이 줄을 추가
+
         backgroundColor: Colors.white,
         elevation: 0.5,
         centerTitle: false,
@@ -128,23 +163,28 @@ class _MyPageState extends State<MyPage> {
                 ),
                 const SizedBox(width: 10),
                 Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      currentUserProfile?.email ?? '로그인 유저 없음',
-                      style: const TextStyle(
-                        fontFamily: 'Pretendard',
-                        fontWeight: FontWeight.bold,
-                        fontSize: 17,
-                      ),
-                    ),
-                    const SizedBox(height: 5),
-                    Text(
-                      '포인트 : ${currentUserProfile?.point ?? 0}p',
-                      style: TextStyle(fontSize: 14, color: Colors.grey[600]),
-                    ),
-                  ],
-                ),
+  crossAxisAlignment: CrossAxisAlignment.start,
+  children: [
+    Text(
+      currentUserProfile?.email ?? '로그인 유저 없음',
+      style: const TextStyle(
+        fontFamily: 'Pretendard',
+        fontWeight: FontWeight.bold,
+        fontSize: 17,
+      ),
+    ),
+    const SizedBox(height: 5),
+    Text(
+      '포인트 : ${currentUserProfile?.point ?? 0}p',
+      style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+    ),
+    Text(
+      '코드: ${currentUserProfile?.code ?? '없음'}',
+      style: TextStyle(fontSize: 13, color: Colors.grey[600]),
+    ),
+  ],
+),
+
               ],
             ),
             const SizedBox(height: 10),

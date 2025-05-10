@@ -91,9 +91,9 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     SystemChrome.setSystemUIOverlayStyle(
       SystemUiOverlayStyle(
-        statusBarColor: Colors.white, // 상태바 배경색
-        statusBarIconBrightness: Brightness.dark, // 아이콘 색상 (검정)
-        statusBarBrightness: Brightness.light, // iOS용
+        statusBarColor: Colors.white,
+        statusBarIconBrightness: Brightness.dark,
+        statusBarBrightness: Brightness.light,
       ),
     );
 
@@ -104,42 +104,37 @@ class _MyAppState extends State<MyApp> {
       print('🟢 사용자 이메일: ${user.email}');
     }
 
-    return MaterialApp(
-      theme: ThemeData(scaffoldBackgroundColor: Color(0xFFF2F2F7)),
-      debugShowCheckedModeBanner: false,
-      home: Scaffold(
-        key: _scaffoldKey, // 🔥 여기!
-        backgroundColor: Color(0xFFF2F2F7),
-        body: IndexedStack(index: _selectedIndex, children: _pages),
-        bottomNavigationBar:
-            _isBottomNavVisible
-                ? BottomNavigationBar(
-                  currentIndex: _selectedIndex,
-                  onTap: _onItemTapped,
-                  backgroundColor: Colors.white,
-                  selectedItemColor: Colors.black,
-                  unselectedItemColor: Colors.grey,
-                  type: BottomNavigationBarType.fixed,
-                  items: const [
-                    BottomNavigationBarItem(icon: Icon(Icons.home), label: '홈'),
-                    BottomNavigationBarItem(
-                      icon: Icon(Icons.search),
-                      label: '검색',
-                    ),
-                    BottomNavigationBarItem(icon: Icon(Icons.map), label: '지도'),
-                    BottomNavigationBarItem(
-                      // ✅ 여기만 변경됨!
-                      icon: Icon(Icons.event_note), // 아이콘 교체
-                      label: '나의 예약',
-                    ),
-                    BottomNavigationBarItem(
-                      icon: Icon(Icons.person),
-                      label: '나의페이지',
-                    ),
-                  ],
-                )
-                : null,
-      ),
+    return Scaffold(
+      key: _scaffoldKey,
+      backgroundColor: Color(0xFFF2F2F7),
+      body: IndexedStack(index: _selectedIndex, children: _pages),
+      bottomNavigationBar:
+          _isBottomNavVisible
+              ? BottomNavigationBar(
+                currentIndex: _selectedIndex,
+                onTap: _onItemTapped,
+                backgroundColor: Colors.white,
+                selectedItemColor: Colors.black,
+                unselectedItemColor: Colors.grey,
+                type: BottomNavigationBarType.fixed,
+                items: const [
+                  BottomNavigationBarItem(icon: Icon(Icons.home), label: '홈'),
+                  BottomNavigationBarItem(
+                    icon: Icon(Icons.search),
+                    label: '검색',
+                  ),
+                  BottomNavigationBarItem(icon: Icon(Icons.map), label: '지도'),
+                  BottomNavigationBarItem(
+                    icon: Icon(Icons.event_note),
+                    label: '나의 예약',
+                  ),
+                  BottomNavigationBarItem(
+                    icon: Icon(Icons.person),
+                    label: '나의페이지',
+                  ),
+                ],
+              )
+              : null,
     );
   }
 }

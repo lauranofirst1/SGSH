@@ -27,6 +27,7 @@ dependencies:
   carousel_slider: ^5.0.0
   table_calendar: ^3.2.0
   flutter_html: ^3.0.0
+  intl: ^0.20.2
 
 
 
@@ -65,4 +66,4 @@ flutter:
     - .env
     - assets/images/dummy_image/
     - assets/images/adimage/
-
+    - assets/images/logo/

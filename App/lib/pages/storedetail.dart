@@ -33,8 +33,7 @@ class _StoreDetailPageState extends State<StoreDetailPage>
   late TabController _tabController;
   bool isBookmarked = false;
   bool showTitle = false;
-static const String bookmarkKey = 'bookmarkedStores';
-
+  static const String bookmarkKey = 'bookmarkedStores';
 
   void fetchStoreArticles() async {
     try {
@@ -59,25 +58,24 @@ static const String bookmarkKey = 'bookmarkedStores';
   }
 
   void toggleBookmark() async {
-  await BookmarkService.toggleBookmark(widget.store.id.toString());
-  await checkBookmarkStatus(); // 북마크 상태를 정확히 다시 읽어옴
+    await BookmarkService.toggleBookmark(widget.store.id.toString());
+    await checkBookmarkStatus(); // 북마크 상태를 정확히 다시 읽어옴
 
-  print(
-    isBookmarked
-        ? "🔖 북마크 추가됨: ${widget.store.name}"
-        : "❌ 북마크 해제됨: ${widget.store.name}",
-  );
-}
+    print(
+      isBookmarked
+          ? "🔖 북마크 추가됨: ${widget.store.name}"
+          : "❌ 북마크 해제됨: ${widget.store.name}",
+    );
+  }
 
-Future<void> checkBookmarkStatus() async {
-  final isMarked = await BookmarkService.isBookmarked(widget.store.id.toString());
-  setState(() {
-    isBookmarked = isMarked;
-  });
-}
-
-
-
+  Future<void> checkBookmarkStatus() async {
+    final isMarked = await BookmarkService.isBookmarked(
+      widget.store.id.toString(),
+    );
+    setState(() {
+      isBookmarked = isMarked;
+    });
+  }
 
   void shareStore() {
     showModalBottomSheet(
@@ -138,42 +136,41 @@ Future<void> checkBookmarkStatus() async {
 
   final ScrollController _scrollController = ScrollController();
 
- @override
-void initState() {
-  super.initState();
-  _tabController = TabController(length: 2, vsync: this);
-  prefsFuture = SharedPreferences.getInstance();
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 2, vsync: this);
+    prefsFuture = SharedPreferences.getInstance();
 
-  _scrollController.addListener(() {
-    if (_scrollController.offset > 150 && !showTitle) {
-      setState(() => showTitle = true);
-    } else if (_scrollController.offset <= 150 && showTitle) {
-      setState(() => showTitle = false);
-    }
-  });
+    _scrollController.addListener(() {
+      if (_scrollController.offset > 150 && !showTitle) {
+        setState(() => showTitle = true);
+      } else if (_scrollController.offset <= 150 && showTitle) {
+        setState(() => showTitle = false);
+      }
+    });
 
-  fetchMenuData();
-  fetchStoreArticles(); // ✅ 여기!
-  saveToRecentStores(widget.store.name);
-    checkBookmarkStatus(); // ✅ 여기!
+    fetchMenuData();
+    fetchStoreArticles();
+  saveToRecentStores(widget.store.id); // ✅ 변경된 부분
+    checkBookmarkStatus();
+  }
 
+  void saveToRecentStores(int storeId) async {
+  final prefs = await prefsFuture;
+  List<String> recentIds = prefs.getStringList('recentStoreIds') ?? [];
+
+  final idStr = storeId.toString();
+  recentIds.remove(idStr);            // 중복 제거
+  recentIds.insert(0, idStr);         // 최신순 정렬
+  if (recentIds.length > 5) {
+    recentIds = recentIds.sublist(0, 5); // 최대 5개까지만 유지
+  }
+
+  await prefs.setStringList('recentStoreIds', recentIds);
+  print("✅ 최근 본 가게 ID 목록: $recentIds");
 }
 
-
-
-
-
-  void saveToRecentStores(String storeName) async {
-    final prefs = await prefsFuture;
-    List<String> recentStores = prefs.getStringList('recentStores') ?? [];
-    recentStores.remove(storeName);
-    recentStores.insert(0, storeName);
-    if (recentStores.length > 5) {
-      recentStores = recentStores.sublist(0, 5);
-    }
-    await prefs.setStringList('recentStores', recentStores);
-    print("✅ 최근 본 가게 업데이트 완료: $recentStores");
-  }
 
   void fetchMenuData() async {
     try {
@@ -233,7 +230,11 @@ void initState() {
           bookmarkCount: 5012,
           onReservePressed: () {
             // 예약하기 눌렀을 때
-            showReservationBottomSheet(context);
+            showReservationBottomSheet(
+  context,
+  storeName: widget.store.name,  // ✅ 수정
+  storeId: widget.store.id,      // ✅ 수정
+);
           },
           onCallPressed: () {
             // 전화 버튼 눌렀을 때
@@ -481,98 +482,97 @@ void initState() {
   }
 
   Widget buildHomeTab() {
-  if (storeArticles.isEmpty) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(32),
-        child: Text("이 가게에 등록된 아티클이 없습니다."),
-      ),
-    );
-  }
-
-  return ListView.builder(
-    padding: EdgeInsets.all(16),
-    itemCount: storeArticles.length,
-    itemBuilder: (context, index) {
-      final article = storeArticles[index];
-      return Container(
-        margin: EdgeInsets.only(bottom: 20),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(20),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black12,
-              blurRadius: 10,
-              offset: Offset(0, 4),
-            ),
-          ],
-          border: Border.all(color: Colors.grey.shade200),
-        ),
+    if (storeArticles.isEmpty) {
+      return Center(
         child: Padding(
-          padding: EdgeInsets.all(20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Icon(Icons.campaign, color: Colors.orange, size: 20),
-                  SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      article.title,
-                      style: TextStyle(
-                        fontSize: 17,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black87,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(height: 12),
-              Text(
-                article.content,
-                style: TextStyle(
-                  fontSize: 14,
-                  color: Colors.black87,
-                  height: 1.5,
-                ),
-              ),
-              SizedBox(height: 16),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    children: [
-                      Icon(Icons.person, size: 14, color: Colors.grey),
-                      SizedBox(width: 4),
-                      Text(
-                        article.author,
-                        style: TextStyle(fontSize: 12, color: Colors.black54),
-                      ),
-                    ],
-                  ),
-                  Row(
-                    children: [
-                      Icon(Icons.access_time, size: 14, color: Colors.grey),
-                      SizedBox(width: 4),
-                      Text(
-                        article.time,
-                        style: TextStyle(fontSize: 12, color: Colors.black45),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ],
-          ),
+          padding: const EdgeInsets.all(32),
+          child: Text("이 가게에 등록된 아티클이 없습니다."),
         ),
       );
-    },
-  );
-}
+    }
 
+    return ListView.builder(
+      padding: EdgeInsets.all(16),
+      itemCount: storeArticles.length,
+      itemBuilder: (context, index) {
+        final article = storeArticles[index];
+        return Container(
+          margin: EdgeInsets.only(bottom: 20),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black12,
+                blurRadius: 10,
+                offset: Offset(0, 4),
+              ),
+            ],
+            border: Border.all(color: Colors.grey.shade200),
+          ),
+          child: Padding(
+            padding: EdgeInsets.all(20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Icon(Icons.campaign, color: Colors.orange, size: 20),
+                    SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        article.title,
+                        style: TextStyle(
+                          fontSize: 17,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black87,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 12),
+                Text(
+                  article.content,
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.black87,
+                    height: 1.5,
+                  ),
+                ),
+                SizedBox(height: 16),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
+                      children: [
+                        Icon(Icons.person, size: 14, color: Colors.grey),
+                        SizedBox(width: 4),
+                        Text(
+                          article.author,
+                          style: TextStyle(fontSize: 12, color: Colors.black54),
+                        ),
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        Icon(Icons.access_time, size: 14, color: Colors.grey),
+                        SizedBox(width: 4),
+                        Text(
+                          article.time,
+                          style: TextStyle(fontSize: 12, color: Colors.black45),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
 
   Widget buildMenuTab(List<menu_data> menus) {
     if (menus.isEmpty) {

@@ -3,6 +3,7 @@ import 'package:app/models/business.dart';
 import 'package:app/pages/articlepage.dart';
 import 'package:app/pages/storedetail.dart';
 import 'package:app/pages/storelist.dart';
+import 'package:app/services/supabase_service.dart';
 import 'package:app/widgets/diningmagazinesection.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -32,13 +33,29 @@ class _MainpageState extends State<Mainpage> {
   final supabase = Supabase.instance.client;
   late Future<SharedPreferences> prefsFuture;
 
+  List<business_data> recommendedStores = [];
+  String userName = '';
+
   @override
   void initState() {
     super.initState();
     prefsFuture = SharedPreferences.getInstance();
     fetchStores();
-    prefsFuture.then((prefs) {
-      setState(() {});
+
+    // 이메일 앞부분 추출
+    SupabaseService().getUserProfile().then((profile) {
+      final email = profile?.email;
+      final namePart = email?.split('@')[0];
+      setState(() {
+        userName = namePart!;
+      });
+    });
+
+    // 랜덤 추천 매장 불러오기
+    fetchRandomStores().then((stores) {
+      setState(() {
+        recommendedStores = stores;
+      });
     });
   }
 
@@ -62,11 +79,30 @@ class _MainpageState extends State<Mainpage> {
     }
   }
 
+  Future<List<business_data>> fetchRandomStores() async {
+    try {
+      final response = await supabase.from('business_data').select();
+
+      List<business_data> allStores =
+          response
+              .map<business_data>((data) => business_data.fromMap(data))
+              .toList();
+
+      allStores.shuffle(); // ✅ 클라이언트에서 무작위 섞기
+
+      return allStores.take(5).toList(); // ✅ 상위 5개만
+    } catch (e) {
+      print("❌ 랜덤 매장 불러오기 실패: $e");
+      return [];
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
+          automaticallyImplyLeading: false, // <-- 이 줄을 추가
         backgroundColor: Colors.white, // 항상 흰색 유지
         elevation: 0.5,
         centerTitle: false,
@@ -107,19 +143,13 @@ class _MainpageState extends State<Mainpage> {
                     }).toList(),
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 24, 16, 0),
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  '최근 본 항목',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-                ),
-              ),
-            ),
 
             buildRecentItems(),
-            const SizedBox(height: 20),
+            RecommendedStoreSection(
+              userName: userName.isNotEmpty ? userName : '회원',
+              stores: recommendedStores,
+            ),
+
             DummyArticleList(newsArticles: newsArticles),
             DiningMagazineSection(magazineArticles: magazineArticles),
           ],
@@ -139,17 +169,21 @@ class _MainpageState extends State<Mainpage> {
           return Center(child: Text("최근 본 가게가 없습니다."));
         }
 
-        List<String> recentStores =
-            snapshot.data!.getStringList('recentStores') ?? [];
+        List<String> recentIds =
+            snapshot.data!.getStringList('recentStoreIds') ?? [];
+
+        if (recentIds.isEmpty) {
+          return Center(child: Text("최근 본 가게가 없습니다."));
+        }
 
         return FutureBuilder<List<business_data>>(
           future: Future.wait(
-            recentStores.map((storeName) async {
-              var response =
+            recentIds.map((id) async {
+              final response =
                   await supabase
                       .from('business_data')
                       .select()
-                      .eq('name', storeName)
+                      .eq('id', int.parse(id))
                       .single();
               return business_data.fromMap(response);
             }),
@@ -164,84 +198,112 @@ class _MainpageState extends State<Mainpage> {
 
             final stores = snapshot.data!;
 
-            return Container(
-              height: 150,
-              child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                itemCount: stores.length,
-                itemBuilder: (context, index) {
-                  final store = stores[index];
-                  return GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => StoreDetailPage(store: store),
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 24, 16, 4),
+                  child: Text(
+                    '최근 본 매장',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+                  child: Text(
+                    '최근 본 매장을 모아봤어요',
+                    style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+                  ),
+                ),
+                Container(
+                  height: 190,
+                  child: ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: stores.length,
+                    itemBuilder: (context, index) {
+                      final store = stores[index];
+                      return GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder:
+                                  (context) => StoreDetailPage(store: store),
+                            ),
+                          );
+                        },
+                        child: Container(
+                          width: 180,
+                          margin: EdgeInsets.only(
+                            left: index == 0 ? 16 : 10,
+                            right: 10,
+                          ),
+                          decoration: BoxDecoration(color: Colors.white),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              ClipRRect(
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(20),
+                                ),
+                                child: Image.network(
+                                  store.image,
+                                  height: 120,
+                                  width: double.infinity,
+                                  fit: BoxFit.cover,
+                                  errorBuilder:
+                                      (_, __, ___) => Container(
+                                        height: 120,
+                                        color: Colors.grey[300],
+                                        child: Icon(Icons.image),
+                                      ),
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                  vertical: 8,
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      store.name,
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.black87,
+                                      ),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                    Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      children: [
+                                        Flexible(
+                                          child: Text(
+                                            store.description,
+                                            style: TextStyle(
+                                              fontSize: 12,
+                                              color: Colors.grey[600],
+                                            ),
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       );
                     },
-                    child: Container(
-                      width: 160,
-                      margin: EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 10,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(16),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black12,
-                            blurRadius: 12,
-                            offset: Offset(0, 6),
-                          ),
-                        ],
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          ClipRRect(
-                            borderRadius: BorderRadius.vertical(
-                              top: Radius.circular(16),
-                            ),
-                            child: Image.network(
-                              store.image,
-                              height: 90,
-                              width: double.infinity,
-                              fit: BoxFit.cover,
-                              errorBuilder:
-                                  (_, __, ___) => Container(
-                                    height: 90,
-                                    color: Colors.grey[300],
-                                    child: Icon(
-                                      Icons.store,
-                                      color: Colors.grey[600],
-                                    ),
-                                  ),
-                            ),
-                          ),
-                          Padding(
-                            padding: EdgeInsets.symmetric(
-                              horizontal: 10,
-                              vertical: 6,
-                            ),
-                            child: Text(
-                              store.name,
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w500,
-                                fontFamily: 'SF Pro Display',
-                                color: Colors.black87,
-                              ),
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
-                },
-              ),
+                  ),
+                ),
+              ],
             );
           },
         );
@@ -435,6 +497,126 @@ class DummyArticleList extends StatelessWidget {
             },
           );
         }).toList(),
+      ],
+    );
+  }
+}
+
+class RecommendedStoreSection extends StatelessWidget {
+  final String userName;
+  final List<business_data> stores;
+
+  const RecommendedStoreSection({
+    super.key,
+    required this.userName,
+    required this.stores,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    if (stores.isEmpty) return SizedBox.shrink();
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 24, 16, 4),
+          child: Text(
+            '$userName님이 좋아할 매장',
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+          child: Text(
+            '마음에 들 만한 곳을 모아봤어요',
+            style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+          ),
+        ),
+        SizedBox(
+          height: 190,
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            itemCount: stores.length,
+            itemBuilder: (context, index) {
+              final store = stores[index];
+              return GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => StoreDetailPage(store: store),
+                    ),
+                  );
+                },
+                child: Container(
+                  width: 180,
+                  margin: EdgeInsets.only(
+                    left: index == 0 ? 16 : 10,
+                    right: 10,
+                  ),
+                  decoration: BoxDecoration(color: Colors.white),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      ClipRRect(
+                        borderRadius: BorderRadius.all(Radius.circular(20)),
+                        child: Image.network(
+                          store.image,
+                          height: 120,
+                          width: double.infinity,
+                          fit: BoxFit.cover,
+                          errorBuilder:
+                              (_, __, ___) => Container(
+                                height: 120,
+                                color: Colors.grey[300],
+                                child: Icon(Icons.image),
+                              ),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 8,
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              store.name,
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black87,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Flexible(
+                                  child: Text(
+                                    store.description,
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: Colors.grey[600],
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
       ],
     );
   }

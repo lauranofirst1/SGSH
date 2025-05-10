@@ -1,17 +1,23 @@
 // 감정된 예약 확인 페이지 구현
 import 'dart:async';
-import 'package:app/models/business.dart';
+import 'package:app/models/reserve_data.dart';
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:intl/intl.dart'; // Added import for DateFormat
 
 class ReservationConfirmPage extends StatefulWidget {
+  final int businessId; // ✅ 추가
   final DateTime date;
   final String time;
   final int people;
+  final String storeName; // ✅ 변수 선언
 
   const ReservationConfirmPage({
+    required this.businessId,
     required this.date,
     required this.time,
     required this.people,
+    required this.storeName, // ✅ this.storeName 사용
   });
 
   @override
@@ -157,6 +163,19 @@ class _ReservationConfirmPageState extends State<ReservationConfirmPage> {
     );
   }
 
+  String convertTo24HourTime(String timeStr) {
+    final isPm = timeStr.contains('오후');
+    final cleaned = timeStr.replaceAll(RegExp(r'[^\d:]'), '');
+    final parts = cleaned.split(':');
+    int hour = int.parse(parts[0]);
+    int minute = int.parse(parts[1]);
+
+    if (isPm && hour != 12) hour += 12;
+    if (!isPm && hour == 12) hour = 0;
+
+    return '${hour.toString().padLeft(2, '0')}:${minute.toString().padLeft(2, '0')}';
+  }
+
   @override
   Widget build(BuildContext context) {
     final String reservationInfo =
@@ -168,8 +187,9 @@ class _ReservationConfirmPageState extends State<ReservationConfirmPage> {
         backgroundColor: Colors.white, // 항상 흰색 유지
         elevation: 0.5,
         centerTitle: false,
-        title: const Text(
-        'Business Name', // Replace with the actual business name or pass it dynamically
+        title: Text(
+          widget
+              .storeName, // Replace with the actual business name or pass it dynamically
           style: TextStyle(
             fontSize: 20,
             fontFamily: 'Pretendard',
@@ -322,7 +342,7 @@ class _ReservationConfirmPageState extends State<ReservationConfirmPage> {
                     ],
                   ),
                 ),
-                SizedBox(height: 80,)
+                SizedBox(height: 80),
               ],
             ),
           ),
@@ -345,14 +365,53 @@ class _ReservationConfirmPageState extends State<ReservationConfirmPage> {
                   ElevatedButton(
                     onPressed:
                         (allCautionsChecked && agreedPrivacy)
-                            ? () {
-                              print('예약 저장: $reservationInfo');
-                              print('방문목적: $selectedPurposes');
-                              print('방문자정보: $visitors');
-                              print('요청사항: ${requestController.text}');
-                              Navigator.pop(context);
+                            ? () async {
+                              final formattedNow = DateFormat(
+                                'yyyy-MM-dd HH:mm:ss',
+                              ).format(DateTime.now());
+                              final formattedTime = convertTo24HourTime(
+                                widget.time,
+                              ); // "오후 2:30" → "14:30"
+
+                              final reserveData = reserve_data(
+                                bId: widget.businessId,
+                                date:
+                                    '${widget.date.year}-${widget.date.month.toString().padLeft(2, '0')}-${widget.date.day.toString().padLeft(2, '0')}',
+                                time: formattedTime, // ✅ 여기 수정
+                                count: widget.people,
+                                rTime: formattedNow, // 현재 시각을 포맷된 문자열로
+                                status: 'standby',
+                                uuid:
+                                    Supabase
+                                        .instance
+                                        .client
+                                        .auth
+                                        .currentUser
+                                        ?.id ??
+                                    '',
+                                comment: requestController.text,
+                              );
+
+                              try {
+                                await Supabase.instance.client
+                                    .from('reserve_data')
+                                    .insert(reserveData.toJson());
+
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(content: Text('예약이 저장되었습니다.')),
+                                );
+                                Navigator.pop(context);
+                              } catch (e) {
+                                print('예약 저장 실패: $e');
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text('예약 저장에 실패했습니다.'),
+                                  ),
+                                );
+                              }
                             }
                             : null,
+
                     style: ElevatedButton.styleFrom(
                       minimumSize: const Size.fromHeight(50),
                       backgroundColor: Colors.black,

@@ -8,77 +8,84 @@ class LoginPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text('로그인', style: TextStyle(fontSize: 24)),
-            const SizedBox(height: 20),
+      backgroundColor: const Color(0xFFFDFBF8),
+      body: SafeArea(
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 32),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                // 상단 로고 이미지
+                Image.asset(
+                  'assets/images/logo/sgsh_logo.png',
+                  height: 300,
+                  fit: BoxFit.contain,
+                ),
+                SizedBox(height: 10,),
+                Text(
+                  '나의 가치를 담은 가게를\n발견해보세요',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Colors.brown[400],
+                  ),
+                ),
+                const SizedBox(height: 60),
 
-            GestureDetector(
-              child: Text("data"),
-              onTap: () async {
-                final User? user = supabase.auth.currentUser;
-                print(user);
-              },
-            ),
-            ElevatedButton(
-              onPressed: () async {
-                final User? user = supabase.auth.currentUser;
-                print(user);
-                try {
-                  await supabase.auth.signInWithOAuth(
-                    OAuthProvider.kakao,
-                    redirectTo:
-                        'io.supabase.flutterquickstart://login-callback/',
-                    authScreenLaunchMode: LaunchMode.externalApplication,
-                  );
-                  supabase.auth.onAuthStateChange.listen((data) async {
-                    final event = data.event;
-                    if (event == AuthChangeEvent.signedIn) {
-                      final user = supabase.auth.currentUser;
-                      if (user != null) {
-                        print('✅ 로그인 성공: ${user.email ?? user.id}');
+                // 카카오 로그인 버튼 (이미지 전체)
+                GestureDetector(
+                  onTap: () async {
+                    try {
+                      await supabase.auth.signInWithOAuth(
+                        OAuthProvider.kakao,
+                        redirectTo: 'io.supabase.flutterquickstart://login-callback/',
+                        authScreenLaunchMode: LaunchMode.externalApplication,
+                      );
 
-                        final existing =
-                            await supabase
+                      supabase.auth.onAuthStateChange.listen((data) async {
+                        final event = data.event;
+                        if (event == AuthChangeEvent.signedIn) {
+                          final user = supabase.auth.currentUser;
+                          if (user != null) {
+                            final existing = await supabase
                                 .from('profile_data')
                                 .select()
                                 .eq('id', user.id)
                                 .maybeSingle();
 
-                        if (existing == null) {
-                          await supabase.from('profile_data').insert({
-                            'id': user.id,
-                            'email': user.email,
-                            'point': 0,
-                          });
-                        }
+                            if (existing == null) {
+                              await supabase.from('profile_data').insert({
+                                'id': user.id,
+                                'email': user.email,
+                                'point': 0,
+                              });
+                            }
 
-                        if (context.mounted) {
-                          Navigator.of(context).pushReplacement(
-                            MaterialPageRoute(builder: (_) => MyApp()),
-                          );
+                            if (context.mounted) {
+                              Navigator.of(context).pushReplacement(
+  MaterialPageRoute(builder: (_) => MyApp()),
+);
+                            }
+                          }
                         }
-                      }
+                      });
+                    } catch (e) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('로그인 오류: $e')),
+                      );
                     }
-                  });
-                } on AuthException catch (error) {
-                  print(error);
-                } catch (e) {
-                  ScaffoldMessenger.of(
-                    context,
-                  ).showSnackBar(SnackBar(content: Text('로그인 오류: $e')));
-                }
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.yellow,
-                foregroundColor: Colors.black,
-              ),
-              child: const Text("카카오 로그인"),
+                  },
+                  child: Image.asset(
+                    'assets/images/logo/kakao_login.png',
+                    width: double.infinity,
+                    height: 48,
+                    fit: BoxFit.contain,
+                  ),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );

@@ -1,6 +1,7 @@
-import 'package:app/widgets/store_bottom_bar.dart';
+import 'package:app/models/business.dart';
+import 'package:app/pages/storedetail.dart';
 import 'package:flutter/material.dart';
-import '../data/dummy_reservations.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import '../data/dummy_completed_info.dart';
 
 class MyDiningPage extends StatefulWidget {
@@ -10,32 +11,97 @@ class MyDiningPage extends StatefulWidget {
 
 class _MyDiningPageState extends State<MyDiningPage> {
   int _selectedCategory = 0;
-  final List<String> categories = ['방문예정', '방문완료', '취소/노쇼'];
+  final List<String> categories = ['방문예정', '방문완료', '예약취소'];
   Map<int, int> starRatings = {}; // 각 예약 ID에 대한 별점 저장
 
-  String get currentStatus {
-    switch (_selectedCategory) {
-      case 0:
-        return 'upcoming';
-      case 1:
-        return 'completed';
-      case 2:
-        return 'canceled';
-      default:
-        return 'upcoming';
+  List<Map<String, dynamic>> reservations = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchReservations();
+  }
+
+  Future<void> _fetchReservations() async {
+    try {
+      final uuid = Supabase.instance.client.auth.currentUser?.id;
+      if (uuid == null) return;
+
+      final response = await Supabase.instance.client
+          .from('reserve_data')
+          .select()
+          .eq('uuid', uuid);
+
+      final List<Map<String, dynamic>> fetched =
+          List<Map<String, dynamic>>.from(response);
+
+      final enriched = await Future.wait(
+        fetched.map((reservation) async {
+          final bId = reservation['b_id'];
+
+          final business =
+              await Supabase.instance.client
+                  .from('business_data')
+                  .select()
+                  .eq('id', bId)
+                  .maybeSingle();
+
+          print(
+            '\uD83C\uDFE2 b_id: $bId -> 사업체: ${business?['name']} (${business?['id']})',
+          );
+
+          final enrichedReservation = Map<String, dynamic>.from(
+            reservation,
+          ); // ✅ 깊은 복사
+          enrichedReservation['storeName'] = business?['name'];
+          enrichedReservation['storeImage'] = business?['image'];
+          enrichedReservation['category'] = business?['category'];
+          enrichedReservation['location'] = business?['location'];
+
+          return enrichedReservation;
+        }),
+      );
+
+      print('\n✅ 최종 enriched 예약 목록:');
+      for (var r in enriched) {
+        final dDay =
+            DateTime.tryParse(r['date'])?.difference(DateTime.now()).inDays;
+        print(
+          '예약 ID: ${r['id']} | ${r['storeName']} | 날짜: ${r['date']} | D-$dDay | status: ${r['status']}',
+        );
+      }
+
+      enriched.sort((a, b) {
+        final aDate = DateTime.tryParse(a['date'] ?? '') ?? DateTime(2100);
+        final bDate = DateTime.tryParse(b['date'] ?? '') ?? DateTime(2100);
+        return aDate.compareTo(bDate);
+      });
+
+      setState(() {
+        reservations = enriched;
+      });
+    } catch (e) {
+      print('❌ 예약 가져오기 실패: $e');
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final filtered =
-        reservations.where((r) => r['status'] == currentStatus).toList();
+        reservations.where((r) {
+          final status = r['status'];
+          if (_selectedCategory == 0) return status == 'standby';
+          if (_selectedCategory == 1) return status == 'approve';
+          if (_selectedCategory == 2) return status == 'cancel';
+          return false;
+        }).toList();
 
     return Scaffold(
-      backgroundColor: Colors.white, // 항상 흰색 유지
-
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: Colors.white, // 항상 흰색 유지
+                  automaticallyImplyLeading: false, // <-- 이 줄을 추가
+
+        backgroundColor: Colors.white,
         elevation: 0.5,
         centerTitle: false,
         title: const Text(
@@ -47,16 +113,13 @@ class _MyDiningPageState extends State<MyDiningPage> {
             color: Colors.black,
           ),
         ),
-
-        foregroundColor: Colors.black, // 버튼색이 스크롤에 의해 바뀌지 않도록
-        surfaceTintColor: Colors.white, // 머티리얼 3 대응용 (앱바 배경 흐림 방지)
-        shadowColor: Colors.transparent, // 그림자 투명화(선택)
+        foregroundColor: Colors.black,
+        surfaceTintColor: Colors.white,
+        shadowColor: Colors.transparent,
       ),
-     
       body: ListView(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
         children: [
-          // 🔻 카테고리 탭: 작대기로 선택 상태 표현
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 8),
             child: Row(
@@ -97,8 +160,6 @@ class _MyDiningPageState extends State<MyDiningPage> {
             ),
           ),
           const SizedBox(height: 20),
-
-          // 🔻 필터링된 카드 출력
           if (filtered.isEmpty)
             const Center(
               child: Padding(
@@ -111,40 +172,15 @@ class _MyDiningPageState extends State<MyDiningPage> {
             )
           else
             ...filtered.map((data) {
-              if (_selectedCategory == 1) {
-                return _buildCompletedCard(data);
-              } else if (_selectedCategory == 2) {
+              if (_selectedCategory == 2) {
                 return _buildCanceledCard(data);
               } else {
-                return _buildReservationCard(data);
+                return _selectedCategory == 1
+                    ? _buildCompletedCard(data)
+                    : _buildReservationCard(data);
               }
             }).toList(),
         ],
-      ),
-    );
-  }
-
-  Widget _buildTopTab(String title, bool isSelected) {
-    return Expanded(
-      child: Container(
-        decoration: BoxDecoration(
-          border: Border(
-            bottom: BorderSide(
-              color: isSelected ? Colors.black : Colors.grey[300]!,
-              width: 2,
-            ),
-          ),
-        ),
-        child: TextButton(
-          onPressed: () {},
-          child: Text(
-            title,
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              color: isSelected ? Colors.black : Colors.grey,
-            ),
-          ),
-        ),
       ),
     );
   }
@@ -172,94 +208,140 @@ class _MyDiningPageState extends State<MyDiningPage> {
   }
 
   Widget _buildReservationCard(Map<String, dynamic> data) {
-    return Card(
-      color: Colors.white,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      elevation: 2,
-      margin: const EdgeInsets.only(bottom: 16),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                if (data['status'] == 'upcoming')
-                  _buildBadge('D-${data['dday']}'),
-                const SizedBox(width: 8),
-                _buildBadge(
-                  '예약',
-                  color: Colors.grey[300]!,
-                  textColor: Colors.black,
-                ),
-                const Spacer(),
-                const Icon(Icons.calendar_today_outlined, color: Colors.red),
-              ],
+    final storeName = data['storeName'] ?? '가게 이름';
+    final imageUrl =
+        data['storeImage'] ?? 'https://example.com/default-image.png';
+    final category = data['category'] ?? '중식';
+    final location = data['location'] ?? '코엑스';
+    final dateStr = data['date'] ?? '';
+    final time = data['time'] ?? '';
+    final count = data['count']?.toString() ?? '0';
+    final businessId = data['b_id'];
+
+    final now = DateTime.now();
+    final date = DateTime.tryParse(dateStr);
+    final dDay = (date != null) ? date.difference(now).inDays : null;
+
+    return GestureDetector(
+      onTap: () async {
+        final business =
+            await Supabase.instance.client
+                .from('business_data')
+                .select()
+                .eq('id', businessId)
+                .maybeSingle();
+
+        if (business != null) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder:
+                  (_) =>
+                      StoreDetailPage(store: business_data.fromMap(business)),
             ),
-            const SizedBox(height: 12),
-            Row(
-              children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(6),
-                  child: Image.asset(
-                    data['image'],
-                    width: 55,
-                    height: 70,
-                    fit: BoxFit.cover,
+          );
+
+          await _fetchReservations();
+        } else {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text('가게 정보를 불러올 수 없습니다.')));
+        }
+      },
+      child: Card(
+        color: Colors.white,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        elevation: 2,
+        margin: const EdgeInsets.only(bottom: 16),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  if (dDay != null) _buildBadge('D-$dDay', color: Colors.red),
+                  const SizedBox(width: 6),
+                  _buildBadge(
+                    '예약',
+                    color: Colors.grey[200]!,
+                    textColor: Colors.black,
                   ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        data['storeName'],
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
+                  const Spacer(),
+                  const Icon(Icons.calendar_today_outlined, color: Colors.red),
+                ],
+              ),
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: Image.network(
+                      imageUrl,
+                      width: 60,
+                      height: 60,
+                      fit: BoxFit.cover,
+                      errorBuilder:
+                          (_, __, ___) => Container(
+                            width: 60,
+                            height: 60,
+                            color: Colors.grey[200],
+                            child: Icon(Icons.image, color: Colors.grey),
+                          ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          storeName,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        '${data['category']} · ${data['location']}',
-                        style: const TextStyle(color: Colors.grey),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        '${data['date']} (${data['dayOfWeek']}) · ${data['time']} · ${data['people']}명',
-                        style: const TextStyle(
-                          color: Colors.red,
-                          fontWeight: FontWeight.w600,
+                        const SizedBox(height: 4),
+                        Text(
+                          '$category · $location',
+                          style: const TextStyle(
+                            color: Colors.grey,
+                            fontSize: 13,
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              Text(
+                '$dateStr · $time · $count명',
+                style: const TextStyle(
+                  color: Colors.red,
+                  fontWeight: FontWeight.w600,
                 ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            SizedBox(
-              width: double.infinity,
-              child: OutlinedButton(
-                onPressed: () {},
-                style: OutlinedButton.styleFrom(
-                  side: const BorderSide(color: Color(0xFFD1D1D6), width: 1),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(6),
+              ),
+              const SizedBox(height: 12),
+              SizedBox(
+                width: double.infinity,
+                child: OutlinedButton(
+                  onPressed: () {},
+                  style: OutlinedButton.styleFrom(
+                    side: const BorderSide(color: Colors.black12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
                   ),
-                  foregroundColor: Colors.black,
-                ),
-                child: const Text(
-                  '초대장 보내기',
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontWeight: FontWeight.w600,
+                  child: const Text(
+                    '초대장 보내기',
+                    style: TextStyle(color: Colors.black),
                   ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -297,52 +379,22 @@ class _MyDiningPageState extends State<MyDiningPage> {
               ],
             ),
             const SizedBox(height: 12),
-            Row(
-              children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(6),
-                  child: Image.asset(
-                    data['image'],
-                    width: 55,
-                    height: 70,
-                    fit: BoxFit.cover,
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        data['storeName'],
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        '${data['category']} · ${data['location']}',
-                        style: const TextStyle(color: Colors.grey),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        '${data['date']} (${data['dayOfWeek']}) · ${data['time']} · ${data['people']}명',
-                        style: const TextStyle(
-                          color: Colors.black,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
+            Text(
+              data['storeName'] ?? '가게 이름',
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              '${data['date']} · ${data['time']} · ${data['count']}명',
+              style: const TextStyle(
+                color: Colors.black,
+                fontWeight: FontWeight.w600,
+              ),
             ),
             const Divider(
               height: 24,
               color: Color.fromARGB(255, 229, 229, 229),
             ),
-            const SizedBox(height: 8),
             const Center(
               child: Text(
                 '별점으로 평가해주세요',
@@ -408,11 +460,18 @@ class _MyDiningPageState extends State<MyDiningPage> {
               children: [
                 ClipRRect(
                   borderRadius: BorderRadius.circular(6),
-                  child: Image.asset(
-                    data['image'],
+                  child: Image.network(
+                    data['storeImage'] ?? '',
                     width: 55,
                     height: 70,
                     fit: BoxFit.cover,
+                    errorBuilder:
+                        (_, __, ___) => Container(
+                          width: 55,
+                          height: 70,
+                          color: Colors.grey[300],
+                          child: Icon(Icons.image, color: Colors.grey),
+                        ),
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -434,7 +493,7 @@ class _MyDiningPageState extends State<MyDiningPage> {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        '${data['date']} (${data['dayOfWeek']}) · ${data['time']} · ${data['people']}명',
+                        '${data['date']} · ${data['time']} · ${data['count']}명',
                         style: const TextStyle(
                           color: Colors.grey,
                           fontWeight: FontWeight.w600,
