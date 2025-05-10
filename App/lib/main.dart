@@ -1,12 +1,10 @@
 import 'package:app/auth/loginpage.dart';
-import 'package:app/models/business.dart';
 import 'package:app/models/userprofile.dart';
 import 'package:app/pages/mydiningpage.dart';
 import 'package:app/pages/mappage.dart';
 import 'package:app/pages/mypage.dart';
 import 'package:app/pages/searchpage.dart';
 import 'package:app/services/supabase_service.dart';
-import 'package:app/widgets/storedetailbottomsheet.dart';
 import 'package:flutter/material.dart';
 import 'package:app/pages/mainpage.dart';
 import 'package:flutter/services.dart';
@@ -33,92 +31,8 @@ void main() async {
     MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        primaryColor: Color(0xFF2D3436),
-        colorScheme: ColorScheme.light(
-          primary: Color(0xFF2D3436),
-          secondary: Color(0xFF0984E3),
-          surface: Colors.white,
-          background: Color(0xFFF7F7F7),
-        ),
-        fontFamily: 'Pretendard',
-        appBarTheme: AppBarTheme(
-          backgroundColor: Colors.white,
-          elevation: 0,
-          centerTitle: false,
-          titleTextStyle: TextStyle(
-            fontSize: 22,
-            fontFamily: 'Pretendard',
-            fontWeight: FontWeight.w600,
-            color: Color(0xFF2D3436),
-            letterSpacing: -0.5,
-          ),
-          iconTheme: IconThemeData(color: Color(0xFF2D3436)),
-        ),
-        cardTheme: CardTheme(
-          elevation: 0,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
-          ),
-          color: Colors.white,
-        ),
-        elevatedButtonTheme: ElevatedButtonThemeData(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Color(0xFF2D3436),
-            foregroundColor: Colors.white,
-            elevation: 0,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
-            ),
-            padding: EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-            textStyle: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-              letterSpacing: -0.5,
-            ),
-          ),
-        ),
-        outlinedButtonTheme: OutlinedButtonThemeData(
-          style: OutlinedButton.styleFrom(
-            foregroundColor: Color(0xFF2D3436),
-            side: BorderSide(color: Color(0xFF2D3436)),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
-            ),
-            padding: EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-            textStyle: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-              letterSpacing: -0.5,
-            ),
-          ),
-        ),
-        textTheme: TextTheme(
-          headlineLarge: TextStyle(
-            fontSize: 28,
-            fontWeight: FontWeight.w700,
-            color: Color(0xFF2D3436),
-            letterSpacing: -0.5,
-          ),
-          headlineMedium: TextStyle(
-            fontSize: 24,
-            fontWeight: FontWeight.w600,
-            color: Color(0xFF2D3436),
-            letterSpacing: -0.5,
-          ),
-          bodyLarge: TextStyle(
-            fontSize: 16,
-            color: Color(0xFF2D3436),
-            letterSpacing: -0.3,
-            height: 1.5,
-          ),
-          bodyMedium: TextStyle(
-            fontSize: 14,
-            color: Color(0xFF2D3436),
-            letterSpacing: -0.3,
-            height: 1.5,
-          ),
-        ),
-      ),
+      fontFamily: 'Pretendard', // ✅ 여기만 추가하면 앱 전체에 적용됨!
+    ),
       home: user == null ? LoginPage() : MyApp(),
     ),
   );

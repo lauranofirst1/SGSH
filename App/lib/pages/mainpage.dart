@@ -17,10 +17,10 @@ class Mainpage extends StatefulWidget {
 
 class _MainpageState extends State<Mainpage> {
   final List<Map<String, dynamic>> items = [
-    {'emoji': '🍚', 'label': "한식"},
+    {'emoji': '🥘', 'label': "한식"},
     {'emoji': '🍜', 'label': "중식"},
-    {'emoji': '🍣', 'label': "일식"},
-    {'emoji': '☕', 'label': "카페"},
+    {'emoji': '🍱', 'label': "일식"},
+    {'emoji': '☕️', 'label': "카페"},
     {'emoji': '🍗', 'label': "치킨"},
     {'emoji': '🍔', 'label': "버거"},
   ];
@@ -181,7 +181,6 @@ class _MainpageState extends State<Mainpage> {
           '가치가게',
           style: TextStyle(
             fontSize: 20,
-            fontFamily: 'Pretendard',
             fontWeight: FontWeight.bold,
             color: Colors.black,
           ),
@@ -195,29 +194,32 @@ class _MainpageState extends State<Mainpage> {
         child: Column(
           children: <Widget>[
             Article(article: bannerArticles),
-            Container(
-              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+            Padding(
+              padding: EdgeInsets.all(8).copyWith(top: 20),
               child: Wrap(
                 alignment: WrapAlignment.start,
-                spacing: 12,
-                runSpacing: 16,
-                children: items.map((item) {
-                  return SizedBox(
-                    width: MediaQuery.of(context).size.width / 6 - 12,
-                    child: _buildEmojiText(
-                      item['emoji'],
-                      item['label'],
-                      context,
-                    ),
-                  );
-                }).toList(),
+                spacing: 8,
+                runSpacing: 12,
+                children:
+                    items.map((item) {
+                      return SizedBox(
+                        width: MediaQuery.of(context).size.width / 6 - 12,
+                        child: _buildEmojiText(
+                          item['emoji'],
+                          item['label'],
+                          context,
+                        ),
+                      );
+                    }).toList(),
               ),
             ),
+
             buildRecentItems(),
             RecommendedStoreSection(
               userName: userName.isNotEmpty ? userName : '회원',
               stores: recommendedStores,
             ),
+
             DummyArticleList(newsArticles: newsArticles),
             DiningMagazineSection(magazineArticles: magazineArticles),
           ],
@@ -394,30 +396,12 @@ class _MainpageState extends State<Mainpage> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
-          Container(
-            padding: EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(12),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
-                  blurRadius: 8,
-                  offset: Offset(0, 2),
-                ),
-              ],
-            ),
-            child: Text(emoji, style: TextStyle(fontSize: 28)),
-          ),
-          SizedBox(height: 8),
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.w500,
-              color: Colors.black87,
-            ),
-          ),
+          Text(emoji, style: const TextStyle(
+            fontFamily: 'TossFace', // pubspec.yaml에서 등록한 폰트 이름
+            fontSize: 28,
+          ),),
+          SizedBox(height: 4),
+          Text(label),
         ],
       ),
     );
