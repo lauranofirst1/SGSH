@@ -56,7 +56,6 @@ class _ArticlePageState extends State<ArticlePage> {
           '가치가게',
           style: TextStyle(
             fontSize: 20,
-            fontFamily: 'Pretendard',
             fontWeight: FontWeight.bold,
             color: Colors.black,
           ),

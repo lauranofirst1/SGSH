@@ -44,11 +44,22 @@ class _StoreListPageState extends State<StoreListPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white, // 🔥 배경색 설정
-      appBar: AppBar(
-        title: Text('맛집 추천'),
-        backgroundColor: Colors.white,
-        elevation: 0,
-        foregroundColor: Colors.black,
+      appBar:AppBar(
+        backgroundColor: Colors.white, // 항상 흰색 유지
+        elevation: 0.5,
+        centerTitle: false,
+        title: const Text(
+          '가치가게',
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: Colors.black,
+          ),
+        ),
+
+        foregroundColor: Colors.black, // 버튼색이 스크롤에 의해 바뀌지 않도록
+        surfaceTintColor: Colors.white, // 머티리얼 3 대응용 (앱바 배경 흐림 방지)
+        shadowColor: Colors.transparent, // 그림자 투명화(선택)
       ),
 
       body:

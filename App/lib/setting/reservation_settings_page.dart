@@ -14,7 +14,6 @@ class ReservationSettingsPage extends StatelessWidget {
           '캘린더 자동 등록',
           style: TextStyle(
             fontSize: 20,
-            fontFamily: 'Pretendard',
             fontWeight: FontWeight.bold,
             color: Colors.black,
           ),

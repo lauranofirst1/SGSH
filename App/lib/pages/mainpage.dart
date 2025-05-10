@@ -195,32 +195,29 @@ class _MainpageState extends State<Mainpage> {
         child: Column(
           children: <Widget>[
             Article(article: bannerArticles),
-            Padding(
-              padding: EdgeInsets.all(8).copyWith(top: 20),
+            Container(
+              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 20),
               child: Wrap(
                 alignment: WrapAlignment.start,
-                spacing: 8,
-                runSpacing: 12,
-                children:
-                    items.map((item) {
-                      return SizedBox(
-                        width: MediaQuery.of(context).size.width / 6 - 12,
-                        child: _buildEmojiText(
-                          item['emoji'],
-                          item['label'],
-                          context,
-                        ),
-                      );
-                    }).toList(),
+                spacing: 12,
+                runSpacing: 16,
+                children: items.map((item) {
+                  return SizedBox(
+                    width: MediaQuery.of(context).size.width / 6 - 12,
+                    child: _buildEmojiText(
+                      item['emoji'],
+                      item['label'],
+                      context,
+                    ),
+                  );
+                }).toList(),
               ),
             ),
-
             buildRecentItems(),
             RecommendedStoreSection(
               userName: userName.isNotEmpty ? userName : '회원',
               stores: recommendedStores,
             ),
-
             DummyArticleList(newsArticles: newsArticles),
             DiningMagazineSection(magazineArticles: magazineArticles),
           ],
@@ -397,9 +394,30 @@ class _MainpageState extends State<Mainpage> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
-          Text(emoji, style: TextStyle(fontSize: 28)),
-          SizedBox(height: 4),
-          Text(label),
+          Container(
+            padding: EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.05),
+                  blurRadius: 8,
+                  offset: Offset(0, 2),
+                ),
+              ],
+            ),
+            child: Text(emoji, style: TextStyle(fontSize: 28)),
+          ),
+          SizedBox(height: 8),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
+              color: Colors.black87,
+            ),
+          ),
         ],
       ),
     );

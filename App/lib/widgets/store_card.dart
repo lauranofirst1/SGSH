@@ -58,7 +58,6 @@ void loadBookmarkStatus() async {
                             Text(
                               store.name,
                               style: TextStyle(
-                                fontFamily: 'Pretendard',
                                 fontSize: 22,
                                 fontWeight: FontWeight.w700,
                               ),
@@ -89,7 +88,6 @@ void loadBookmarkStatus() async {
                               "4.7",
                               style: TextStyle(
                                 fontSize: 14,
-                                fontFamily: 'pretendard',
                                 fontWeight: FontWeight.w700,
                               ),
                             ),
@@ -98,7 +96,6 @@ void loadBookmarkStatus() async {
                               "(220) • ",
                               style: TextStyle(
                                 fontSize: 12,
-                                fontFamily: 'pretendard',
                                 fontWeight: FontWeight.w300,
                               ),
                             ),
@@ -107,7 +104,6 @@ void loadBookmarkStatus() async {
                                 store.address,
                                 style: TextStyle(
                                   fontSize: 12,
-                                  fontFamily: 'pretendard',
                                   fontWeight: FontWeight.w300,
                                 ),
                               ),

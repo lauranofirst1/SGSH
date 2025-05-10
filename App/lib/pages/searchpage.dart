@@ -106,7 +106,6 @@ class _SearchPageState extends State<SearchPage> {
           '검색하기',
           style: TextStyle(
             fontSize: 20,
-            fontFamily: 'Pretendard',
             fontWeight: FontWeight.bold,
             color: Colors.black,
           ),

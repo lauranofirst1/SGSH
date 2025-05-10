@@ -20,7 +20,6 @@ class SettingsPage extends StatelessWidget {
           '설정',
           style: TextStyle(
             fontSize: 20,
-            fontFamily: 'Pretendard',
             fontWeight: FontWeight.bold,
             color: Colors.black,
           ),

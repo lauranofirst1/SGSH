@@ -14,7 +14,6 @@ class ServiceSettingsPage extends StatelessWidget {
           '알림 설정',
           style: TextStyle(
             fontSize: 20,
-            fontFamily: 'Pretendard',
             fontWeight: FontWeight.bold,
             color: Colors.black,
           ),

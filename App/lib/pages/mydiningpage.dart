@@ -108,7 +108,6 @@ class _MyDiningPageState extends State<MyDiningPage> {
           '나의 예약',
           style: TextStyle(
             fontSize: 20,
-            fontFamily: 'Pretendard',
             fontWeight: FontWeight.bold,
             color: Colors.black,
           ),

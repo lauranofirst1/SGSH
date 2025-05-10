@@ -44,6 +44,10 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   fonts:
+    - family: moneygrapy
+      fonts:
+        - asset: assets/fonts/Moneygraphy-Rounded.ttf
+        - asset: assets/fonts/Moneygraphy-Pixel.ttf
     - family: Pretendard
       fonts:
         - asset: assets/fonts/Pretendard-Thin.ttf
@@ -64,6 +68,9 @@ flutter:
           weight: 800
         - asset: assets/fonts/Pretendard-Black.ttf
           weight: 900
+    - family: TossFace
+      fonts:
+        - asset: assets/fonts/TossFaceFontMac.ttf
   assets:
     - .env
     - assets/images/dummy_image/

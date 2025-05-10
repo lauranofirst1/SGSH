@@ -14,7 +14,6 @@ class AccountPage extends StatelessWidget {
           '내 정보 수정',
           style: TextStyle(
             fontSize: 20,
-            fontFamily: 'Pretendard',
             fontWeight: FontWeight.bold,
             color: Colors.black,
           ),

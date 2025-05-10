@@ -38,46 +38,46 @@ class _MyPageState extends State<MyPage> {
     loadUserProfile(); // ✅ 추가
     loadBookmarkedStores();
   }
+  
 
   Future<void> loadUserProfile() async {
-  UserProfile? profile = await SupabaseService().getUserProfile();
+    UserProfile? profile = await SupabaseService().getUserProfile();
 
-  if (profile?.code == null) {
-    final randomCode = (1000 + (DateTime.now().millisecondsSinceEpoch % 9000)).toString();
+    if (profile?.code == null) {
+      final randomCode =
+          (1000 + (DateTime.now().millisecondsSinceEpoch % 9000)).toString();
 
-    // 중복 방지: 해당 코드가 이미 존재하는지 확인
-    final isDuplicate = await Supabase.instance.client
-        .from('profile_data')
-        .select('code')
-        .eq('code', randomCode)
-        .maybeSingle();
+      // 중복 방지: 해당 코드가 이미 존재하는지 확인
+      final isDuplicate =
+          await Supabase.instance.client
+              .from('profile_data')
+              .select('code')
+              .eq('code', randomCode)
+              .maybeSingle();
 
-    if (isDuplicate == null) {
-      // Supabase에 랜덤 코드 저장
-      await Supabase.instance.client
-          .from('profile_data')
-          .update({'code': randomCode})
-          .eq('id', profile!.id);
+      if (isDuplicate == null) {
+        // Supabase에 랜덤 코드 저장
+        await Supabase.instance.client
+            .from('profile_data')
+            .update({'code': randomCode})
+            .eq('id', profile!.id);
 
-      // 메모리에 반영
-      profile = UserProfile(
-        id: profile.id,
-        email: profile.email,
-        point: profile.point,
-        bId: profile.bId,
-        code: randomCode, // ✅ 제대로 전달
-      );
+        // 메모리에 반영
+        profile = UserProfile(
+          id: profile.id,
+          email: profile.email,
+          point: profile.point,
+          bId: profile.bId,
+          code: randomCode, // ✅ 제대로 전달
+        );
+      }
     }
+
+    setState(() {
+      currentUserProfile = profile;
+    });
+    print('👤 사용자 코드: ${profile?.code}');
   }
-
-  setState(() {
-    currentUserProfile = profile;
-  });
-  print('👤 사용자 코드: ${profile?.code}');
-
-}
-
-
 
   Future<void> loadBookmarkedStores() async {
     final allStores = await fetchAllStores();
@@ -116,7 +116,7 @@ class _MyPageState extends State<MyPage> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-                  automaticallyImplyLeading: false, // <-- 이 줄을 추가
+        automaticallyImplyLeading: false, // <-- 이 줄을 추가
 
         backgroundColor: Colors.white,
         elevation: 0.5,
@@ -125,7 +125,6 @@ class _MyPageState extends State<MyPage> {
           '마이페이지',
           style: TextStyle(
             fontSize: 20,
-            fontFamily: 'Pretendard',
             fontWeight: FontWeight.bold,
             color: Colors.black,
           ),
@@ -163,28 +162,26 @@ class _MyPageState extends State<MyPage> {
                 ),
                 const SizedBox(width: 10),
                 Column(
-  crossAxisAlignment: CrossAxisAlignment.start,
-  children: [
-    Text(
-      currentUserProfile?.email ?? '로그인 유저 없음',
-      style: const TextStyle(
-        fontFamily: 'Pretendard',
-        fontWeight: FontWeight.bold,
-        fontSize: 17,
-      ),
-    ),
-    const SizedBox(height: 5),
-    Text(
-      '포인트 : ${currentUserProfile?.point ?? 0}p',
-      style: TextStyle(fontSize: 14, color: Colors.grey[600]),
-    ),
-    Text(
-      '코드: ${currentUserProfile?.code ?? '없음'}',
-      style: TextStyle(fontSize: 13, color: Colors.grey[600]),
-    ),
-  ],
-),
-
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      currentUserProfile?.email ?? '로그인 유저 없음',
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 17,
+                      ),
+                    ),
+                    const SizedBox(height: 5),
+                    Text(
+                      '포인트 : ${currentUserProfile?.point ?? 0}p',
+                      style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+                    ),
+                    Text(
+                      '코드: ${currentUserProfile?.code ?? '없음'}',
+                      style: TextStyle(fontSize: 13, color: Colors.grey[600]),
+                    ),
+                  ],
+                ),
               ],
             ),
             const SizedBox(height: 10),
@@ -282,7 +279,6 @@ class _MyPageState extends State<MyPage> {
                                   style: const TextStyle(
                                     fontSize: 20,
                                     fontWeight: FontWeight.bold,
-                                    fontFamily: 'Pretendard',
                                   ),
                                 ),
                                 const SizedBox(height: 4),
@@ -344,11 +340,9 @@ class _MyPageState extends State<MyPage> {
                                 store.id.toString(),
                               );
                               // 북마크 ID만 최신화
-                              
 
                               setState(() {
-                                        loadBookmarkedStores();
-
+                                loadBookmarkedStores();
                               });
                             },
                           ),

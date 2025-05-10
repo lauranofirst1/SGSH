@@ -192,7 +192,6 @@ class _ReservationConfirmPageState extends State<ReservationConfirmPage> {
               .storeName, // Replace with the actual business name or pass it dynamically
           style: TextStyle(
             fontSize: 20,
-            fontFamily: 'Pretendard',
             fontWeight: FontWeight.bold,
             color: Colors.black,
           ),
