@@ -217,6 +217,7 @@ class _MapPageState extends State<MapPage> {
               child: Row(
                 children: [
                   const SizedBox(width: 4),
+                  _tagChip('가치가게의 추천'),
                   _tagChip('육면'),
                   _tagChip('카페'),
                   _tagChip('한식'),
@@ -239,13 +240,28 @@ class _MapPageState extends State<MapPage> {
       padding: const EdgeInsets.symmetric(horizontal: 4),
       child: GestureDetector(
         onTap: () {
-          _searchController.text = label;
-          _searchAndMove(label);
+          if (label == '가치가게의 추천') {
+            _showRecommendationSheet();
+          } else {
+            _searchController.text = label;
+            _searchAndMove(label);
+          }
         },
         child: Chip(
-          label: Text('#$label'),
+          label: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (label == '가치가게의 추천') ...[
+                const Icon(Icons.place, color: Colors.orange, size: 16),
+                const SizedBox(width: 4),
+              ],
+              Text('#$label'),
+            ],
+          ),
           backgroundColor: Colors.white,
-          side: const BorderSide(color: Colors.black12),
+          side: BorderSide(
+            color: label == '가치가게의 추천' ? Colors.orange : Colors.black12,
+          ),
           labelStyle: const TextStyle(color: Colors.black),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(30),
@@ -270,44 +286,6 @@ class _MapPageState extends State<MapPage> {
       );
     }
   }
-
-  Widget _reopenButton() => Align(
-        alignment: Alignment.bottomCenter,
-        child: Padding(
-          padding: const EdgeInsets.only(bottom: 30),
-          child: Visibility(
-            visible: _hasClosedRecommendation,
-            child: SizedBox(
-              height: 42,
-              child: ElevatedButton.icon(
-                onPressed: () {
-                  setState(() => _hasClosedRecommendation = false);
-                  _showRecommendationSheet();
-                },
-                icon: const Icon(Icons.place, color: Colors.orange),
-                label: const Text(
-                  '가치가게의 추천',
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontWeight: FontWeight.w500,
-                    fontSize: 14,
-                  ),
-                ),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.white,
-                  foregroundColor: Colors.black,
-                  elevation: 3,
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(24),
-                    side: const BorderSide(color: Colors.orange),
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ),
-      );
 
   Future<void> _showRecommendationSheet() async {
     if (_cachedRecommendedStores.isEmpty) {
@@ -348,7 +326,6 @@ class _MapPageState extends State<MapPage> {
                 mapview(),
                 _zoomButtons(),
                 _searchBar(),
-                _reopenButton(),
               ],
             ),
           ],
