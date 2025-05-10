@@ -79,7 +79,7 @@ class _MyPageState extends State<MyPage> with AutomaticKeepAliveClientMixin, Wid
   void _subscribeToBookmarkChanges() {
     _bookmarkSubscription = BookmarkService.bookmarkStream.listen((ids) {
       print('📱 북마크 변경 감지: $ids');
-      loadBookmarkedStores();
+    loadBookmarkedStores();
     });
   }
 
@@ -125,16 +125,16 @@ class _MyPageState extends State<MyPage> with AutomaticKeepAliveClientMixin, Wid
   Future<void> loadBookmarkedStores() async {
     print('🔄 북마크 목록 새로고침 중...');
     try {
-      final allStores = await fetchAllStores();
-      final ids = await BookmarkService.getBookmarkedIds();
+    final allStores = await fetchAllStores();
+    final ids = await BookmarkService.getBookmarkedIds();
       print('📚 북마크된 ID 목록: $ids');
 
       if (mounted) {
-        setState(() {
+    setState(() {
           bookmarkedStores = allStores
               .where((store) => ids.contains(store.id.toString()))
               .toList();
-        });
+    });
         print('✅ 북마크 목록 업데이트 완료: ${bookmarkedStores.length}개');
       }
     } catch (e) {
@@ -176,48 +176,48 @@ class _MyPageState extends State<MyPage> with AutomaticKeepAliveClientMixin, Wid
           automaticallyImplyLeading: false,
           backgroundColor: Colors.white,
           elevation: 0,
-          centerTitle: false,
-          title: const Text(
-            '마이페이지',
-            style: TextStyle(
+        centerTitle: false,
+        title: const Text(
+          '마이페이지',
+          style: TextStyle(
               fontSize: 24,
-              fontWeight: FontWeight.bold,
+            fontWeight: FontWeight.bold,
               color: Color(0xFF222222),
               letterSpacing: -1.1,
-            ),
           ),
-          actions: [
-            IconButton(
+        ),
+        actions: [
+          IconButton(
               icon: const Icon(Icons.notifications_none, color: Color(0xFF222222)),
               onPressed: () {
                 _showSnackbar('알림 설정 이동');
                 loadBookmarkedStores();  // 알림 버튼 클릭 시에도 새로고침
               },
-            ),
-            IconButton(
+          ),
+          IconButton(
               icon: const Icon(Icons.settings, color: Color(0xFF222222)),
               onPressed: () async {
-                _showSnackbar('설정 이동');
+              _showSnackbar('설정 이동');
                 await Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => SettingsPage()),
-                );
+                context,
+                MaterialPageRoute(builder: (context) => SettingsPage()),
+              );
                 loadBookmarkedStores();  // 설정 페이지에서 돌아올 때 새로고침
-              },
-            ),
-          ],
+            },
+          ),
+        ],
           foregroundColor: Color(0xFF222222),
-          surfaceTintColor: Colors.white,
-          shadowColor: Colors.transparent,
-        ),
-        body: SafeArea(
+        surfaceTintColor: Colors.white,
+        shadowColor: Colors.transparent,
+      ),
+      body: SafeArea(
           child: RefreshIndicator(  // 당겨서 새로고침 기능 추가
             onRefresh: loadBookmarkedStores,
-            child: ListView(
-              padding: const EdgeInsets.all(20),
+        child: ListView(
+          padding: const EdgeInsets.all(20),
+          children: [
+            Row(
               children: [
-                Row(
-                  children: [
                     Container(
                       width: 80,
                       height: 80,
@@ -227,20 +227,20 @@ class _MyPageState extends State<MyPage> with AutomaticKeepAliveClientMixin, Wid
                         border: Border.all(color: Color(0xFFF0F0F0), width: 1),
                       ),
                       child: Icon(Icons.person, size: 40, color: Colors.grey[400]),
-                    ),
+                ),
                     const SizedBox(width: 16),
                     Expanded(
                       child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            currentUserProfile?.email ?? '로그인 유저 없음',
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      currentUserProfile?.email ?? '로그인 유저 없음',
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
                               fontSize: 18,
                               color: Color(0xFF222222),
-                            ),
-                          ),
+                      ),
+                    ),
                           const SizedBox(height: 8),
                           Container(
                             padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
@@ -253,7 +253,7 @@ class _MyPageState extends State<MyPage> with AutomaticKeepAliveClientMixin, Wid
                               children: [
                                 Icon(Icons.stars, size: 16, color: Color(0xFFFFB800)),
                                 SizedBox(width: 4),
-                                Text(
+                    Text(
                                   '${currentUserProfile?.point ?? 0}p',
                                   style: TextStyle(
                                     fontSize: 14,
@@ -270,14 +270,14 @@ class _MyPageState extends State<MyPage> with AutomaticKeepAliveClientMixin, Wid
                             decoration: BoxDecoration(
                               color: Color(0xFFF8F8F8),
                               borderRadius: BorderRadius.circular(20),
-                            ),
+                    ),
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 Icon(Icons.qr_code, size: 16, color: Color(0xFF666666)),
                                 SizedBox(width: 4),
-                                Text(
-                                  '코드: ${currentUserProfile?.code ?? '없음'}',
+                    Text(
+                      '코드: ${currentUserProfile?.code ?? '없음'}',
                                   style: TextStyle(
                                     fontSize: 14,
                                     color: Color(0xFF666666),
@@ -292,11 +292,11 @@ class _MyPageState extends State<MyPage> with AutomaticKeepAliveClientMixin, Wid
                   ],
                 ),
                 const SizedBox(height: 16),
-                Row(
-                  children: [
-                    Expanded(
-                      child: OutlinedButton(
-                        onPressed: () => _showSnackbar('프로필 수정 눌림'),
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed: () => _showSnackbar('프로필 수정 눌림'),
                         style: OutlinedButton.styleFrom(
                           foregroundColor: Color(0xFF222222),
                           side: BorderSide(color: Color(0xFFE0E0E0)),
@@ -309,12 +309,12 @@ class _MyPageState extends State<MyPage> with AutomaticKeepAliveClientMixin, Wid
                           '프로필 수정',
                           style: TextStyle(fontWeight: FontWeight.bold),
                         ),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: OutlinedButton(
-                        onPressed: () => _showSnackbar('쿠폰함 열기'),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed: () => _showSnackbar('쿠폰함 열기'),
                         style: OutlinedButton.styleFrom(
                           foregroundColor: Color(0xFF222222),
                           side: BorderSide(color: Color(0xFFE0E0E0)),
@@ -327,26 +327,26 @@ class _MyPageState extends State<MyPage> with AutomaticKeepAliveClientMixin, Wid
                           '쿠폰함',
                           style: TextStyle(fontWeight: FontWeight.bold),
                         ),
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
+              ],
+            ),
                 const SizedBox(height: 32),
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
                   child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        '저장한 레스토랑 ${bookmarkedStores.length}',
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  '저장한 레스토랑 ${bookmarkedStores.length}',
                         style: const TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 18,
                           color: Color(0xFF222222),
                         ),
-                      ),
-                      TextButton(
-                        onPressed: _navigateToLikePage,
+                ),
+                TextButton(
+                  onPressed: _navigateToLikePage,
                         style: TextButton.styleFrom(
                           foregroundColor: Color(0xFF666666),
                           padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -358,166 +358,177 @@ class _MyPageState extends State<MyPage> with AutomaticKeepAliveClientMixin, Wid
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                      ),
-                    ],
-                  ),
                 ),
-                ...bookmarkedStores.map((store) {
-                  return Container(
-                    margin: const EdgeInsets.only(bottom: 16),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: Color(0xFFF0F0F0), width: 1),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.03),
-                          blurRadius: 10,
-                          offset: Offset(0, 2),
-                        ),
-                      ],
+              ],
+            ),
+                ),
+            ...bookmarkedStores.map((store) {
+              return GestureDetector(
+                    onTap: () async {
+                      final result = await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                          builder: (context) => StoreDetailPage(store: store),
                     ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.all(16),
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              ClipRRect(
-                                borderRadius: BorderRadius.circular(12),
-                                child: Image.network(
-                                  store.image,
-                                  width: 80,
-                                  height: 100,
-                                  fit: BoxFit.cover,
-                                  loadingBuilder: (context, child, loadingProgress) {
-                                    if (loadingProgress == null) return child;
-                                    return Container(
-                                      width: 80,
-                                      height: 100,
-                                      color: Colors.grey[100],
-                                      child: Center(
-                                        child: CircularProgressIndicator(
-                                          strokeWidth: 2,
-                                          valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF666666)),
+                  );
+                      if (result == true) loadBookmarkedStores();
+                },
+                child: Container(
+                  margin: const EdgeInsets.only(bottom: 16),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(color: Color(0xFFF0F0F0), width: 1),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.03),
+                            blurRadius: 10,
+                            offset: Offset(0, 2),
+                          ),
+                        ],
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                          Padding(
+                            padding: const EdgeInsets.all(16),
+                            child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          ClipRRect(
+                                  borderRadius: BorderRadius.circular(12),
+                            child: Image.network(
+                              store.image,
+                                    width: 80,
+                                    height: 100,
+                              fit: BoxFit.cover,
+                                    loadingBuilder: (context, child, loadingProgress) {
+                                if (loadingProgress == null) return child;
+                                      return Container(
+                                        width: 80,
+                                        height: 100,
+                                        color: Colors.grey[100],
+                                        child: Center(
+                                          child: CircularProgressIndicator(
+                                            strokeWidth: 2,
+                                            valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF666666)),
+                                          ),
                                         ),
-                                      ),
-                                    );
-                                  },
-                                  errorBuilder: (context, error, stackTrace) {
-                                    return Container(
-                                      width: 80,
-                                      height: 100,
-                                      color: Colors.grey[100],
-                                      child: Icon(Icons.image, color: Colors.grey[400]),
-                                    );
-                                  },
+                                );
+                              },
+                              errorBuilder: (context, error, stackTrace) {
+                                return Container(
+                                        width: 80,
+                                        height: 100,
+                                        color: Colors.grey[100],
+                                        child: Icon(Icons.image, color: Colors.grey[400]),
+                                );
+                              },
+                            ),
+                          ),
+                                const SizedBox(width: 16),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  store.name,
+                                  style: const TextStyle(
+                                          fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                          color: Color(0xFF222222),
+                                  ),
                                 ),
-                              ),
-                              const SizedBox(width: 16),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                      const SizedBox(height: 6),
+                                Text(
+                                  store.description,
+                                  style: const TextStyle(
+                                          fontSize: 13,
+                                    color: Color(0xFF666666),
+                                          height: 1.4,
+                                  ),
+                                ),
+                                      const SizedBox(height: 8),
+                                      Row(
+                                        children: [
+                                          Container(
+                                            padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                            decoration: BoxDecoration(
+                                              color: Color(0xFFFFF8E1),
+                                              borderRadius: BorderRadius.circular(6),
+                                            ),
+                                            child: Row(
+                                              mainAxisSize: MainAxisSize.min,
                                   children: [
+                                    Icon(
+                                      Icons.star,
+                                                  color: Color(0xFFFFB800),
+                                                  size: 14,
+                                    ),
+                                    SizedBox(width: 4),
                                     Text(
-                                      store.name,
-                                      style: const TextStyle(
-                                        fontSize: 18,
+                                      '4.7',
+                                      style: TextStyle(
                                         fontWeight: FontWeight.bold,
-                                        color: Color(0xFF222222),
+                                                    fontSize: 13,
+                                                    color: Color(0xFF222222),
                                       ),
                                     ),
-                                    const SizedBox(height: 6),
                                     Text(
-                                      store.description,
-                                      style: const TextStyle(
-                                        fontSize: 13,
-                                        color: Color(0xFF666666),
-                                        height: 1.4,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 8),
-                                    Row(
-                                      children: [
-                                        Container(
-                                          padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                                          decoration: BoxDecoration(
-                                            color: Color(0xFFFFF8E1),
-                                            borderRadius: BorderRadius.circular(6),
-                                          ),
-                                          child: Row(
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: [
-                                              Icon(
-                                                Icons.star,
-                                                color: Color(0xFFFFB800),
-                                                size: 14,
-                                              ),
-                                              SizedBox(width: 4),
-                                              Text(
-                                                '4.7',
-                                                style: TextStyle(
-                                                  fontWeight: FontWeight.bold,
-                                                  fontSize: 13,
-                                                  color: Color(0xFF222222),
+                                                  ' (220)',
+                                      style: TextStyle(
+                                                    fontSize: 12,
+                                                    color: Color(0xFF666666),
+                                                  ),
                                                 ),
-                                              ),
-                                              Text(
-                                                ' (220)',
-                                                style: TextStyle(
-                                                  fontSize: 12,
-                                                  color: Color(0xFF666666),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    const SizedBox(height: 8),
-                                    Text(
-                                      store.address,
-                                      style: const TextStyle(
-                                        fontSize: 13,
-                                        color: Color(0xFF666666),
-                                      ),
-                                    ),
-                                    const SizedBox(height: 4),
-                                    Text(
-                                      '점심 1.5만원 · 저녁 2.5만원',
-                                      style: const TextStyle(
-                                        fontSize: 13,
-                                        color: Color(0xFF666666),
+                                              ],
                                       ),
                                     ),
                                   ],
                                 ),
-                              ),
-                              IconButton(
-                                icon: const Icon(Icons.bookmark, color: Color(0xFFE53935)),
-                                onPressed: () async {
-                                  await BookmarkService.toggleBookmark(
-                                    store.id.toString(),
-                                  );
-                                  // setState(() {
-                                  //   loadBookmarkedStores();
-                                  // }); // 불필요한 새로고침 제거, 스트림 알림만 사용
-                                },
-                              ),
-                            ],
+                                      const SizedBox(height: 8),
+                                Text(
+                                  store.address,
+                                  style: const TextStyle(
+                                          fontSize: 13,
+                                          color: Color(0xFF666666),
+                                  ),
+                                ),
+                                      const SizedBox(height: 4),
+                                      Text(
+                                  '점심 1.5만원 · 저녁 2.5만원',
+                                        style: const TextStyle(
+                                          fontSize: 13,
+                                          color: Color(0xFF666666),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                IconButton(
+                                  icon: const Icon(Icons.bookmark, color: Color(0xFFE53935)),
+                                  onPressed: () async {
+                                    await BookmarkService.toggleBookmark(
+                                      store.id.toString(),
+                                    );
+                                    // setState(() {
+                                    //   loadBookmarkedStores();
+                                    // }); // 불필요한 새로고침 제거, 스트림 알림만 사용
+                                  },
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-                          child: MemoInputCard(memoKey: store.name),
-                        ),
-                      ],
-                    ),
-                  );
-                }).toList(),
-              ],
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                            child: MemoInputCard(memoKey: store.name),
+                          ),
+                    ],
+                  ),
+                ),
+              );
+            }).toList(),
+          ],
             ),
           ),
         ),

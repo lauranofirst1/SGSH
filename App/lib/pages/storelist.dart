@@ -27,13 +27,10 @@ class _StoreListPageState extends State<StoreListPage> {
       var response = await supabase
           .from("business_data")
           .select()
-          .order("id", ascending: true); // 🔥 id 기준 오름차순 정렬
+          .order("id", ascending: true);
 
       setState(() {
-        storeList =
-            response
-                .map<business_data>((data) => business_data.fromMap(data))
-                .toList(); // 🔥 변환 적용
+        storeList = response.map<business_data>((data) => business_data.fromMap(data)).toList();
       });
     } catch (e) {
       print("❌ 오류 발생: $e");
@@ -44,7 +41,7 @@ class _StoreListPageState extends State<StoreListPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white, // 🔥 배경색 설정
-      appBar:AppBar(
+      appBar: AppBar(
         backgroundColor: Colors.white, // 항상 흰색 유지
         elevation: 0.5,
         centerTitle: false,
@@ -56,7 +53,6 @@ class _StoreListPageState extends State<StoreListPage> {
             color: Colors.black,
           ),
         ),
-
         foregroundColor: Colors.black, // 버튼색이 스크롤에 의해 바뀌지 않도록
         surfaceTintColor: Colors.white, // 머티리얼 3 대응용 (앱바 배경 흐림 방지)
         shadowColor: Colors.transparent, // 그림자 투명화(선택)

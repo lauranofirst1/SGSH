@@ -10,7 +10,7 @@ class BookmarkService {
 
   static Future<List<String>> _getStoredIds() async {
     try {
-      final prefs = await SharedPreferences.getInstance();
+    final prefs = await SharedPreferences.getInstance();
       final ids = prefs.getStringList(_key) ?? [];
       print('📚 저장된 북마크 ID 목록: $ids');
       return ids;
@@ -22,14 +22,14 @@ class BookmarkService {
 
   static Future<void> toggleBookmark(String storeId) async {
     try {
-      final prefs = await SharedPreferences.getInstance();
+    final prefs = await SharedPreferences.getInstance();
       final ids = List<String>.from(await _getStoredIds());
       
-      if (ids.contains(storeId)) {
-        ids.remove(storeId);
+    if (ids.contains(storeId)) {
+      ids.remove(storeId);
         print('🗑️ 북마크 제거: $storeId');
-      } else {
-        ids.add(storeId);
+    } else {
+      ids.add(storeId);
         print('🔖 북마크 추가: $storeId');
       }
       
@@ -47,8 +47,8 @@ class BookmarkService {
 
   static Future<bool> isBookmarked(String storeId) async {
     try {
-      final ids = await _getStoredIds();
-      return ids.contains(storeId);
+    final ids = await _getStoredIds();
+    return ids.contains(storeId);
     } catch (e) {
       print('❌ 북마크 상태 확인 실패: $e');
       return false;

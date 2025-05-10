@@ -97,7 +97,7 @@ class _SearchPageState extends State<SearchPage> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        automaticallyImplyLeading: false, // <-- 이 줄을 추가
+                  automaticallyImplyLeading: false, // <-- 이 줄을 추가
         backgroundColor: Colors.white, // 항상 흰색 유지
         elevation: 0.5,
         centerTitle: false,

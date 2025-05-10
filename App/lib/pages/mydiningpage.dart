@@ -109,12 +109,12 @@ class _MyDiningPageState extends State<MyDiningPage> {
   @override
   Widget build(BuildContext context) {
     final filtered = reservations.where((r) {
-      final status = r['status'];
-      if (_selectedCategory == 0) return status == 'standby';
-      if (_selectedCategory == 1) return status == 'approve';
-      if (_selectedCategory == 2) return status == 'cancel';
-      return false;
-    }).toList();
+          final status = r['status'];
+          if (_selectedCategory == 0) return status == 'standby';
+          if (_selectedCategory == 1) return status == 'approve';
+          if (_selectedCategory == 2) return status == 'cancel';
+          return false;
+        }).toList();
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -142,41 +142,41 @@ class _MyDiningPageState extends State<MyDiningPage> {
             padding: const EdgeInsets.symmetric(vertical: 4),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
-              children: [
+                    children: [
                 Expanded(
                   child: _tabPill(
                     emoji: '⏰',
                     label: '방문',
                     count: reservations.where((r) => r['status'] == 'standby').length,
                     selected: _selectedCategory == 0,
-                    color: Color(0xFF1976D2),
+                    color: Colors.black,
                     onTap: () => _onTabTapped(0),
-                  ),
-                ),
-                const SizedBox(width: 4),
+                        ),
+                      ),
+                SizedBox(width: 0),
                 Expanded(
                   child: _tabPill(
                     emoji: '✅',
                     label: '완료',
                     count: reservations.where((r) => r['status'] == 'approve').length,
                     selected: _selectedCategory == 1,
-                    color: Color(0xFF43A047),
+                    color: Colors.black,
                     onTap: () => _onTabTapped(1),
                   ),
                 ),
-                const SizedBox(width: 4),
+                SizedBox(width: 0),
                 Expanded(
                   child: _tabPill(
                     emoji: '❌',
                     label: '취소',
                     count: reservations.where((r) => r['status'] == 'cancel').length,
                     selected: _selectedCategory == 2,
-                    color: Color(0xFFE53935),
+                    color: Colors.black,
                     onTap: () => _onTabTapped(2),
+                        ),
+                      ),
+                    ],
                   ),
-                ),
-              ],
-            ),
           ),
           Expanded(
             child: PageView(
@@ -206,27 +206,27 @@ class _MyDiningPageState extends State<MyDiningPage> {
     return ListView(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
       children: [
-        if (filtered.isEmpty)
-          const Center(
-            child: Padding(
+          if (filtered.isEmpty)
+            const Center(
+              child: Padding(
               padding: EdgeInsets.only(top: 60),
-              child: Text(
-                '예약 내역이 없습니다.',
+                child: Text(
+                  '예약 내역이 없습니다.',
                 style: TextStyle(fontSize: 15, color: Color(0xFFB0B0B0)),
+                ),
               ),
-            ),
-          )
-        else
-          ...filtered.map((data) {
+            )
+          else
+            ...filtered.map((data) {
             if (category == 2) {
-              return _buildCanceledCard(data);
-            } else {
+                return _buildCanceledCard(data);
+              } else {
               return category == 1
-                  ? _buildCompletedCard(data)
-                  : _buildReservationCard(data);
-            }
-          }).toList(),
-      ],
+                    ? _buildCompletedCard(data)
+                    : _buildReservationCard(data);
+              }
+            }).toList(),
+        ],
     );
   }
 
@@ -515,36 +515,36 @@ class _MyDiningPageState extends State<MyDiningPage> {
         }
       },
       child: Card(
-        color: Colors.white,
+      color: Colors.white,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
           side: BorderSide(color: Color(0xFFF0F0F0), width: 1),
         ),
-        elevation: 2,
+      elevation: 2,
         shadowColor: Colors.black.withOpacity(0.06),
         margin: const EdgeInsets.only(bottom: 24),
-        child: Padding(
+      child: Padding(
           padding: const EdgeInsets.all(20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  _buildBadge(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                _buildBadge(
                     '완료',
                     color: Color(0xFF43A047),
                     textColor: Colors.white,
-                  ),
-                  const SizedBox(width: 6),
-                  Text(
-                    '총 ${visitCount}회 방문',
-                    style: TextStyle(color: Colors.grey[600], fontSize: 12),
-                  ),
-                  const Spacer(),
-                  Icon(Icons.close, color: Colors.grey[400]),
-                ],
-              ),
-              const SizedBox(height: 12),
+                ),
+                const SizedBox(width: 6),
+                Text(
+                  '총 ${visitCount}회 방문',
+                  style: TextStyle(color: Colors.grey[600], fontSize: 12),
+                ),
+                const Spacer(),
+                Icon(Icons.close, color: Colors.grey[400]),
+              ],
+            ),
+            const SizedBox(height: 12),
               Row(
                 children: [
                   ClipRRect(
@@ -567,11 +567,11 @@ class _MyDiningPageState extends State<MyDiningPage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          data['storeName'] ?? '가게 이름',
-                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                        ),
-                        const SizedBox(height: 4),
+            Text(
+              data['storeName'] ?? '가게 이름',
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+            ),
+            const SizedBox(height: 4),
                         Text(
                           '${data['category']} · ${data['location']}',
                           style: const TextStyle(color: Colors.grey, fontSize: 13),
@@ -582,50 +582,50 @@ class _MyDiningPageState extends State<MyDiningPage> {
                 ],
               ),
               const SizedBox(height: 12),
-              Text(
-                '${data['date']} · ${data['time']} · ${data['count']}명',
-                style: const TextStyle(
-                  color: Colors.black,
-                  fontWeight: FontWeight.w600,
-                ),
+            Text(
+              '${data['date']} · ${data['time']} · ${data['count']}명',
+              style: const TextStyle(
+                color: Colors.black,
+                fontWeight: FontWeight.w600,
               ),
-              const Divider(
-                height: 24,
-                color: Color.fromARGB(255, 229, 229, 229),
+            ),
+            const Divider(
+              height: 24,
+              color: Color.fromARGB(255, 229, 229, 229),
+            ),
+            const Center(
+              child: Text(
+                '별점으로 평가해주세요',
+                style: TextStyle(fontWeight: FontWeight.bold),
               ),
-              const Center(
-                child: Text(
-                  '별점으로 평가해주세요',
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: List.generate(5, (index) {
+                return IconButton(
+                  icon: Icon(
+                    index < (starRatings[id] ?? 0)
+                        ? Icons.star
+                        : Icons.star_border,
+                    size: 32,
+                    color: Colors.grey[600],
+                  ),
+                  onPressed: () {
+                    setState(() {
+                      starRatings[id] = index + 1;
+                    });
+                  },
+                );
+              }),
+            ),
+            Center(
+              child: _buildBadge(
+                '잊기 전에 남겨보세요',
+                color: const Color.fromARGB(255, 238, 238, 238),
+                textColor: Colors.black,
               ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: List.generate(5, (index) {
-                  return IconButton(
-                    icon: Icon(
-                      index < (starRatings[id] ?? 0)
-                          ? Icons.star
-                          : Icons.star_border,
-                      size: 32,
-                      color: Colors.grey[600],
-                    ),
-                    onPressed: () {
-                      setState(() {
-                        starRatings[id] = index + 1;
-                      });
-                    },
-                  );
-                }),
-              ),
-              Center(
-                child: _buildBadge(
-                  '잊기 전에 남겨보세요',
-                  color: const Color.fromARGB(255, 238, 238, 238),
-                  textColor: Colors.black,
-                ),
-              ),
-            ],
+            ),
+          ],
           ),
         ),
       ),
@@ -653,90 +653,90 @@ class _MyDiningPageState extends State<MyDiningPage> {
         }
       },
       child: Card(
-        color: Colors.white,
+      color: Colors.white,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
           side: BorderSide(color: Color(0xFFF0F0F0), width: 1),
         ),
-        elevation: 2,
+      elevation: 2,
         shadowColor: Colors.black.withOpacity(0.06),
         margin: const EdgeInsets.only(bottom: 24),
-        child: Padding(
+      child: Padding(
           padding: const EdgeInsets.all(20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  _buildBadge(
-                    '취소됨',
-                    color: Colors.grey[300]!,
-                    textColor: Colors.black,
-                  ),
-                  const Spacer(),
-                  Icon(Icons.info_outline, color: Colors.grey[400]),
-                ],
-              ),
-              const SizedBox(height: 12),
-              Row(
-                children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(6),
-                    child: Image.network(
-                      data['storeImage'] ?? '',
-                      width: 55,
-                      height: 70,
-                      fit: BoxFit.cover,
-                      errorBuilder:
-                          (_, __, ___) => Container(
-                            width: 55,
-                            height: 70,
-                            color: Colors.grey[300],
-                            child: Icon(Icons.image, color: Colors.grey),
-                          ),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          data['storeName'],
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          '${data['category']} · ${data['location']}',
-                          style: const TextStyle(color: Colors.grey),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          '${data['date']} · ${data['time']} · ${data['count']}명',
-                          style: const TextStyle(
-                            color: Colors.grey,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 12),
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: const Color.fromARGB(255, 245, 245, 245),
-                  borderRadius: BorderRadius.circular(8),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                _buildBadge(
+                  '취소됨',
+                  color: Colors.grey[300]!,
+                  textColor: Colors.black,
                 ),
-                child: const Text(
-                  '사정이 생겨 방문하지 못했어요',
-                  style: TextStyle(color: Colors.black54),
+                const Spacer(),
+                Icon(Icons.info_outline, color: Colors.grey[400]),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(6),
+                  child: Image.network(
+                    data['storeImage'] ?? '',
+                    width: 55,
+                    height: 70,
+                    fit: BoxFit.cover,
+                    errorBuilder:
+                        (_, __, ___) => Container(
+                          width: 55,
+                          height: 70,
+                          color: Colors.grey[300],
+                          child: Icon(Icons.image, color: Colors.grey),
+                        ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        data['storeName'],
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        '${data['category']} · ${data['location']}',
+                        style: const TextStyle(color: Colors.grey),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        '${data['date']} · ${data['time']} · ${data['count']}명',
+                        style: const TextStyle(
+                          color: Colors.grey,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: const Color.fromARGB(255, 245, 245, 245),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: const Text(
+                '사정이 생겨 방문하지 못했어요',
+                style: TextStyle(color: Colors.black54),
                 ),
               ),
             ],
@@ -758,39 +758,45 @@ class _MyDiningPageState extends State<MyDiningPage> {
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 6),
-        decoration: BoxDecoration(
-          border: Border(
-            bottom: BorderSide(
-              color: selected ? color : Colors.transparent,
-              width: 2,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  emoji,
+                  style: TextStyle(
+                    fontFamily: 'TossFace',
+                    fontSize: 16,
+                    color: selected ? color : Colors.grey,
+                  ),
+                ),
+                const SizedBox(width: 5),
+                Text(
+                  '$label $count',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    color: selected ? color : Colors.grey,
+                    letterSpacing: -0.5,
+                  ),
+                ),
+              ],
             ),
-          ),
-        ),
-        child: Center(
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                emoji,
-                style: TextStyle(
-                  fontFamily: 'TossFace',
-                  fontSize: 16,
-                  color: selected ? color : Colors.grey,
-                ),
+            const SizedBox(height: 4),
+            AnimatedContainer(
+              duration: Duration(milliseconds: 200),
+              curve: Curves.ease,
+              width: 32,
+              height: 2,
+              decoration: BoxDecoration(
+                color: selected ? color : Colors.grey[300],
+                borderRadius: BorderRadius.circular(2),
               ),
-              const SizedBox(width: 5),
-              Text(
-                '$label $count',
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
-                  color: selected ? color : Colors.grey,
-                  letterSpacing: -0.5,
-                ),
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

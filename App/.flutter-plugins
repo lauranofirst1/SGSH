@@ -32,3 +32,6 @@ url_launcher_linux=/Users/hanseoyeon/.pub-cache/hosted/pub.dev/url_launcher_linu
 url_launcher_macos=/Users/hanseoyeon/.pub-cache/hosted/pub.dev/url_launcher_macos-3.2.2/
 url_launcher_web=/Users/hanseoyeon/.pub-cache/hosted/pub.dev/url_launcher_web-2.4.0/
 url_launcher_windows=/Users/hanseoyeon/.pub-cache/hosted/pub.dev/url_launcher_windows-3.1.4/
+webview_flutter=/Users/hanseoyeon/.pub-cache/hosted/pub.dev/webview_flutter-4.11.0/
+webview_flutter_android=/Users/hanseoyeon/.pub-cache/hosted/pub.dev/webview_flutter_android-4.4.2/
+webview_flutter_wkwebview=/Users/hanseoyeon/.pub-cache/hosted/pub.dev/webview_flutter_wkwebview-3.20.0/

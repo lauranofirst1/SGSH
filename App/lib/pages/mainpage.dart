@@ -255,24 +255,38 @@ class _MainpageState extends State<Mainpage> {
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Text(
-                                item['emoji'],
-                                style: const TextStyle(
-                                  fontFamily: 'TossFace',
-                                  fontSize: 44,
+                              GestureDetector(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => StoreListPage(),
+                                    ),
+                                  );
+                                },
+                                child: Column(
+                                  children: [
+                                    Text(
+                                      item['emoji'],
+                                      style: const TextStyle(
+                                        fontFamily: 'TossFace',
+                                        fontSize: 36,
+                                      ),
+                                    ),
+                                    SizedBox(height: 10),
+                                    Text(
+                                      item['label'],
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.w600,
+                                        color: Colors.black87,
+                                        height: 1.2,
+                                      ),
+                                      maxLines: 2,
+                                    ),
+                                  ],
                                 ),
-                              ),
-                              SizedBox(height: 10),
-                              Text(
-                                item['label'],
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.black87,
-                                  height: 1.2,
-                                ),
-                                maxLines: 2,
                               ),
                             ],
                           ),

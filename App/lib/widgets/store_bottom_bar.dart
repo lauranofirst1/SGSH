@@ -18,70 +18,98 @@ class StoreBottomBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       height: 100,
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      decoration: const BoxDecoration(
+      padding: const EdgeInsets.only(left: 20, right: 20, top: 14, bottom: 32),
+      decoration: BoxDecoration(
         color: Colors.white,
+        borderRadius: const BorderRadius.only(
+          topLeft: Radius.circular(24),
+          topRight: Radius.circular(24),
+        ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black12,
-            blurRadius: 6,
-            offset: Offset(0, -2),
+            color: Colors.black.withOpacity(0.07),
+            blurRadius: 18,
+            offset: Offset(0, -6),
           ),
         ],
       ),
-      child: Padding(
-        padding: EdgeInsets.all(10).copyWith(bottom: 40),
         child: Row(
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          Column(
+            mainAxisSize: MainAxisSize.min,
           children: [
             GestureDetector(
               onTap: () {
-                onBookmarkToggle(!isBookmarked); // ✅ 상태 반전 전달
+                  onBookmarkToggle(!isBookmarked);
               },
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
+                child: CircleAvatar(
+                  radius: 16,
+                  backgroundColor: isBookmarked ? Color(0xFFFFF3F0) : Color(0xFFF8F8F8),
+                  child: Icon(
                     isBookmarked ? Icons.bookmark : Icons.bookmark_border,
-                    size: 20,
-                    color: Colors.black,
+                    size: 18,
+                    color: isBookmarked ? Color(0xFFE53935) : Color(0xFFB0B0B0),
                   ),
-                  Text('북마크', style: TextStyle(fontSize: 12)),
-                ],
+                ),
+                  ),
+              const SizedBox(height: 2),
+              Text(
+                '북마크',
+                style: TextStyle(
+                  fontSize: 10,
+                  fontWeight: FontWeight.w600,
+                  color: isBookmarked ? Color(0xFFE53935) : Color(0xFF888888),
+                ),
               ),
+                ],
             ),
-            const SizedBox(width: 24),
+          const SizedBox(width: 18),
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
             GestureDetector(
               onTap: onCallPressed,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: const [
-                  Icon(Icons.phone, size: 20, color: Colors.black),
-                  Text('전화', style: TextStyle(fontSize: 12)),
-                ],
+                child: CircleAvatar(
+                  radius: 16,
+                  backgroundColor: Color(0xFFF8F8F8),
+                  child: Icon(Icons.phone, size: 18, color: Color(0xFF888888)),
+                ),
               ),
+              const SizedBox(height: 2),
+              Text(
+                '전화',
+                style: TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: Color(0xFF888888)),
+              ),
+            ],
             ),
             const SizedBox(width: 20),
             Expanded(
+            child: SizedBox(
+              height: 54,
               child: ElevatedButton(
                 onPressed: onReservePressed,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.red,
+                  backgroundColor: Color(0xFFE53935),
+                  elevation: 0,
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(16),
                   ),
+                  padding: EdgeInsets.symmetric(vertical: 0),
                 ),
                 child: const Text(
                   '예약하기',
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
-                    fontSize: 16,
+                    fontSize: 19,
+                    letterSpacing: -0.5,
+                  ),
                   ),
                 ),
               ),
             ),
           ],
-        ),
       ),
     );
   }

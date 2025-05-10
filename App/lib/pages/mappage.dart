@@ -148,34 +148,6 @@ class _MapPageState extends State<MapPage> {
     }
   }
 
-  Widget _zoomButtons() => Positioned(
-        bottom: 160,
-        right: 16,
-        child: Column(
-          children: [
-            _zoomButton(
-              Icons.add,
-              () => _mapController?.animateCamera(CameraUpdate.zoomIn()),
-              'zoom-in',
-            ),
-            const SizedBox(height: 12),
-            _zoomButton(
-              Icons.remove,
-              () => _mapController?.animateCamera(CameraUpdate.zoomOut()),
-              'zoom-out',
-            ),
-          ],
-        ),
-      );
-
-  Widget _zoomButton(IconData icon, VoidCallback onPressed, String tag) =>
-      FloatingActionButton(
-        heroTag: tag,
-        onPressed: onPressed,
-        backgroundColor: Colors.white,
-        child: Icon(icon, color: Colors.black, size: 30),
-      );
-
   Widget _searchBar() => Positioned(
         top: 16,
         left: 16,
@@ -183,54 +155,86 @@ class _MapPageState extends State<MapPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Container(
-              height: 48,
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(16),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
-                    blurRadius: 10,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-              ),
-              child: Row(
-                children: [
-                  const Icon(Icons.search, color: Colors.grey, size: 20),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: TextField(
-                      controller: _searchController,
-                      style: const TextStyle(
-                        fontSize: 15,
-                        color: Colors.black87,
+            Row(
+              children: [
+                Container(
+                  width: 38,
+                  height: 38,
+                  margin: EdgeInsets.only(right: 8),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.07),
+                        blurRadius: 8,
+                        offset: Offset(0, 2),
                       ),
-                      decoration: const InputDecoration(
-                        hintText: '가게 이름 검색',
-                        hintStyle: TextStyle(
-                          color: Colors.grey,
-                          fontSize: 15,
+                    ],
+                  ),
+                  child: IconButton(
+                    icon: Icon(Icons.my_location, color: Colors.blue, size: 22),
+                    onPressed: () async {
+                      final position = await _locationService.getCurrentLocation();
+                      if (position != null) {
+                        _moveToLocation(position);
+                      }
+                    },
+                    tooltip: '내 위치로 이동',
+                  ),
+                ),
+                Expanded(
+                  child: Container(
+                    height: 48,
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.05),
+                          blurRadius: 10,
+                          offset: const Offset(0, 4),
                         ),
-                        border: InputBorder.none,
-                        contentPadding: EdgeInsets.symmetric(vertical: 12),
-                      ),
-                      onSubmitted: (query) => _searchAndMove(query),
+                      ],
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.search, color: Colors.grey, size: 20),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: TextField(
+                            controller: _searchController,
+                            style: const TextStyle(
+                              fontSize: 15,
+                              color: Colors.black87,
+                            ),
+                            decoration: const InputDecoration(
+                              hintText: '가게 이름 검색',
+                              hintStyle: TextStyle(
+                                color: Colors.grey,
+                                fontSize: 15,
+                              ),
+                              border: InputBorder.none,
+                              contentPadding: EdgeInsets.symmetric(vertical: 12),
+                            ),
+                            onSubmitted: (query) => _searchAndMove(query),
+                          ),
+                        ),
+                        if (_searchController.text.isNotEmpty)
+                        IconButton(
+                            icon: const Icon(Icons.close, size: 20),
+                            color: Colors.grey,
+                            onPressed: () {
+                              _searchController.clear();
+                              setState(() {});
+                            },
+                        ),
+                      ],
                     ),
                   ),
-                  if (_searchController.text.isNotEmpty)
-                    IconButton(
-                      icon: const Icon(Icons.close, size: 20),
-                      color: Colors.grey,
-                      onPressed: () {
-                        _searchController.clear();
-                        setState(() {});
-                      },
-                    ),
-                ],
-              ),
+                ),
+              ],
             ),
             const SizedBox(height: 12),
             SingleChildScrollView(
@@ -264,8 +268,8 @@ class _MapPageState extends State<MapPage> {
           if (label == '가치가게의 추천') {
             _showRecommendationSheet();
           } else {
-            _searchController.text = label;
-            _searchAndMove(label);
+          _searchController.text = label;
+          _searchAndMove(label);
           }
         },
         child: Chip(
@@ -345,7 +349,6 @@ class _MapPageState extends State<MapPage> {
             Stack(
               children: [
                 mapview(),
-                _zoomButtons(),
                 _searchBar(),
               ],
             ),

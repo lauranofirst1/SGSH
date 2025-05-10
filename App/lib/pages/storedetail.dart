@@ -253,6 +253,43 @@ class _StoreDetailPageState extends State<StoreDetailPage>
     );
   }
 
+  void _callStore(String phoneNumber) async {
+    print('[DEBUG] 원본 전화번호: $phoneNumber');
+    
+    // 전화번호 형식 정제 (캐치테이블 스타일)
+    String cleaned = phoneNumber;
+    
+    // 1. 한글, 특수문자 제거
+    cleaned = cleaned.replaceAll(RegExp(r'[^0-9]'), '');
+    
+    // 2. 지역번호 처리 (02 -> 02, 나머지 -> 0)
+    if (cleaned.startsWith('02')) {
+      cleaned = '02' + cleaned.substring(2);
+    } else if (cleaned.length >= 10) {
+      cleaned = '0' + cleaned;
+    }
+    
+    print('[DEBUG] 정제된 전화번호: $cleaned');
+    
+    if (cleaned.isEmpty || cleaned.length < 10) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('유효한 전화번호가 없습니다.')),
+      );
+      return;
+    }
+    
+    final Uri url = Uri(scheme: 'tel', path: cleaned);
+    print('[DEBUG] tel url: $url');
+    
+    if (await canLaunchUrl(url)) {
+      await launchUrl(url);
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('전화를 걸 수 없습니다.')),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return AnnotatedRegion<SystemUiOverlayStyle>(
@@ -272,7 +309,7 @@ class _StoreDetailPageState extends State<StoreDetailPage>
             );
           },
           onCallPressed: () {
-            print("전화 클릭!");
+            _callStore(widget.store.number);
           },
           onBookmarkToggle: (newState) async {
             toggleBookmark(); // ✅ 내부에서 상태 변경
@@ -411,21 +448,31 @@ class _StoreDetailPageState extends State<StoreDetailPage>
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                '춘천 | 파스타',
-                style: TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w100,
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: Colors.grey[100],
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: Text(
+                  '춘천 | 파스타',
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.grey[700],
+                  ),
                 ),
               ),
               linkbutton(),
             ],
           ),
+          SizedBox(height: 8),
           Text(
             widget.store.name,
             style: TextStyle(
-              fontSize: 25,
+              fontSize: 24,
               fontWeight: FontWeight.w700,
+              letterSpacing: -0.5,
             ),
           ),
           SizedBox(height: 2),
@@ -709,22 +756,6 @@ class _StoreDetailPageState extends State<StoreDetailPage>
                                 color: Colors.grey[200],
                                 child: Icon(Icons.image, color: Colors.grey),
                               ),
-                        ),
-                        Positioned(
-                          bottom: 4,
-                          right: 4,
-                          child: Container(
-                            padding: EdgeInsets.all(4),
-                            decoration: BoxDecoration(
-                              color: Colors.black45,
-                              shape: BoxShape.circle,
-                            ),
-                            child: Icon(
-                              Icons.shopping_cart_outlined,
-                              color: Colors.white,
-                              size: 16,
-                            ),
-                          ),
                         ),
                       ],
                     ),
