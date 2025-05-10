@@ -1,10 +1,12 @@
 import 'package:app/auth/loginpage.dart';
+import 'package:app/models/business.dart';
 import 'package:app/models/userprofile.dart';
 import 'package:app/pages/mydiningpage.dart';
 import 'package:app/pages/mappage.dart';
 import 'package:app/pages/mypage.dart';
 import 'package:app/pages/searchpage.dart';
 import 'package:app/services/supabase_service.dart';
+import 'package:app/widgets/storedetailbottomsheet.dart';
 import 'package:flutter/material.dart';
 import 'package:app/pages/mainpage.dart';
 import 'package:flutter/services.dart';

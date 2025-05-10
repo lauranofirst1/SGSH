@@ -42,7 +42,6 @@ class _MainpageState extends State<Mainpage> {
     prefsFuture = SharedPreferences.getInstance();
     fetchStores();
 
-    // 이메일 앞부분 추출
     SupabaseService().getUserProfile().then((profile) {
       final email = profile?.email;
       final namePart = email?.split('@')[0];
@@ -51,13 +50,85 @@ class _MainpageState extends State<Mainpage> {
       });
     });
 
-    // 랜덤 추천 매장 불러오기
-    fetchRandomStores().then((stores) {
+    fetchTopViewedStores().then((stores) {
       setState(() {
         recommendedStores = stores;
       });
     });
   }
+
+  Future<List<business_data>> fetchTopViewedStores() async {
+  try {
+    final today = DateTime.now();
+    final weekAgo = today.subtract(Duration(days: 7));
+    final weekAgoStr =
+        '${weekAgo.year}-${weekAgo.month.toString().padLeft(2, '0')}-${weekAgo.day.toString().padLeft(2, '0')}';
+
+    print("🕒 조회 기준: $weekAgoStr 이후 데이터");
+
+    // 1. 최근 7일 조회수 합산
+    final response = await supabase
+        .from('business_hits')
+        .select('b_id, hits')
+        .gte('date', weekAgoStr);
+
+    print("📊 조회된 hits rows: ${response.length}");
+    for (var item in response) {
+      print("→ b_id: ${item['b_id']}, hits: ${item['hits']}");
+    }
+
+    // 2. [b_id별 합산]
+    final Map<int, int> hitsByStore = {};
+    for (var item in response) {
+      final bId = item['b_id'] as int;
+      final hits = item['hits'] as int;
+      hitsByStore[bId] = (hitsByStore[bId] ?? 0) + hits;
+    }
+
+    print("📈 합산된 조회수:");
+    hitsByStore.forEach((id, hits) {
+      print("→ 매장 $id: $hits회");
+    });
+
+    // 3. 정렬: 조회수 많은 순 + 같은 조회수는 랜덤 섞기
+    final sortedIds =
+        hitsByStore.entries.toList()
+          ..shuffle()
+          ..sort((a, b) => b.value.compareTo(a.value));
+
+    final topIds = sortedIds.take(7).map((e) => e.key).toList();
+    print("🏆 추천 매장 ID(정렬된): $topIds");
+
+    // 4. 상위 매장 정보 가져오기
+    final storesResponse = await supabase
+        .from('business_data')
+        .select()
+        .inFilter('id', topIds);
+
+    print("🏪 매장 정보 수신 완료: ${storesResponse.length}");
+
+    List<business_data> topStores =
+        storesResponse
+            .map<business_data>((data) => business_data.fromMap(data))
+            .toList();
+
+    // 5. 순서 정렬
+    topStores.sort(
+      (a, b) => topIds.indexOf(a.id!).compareTo(topIds.indexOf(b.id!)),
+    );
+
+    print("✅ 최종 추천 매장 리스트:");
+    for (var store in topStores) {
+      print("→ ${store.name} (${store.id})");
+    }
+
+    return topStores;
+  } catch (e) {
+    print("❌ 추천 매장 조회 실패: $e");
+    return [];
+  }
+}
+
 
   void fetchStores() async {
     try {
@@ -79,30 +150,30 @@ class _MainpageState extends State<Mainpage> {
     }
   }
 
-  Future<List<business_data>> fetchRandomStores() async {
-    try {
-      final response = await supabase.from('business_data').select();
+  // Future<List<business_data>> fetchRandomStores() async {
+  //   try {
+  //     final response = await supabase.from('business_data').select();
 
-      List<business_data> allStores =
-          response
-              .map<business_data>((data) => business_data.fromMap(data))
-              .toList();
+  //     List<business_data> allStores =
+  //         response
+  //             .map<business_data>((data) => business_data.fromMap(data))
+  //             .toList();
 
-      allStores.shuffle(); // ✅ 클라이언트에서 무작위 섞기
+  //     allStores.shuffle(); // ✅ 클라이언트에서 무작위 섞기
 
-      return allStores.take(5).toList(); // ✅ 상위 5개만
-    } catch (e) {
-      print("❌ 랜덤 매장 불러오기 실패: $e");
-      return [];
-    }
-  }
+  //     return allStores.take(5).toList(); // ✅ 상위 5개만
+  //   } catch (e) {
+  //     print("❌ 랜덤 매장 불러오기 실패: $e");
+  //     return [];
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-          automaticallyImplyLeading: false, // <-- 이 줄을 추가
+        automaticallyImplyLeading: false, // <-- 이 줄을 추가
         backgroundColor: Colors.white, // 항상 흰색 유지
         elevation: 0.5,
         centerTitle: false,
@@ -454,10 +525,17 @@ class DummyArticleList extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Padding(
-          padding: EdgeInsets.fromLTRB(16, 24, 16, 0),
+          padding: const EdgeInsets.fromLTRB(16, 24, 16, 4),
           child: Text(
             '가치가게 소식',
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 0, 16, 5),
+          child: Text(
+            '가치가게 소식을 모아봤어요',
+            style: TextStyle(fontSize: 14, color: Colors.grey[600]),
           ),
         ),
         ...newsArticles.map((article) {

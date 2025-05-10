@@ -57,6 +57,41 @@ class _StoreDetailPageState extends State<StoreDetailPage>
     }
   }
 
+  void updateTodayHits() async {
+  final today = DateTime.now();
+  final todayStr = '${today.year}-${today.month.toString().padLeft(2, '0')}-${today.day.toString().padLeft(2, '0')}';
+
+  try {
+    // 이미 있는지 확인
+    final existing = await supabase
+        .from('business_hits')
+        .select()
+        .eq('b_id', widget.store.id)
+        .eq('date', todayStr)
+        .maybeSingle();
+
+    if (existing != null) {
+      // 이미 있으면 hits + 1
+      await supabase
+          .from('business_hits')
+          .update({'hits': (existing['hits'] ?? 0) + 1})
+          .eq('id', existing['id']);
+      print('✅ 오늘 조회수 +1');
+    } else {
+      // 없으면 새로 생성
+      await supabase.from('business_hits').insert({
+        'b_id': widget.store.id,
+        'date': todayStr,
+        'hits': 1,
+      });
+      print('✅ 첫 방문 기록됨');
+    }
+  } catch (e) {
+    print("❌ 조회수 업데이트 실패: $e");
+  }
+}
+
+
   void toggleBookmark() async {
     await BookmarkService.toggleBookmark(widget.store.id.toString());
     await checkBookmarkStatus(); // 북마크 상태를 정확히 다시 읽어옴
@@ -152,25 +187,26 @@ class _StoreDetailPageState extends State<StoreDetailPage>
 
     fetchMenuData();
     fetchStoreArticles();
-  saveToRecentStores(widget.store.id); // ✅ 변경된 부분
+    saveToRecentStores(widget.store.id); // ✅ 변경된 부분
     checkBookmarkStatus();
+      updateTodayHits(); // ✅ 이거 꼭 호출하기
+
   }
 
   void saveToRecentStores(int storeId) async {
-  final prefs = await prefsFuture;
-  List<String> recentIds = prefs.getStringList('recentStoreIds') ?? [];
+    final prefs = await prefsFuture;
+    List<String> recentIds = prefs.getStringList('recentStoreIds') ?? [];
 
-  final idStr = storeId.toString();
-  recentIds.remove(idStr);            // 중복 제거
-  recentIds.insert(0, idStr);         // 최신순 정렬
-  if (recentIds.length > 5) {
-    recentIds = recentIds.sublist(0, 5); // 최대 5개까지만 유지
+    final idStr = storeId.toString();
+    recentIds.remove(idStr); // 중복 제거
+    recentIds.insert(0, idStr); // 최신순 정렬
+    if (recentIds.length > 5) {
+      recentIds = recentIds.sublist(0, 5); // 최대 5개까지만 유지
+    }
+
+    await prefs.setStringList('recentStoreIds', recentIds);
+    print("✅ 최근 본 가게 ID 목록: $recentIds");
   }
-
-  await prefs.setStringList('recentStoreIds', recentIds);
-  print("✅ 최근 본 가게 ID 목록: $recentIds");
-}
-
 
   void fetchMenuData() async {
     try {
@@ -227,21 +263,22 @@ class _StoreDetailPageState extends State<StoreDetailPage>
       ),
       child: Scaffold(
         bottomNavigationBar: StoreBottomBar(
-          bookmarkCount: 5012,
+          isBookmarked: isBookmarked,
           onReservePressed: () {
-            // 예약하기 눌렀을 때
             showReservationBottomSheet(
-  context,
-  storeName: widget.store.name,  // ✅ 수정
-  storeId: widget.store.id,      // ✅ 수정
-);
+              context,
+              storeName: widget.store.name,
+              storeId: widget.store.id,
+            );
           },
           onCallPressed: () {
-            // 전화 버튼 눌렀을 때
             print("전화 클릭!");
           },
-          onBookmarkPressed: () {},
+          onBookmarkToggle: (newState) async {
+            toggleBookmark(); // ✅ 내부에서 상태 변경
+          },
         ),
+
         backgroundColor: Colors.white,
         body: Stack(
           children: [
@@ -255,13 +292,17 @@ class _StoreDetailPageState extends State<StoreDetailPage>
                     backgroundColor: Colors.white,
                     scrolledUnderElevation: 0,
                     elevation: 0,
-                    leading: Padding(
-                      padding: EdgeInsets.only(left: 16),
-                      child: _circleIconButton(
-                        icon: Icons.arrow_back_ios_new,
-                        onTap: () => Navigator.pop(context),
+                    leading: Center(
+                      // ← Center로 감싸주기!
+                      child: Padding(
+                        padding: EdgeInsets.only(left: 12), // 적당한 좌측 여백
+                        child: _circleIconButton(
+                          icon: Icons.arrow_back_ios_new,
+                          onTap: () => Navigator.pop(context),
+                        ),
                       ),
                     ),
+
                     actions: [
                       _circleIconButton(
                         icon: Icons.home,

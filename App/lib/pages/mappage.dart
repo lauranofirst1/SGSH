@@ -1,4 +1,3 @@
-// ✅ MapPage 리팩토링: 독립적으로 바텀시트 포함 & 외부 onMarkerTap 제거
 import 'package:app/models/business.dart';
 import 'package:app/services/location_service.dart';
 import 'package:app/services/marker_service.dart';
@@ -6,6 +5,7 @@ import 'package:app/widgets/storedetailbottomsheet.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:collection/collection.dart';
 
 class MapPage extends StatefulWidget {
   const MapPage({super.key});
@@ -19,9 +19,14 @@ class _MapPageState extends State<MapPage> {
   final MarkerService _markerService = MarkerService();
   final LocationService _locationService = LocationService();
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  final TextEditingController _searchController = TextEditingController();
 
   bool _mapMoved = false;
   Position? _initialPosition;
+  PersistentBottomSheetController? _activeBottomSheet;
+
+  List<business_data> _cachedRecommendedStores = [];
+  bool _hasClosedRecommendation = false;
 
   @override
   void initState() {
@@ -37,56 +42,37 @@ class _MapPageState extends State<MapPage> {
     _initialPosition = position;
 
     if (mounted) setState(() {});
-
     _moveToLocation(position);
 
-    // 추천 가게 2개 바텀시트로 띄우기
-    final recommendations = _markerService.getRecommendations(limit: 2);
-    if (recommendations.isNotEmpty) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        _scaffoldKey.currentState?.showBottomSheet(
-          (context) => _buildRecommendationSheet(recommendations),
-          backgroundColor: Colors.transparent,
-        );
-      });
-    }
-  }
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      _cachedRecommendedStores = await _markerService.getTopBusinessesByHits(3);
+      if (_cachedRecommendedStores.isNotEmpty) {
+        Future.delayed(const Duration(milliseconds: 300), () {
+          _activeBottomSheet = _scaffoldKey.currentState?.showBottomSheet(
+            (context) => StoreDetailBottomSheet(
+              name: '추천 맛집',
+              address: '근처',
+              store: null,
+              recommendedStores: _cachedRecommendedStores,
+            ),
+            backgroundColor: Colors.transparent,
+          );
 
-  Widget _buildRecommendationSheet(List<business_data> list) {
-    return Container(
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: list
-            .map((store) => ListTile(
-                  title: Text(store.name ?? '이름 없음'),
-                  subtitle: Text(store.address ?? '주소 없음'),
-                  onTap: () => _onMarkerTap(store.name ?? '', store.address ?? '', store),
-                ))
-            .toList(),
-      ),
-    );
-  }
-
-  void _onMarkerTap(String name, String address, business_data? store) {
-    final controller = _scaffoldKey.currentState!.showBottomSheet(
-      (context) => StoreDetailBottomSheet(
-        name: name,
-        address: address,
-        store: store,
-      ),
-      backgroundColor: Colors.transparent,
-    );
+          _activeBottomSheet?.closed.then((_) {
+            if (mounted) {
+              setState(() => _hasClosedRecommendation = true);
+            }
+          });
+        });
+      }
+    });
   }
 
   @override
   void dispose() {
     _mapController?.dispose();
     _mapController = null;
+    _searchController.dispose();
     super.dispose();
   }
 
@@ -115,6 +101,7 @@ class _MapPageState extends State<MapPage> {
           _mapController = controller;
         }
       },
+      onTap: (_) => _activeBottomSheet?.close(),
       onCameraMove: (_) {
         if (!_mapMoved) setState(() => _mapMoved = true);
       },
@@ -132,8 +119,37 @@ class _MapPageState extends State<MapPage> {
     );
   }
 
+  Future<void> _onMarkerTap(
+    String name,
+    String address,
+    business_data? store,
+  ) async {
+    _activeBottomSheet?.close();
+
+    if (store != null) {
+      _activeBottomSheet = _scaffoldKey.currentState!.showBottomSheet(
+        (context) => StoreDetailBottomSheet(
+          name: name,
+          address: address,
+          store: store,
+        ),
+        backgroundColor: Colors.transparent,
+      );
+    } else {
+      final top3 = await _markerService.getTopBusinessesByHits(3);
+      _activeBottomSheet = _scaffoldKey.currentState!.showBottomSheet(
+        (context) => StoreDetailBottomSheet(
+          name: '추천 맛집',
+          address: '근처',
+          recommendedStores: top3,
+        ),
+        backgroundColor: Colors.transparent,
+      );
+    }
+  }
+
   Widget _zoomButtons() => Positioned(
-        bottom: 100,
+        bottom: 160,
         right: 16,
         child: Column(
           children: [
@@ -160,6 +176,163 @@ class _MapPageState extends State<MapPage> {
         child: Icon(icon, color: Colors.black, size: 30),
       );
 
+  Widget _searchBar() => Positioned(
+        top: 16,
+        left: 16,
+        right: 16,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 8)],
+              ),
+              child: Row(
+                children: [
+                  const Icon(Icons.search, color: Colors.grey),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: TextField(
+                      controller: _searchController,
+                      decoration: const InputDecoration(
+                        hintText: '가게 이름 검색',
+                        border: InputBorder.none,
+                      ),
+                      onSubmitted: (query) => _searchAndMove(query),
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.close),
+                    onPressed: () => _searchController.clear(),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 8),
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: [
+                  const SizedBox(width: 4),
+                  _tagChip('육면'),
+                  _tagChip('카페'),
+                  _tagChip('한식'),
+                  _tagChip('분식'),
+                  _tagChip('디저트'),
+                  _tagChip('중식'),
+                  _tagChip('고기'),
+                  _tagChip('샐러드'),
+                  _tagChip('베이커리'),
+                  const SizedBox(width: 4),
+                ],
+              ),
+            ),
+          ],
+        ),
+      );
+
+  Widget _tagChip(String label) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 4),
+      child: GestureDetector(
+        onTap: () {
+          _searchController.text = label;
+          _searchAndMove(label);
+        },
+        child: Chip(
+          label: Text('#$label'),
+          backgroundColor: Colors.white,
+          side: const BorderSide(color: Colors.black12),
+          labelStyle: const TextStyle(color: Colors.black),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(30),
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _searchAndMove(String name) {
+    final matched = _markerService.savedBusinessList.firstWhereOrNull(
+      (b) => b.name.toLowerCase().contains(name.toLowerCase()),
+    );
+
+    if (matched != null && matched.latDouble != null && matched.lngDouble != null) {
+      final latLng = LatLng(matched.latDouble!, matched.lngDouble!);
+      _mapController?.animateCamera(CameraUpdate.newLatLngZoom(latLng, 17));
+      _onMarkerTap(matched.name, matched.address, matched);
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('검색 결과가 없습니다')),
+      );
+    }
+  }
+
+  Widget _reopenButton() => Align(
+        alignment: Alignment.bottomCenter,
+        child: Padding(
+          padding: const EdgeInsets.only(bottom: 30),
+          child: Visibility(
+            visible: _hasClosedRecommendation,
+            child: SizedBox(
+              height: 42,
+              child: ElevatedButton.icon(
+                onPressed: () {
+                  setState(() => _hasClosedRecommendation = false);
+                  _showRecommendationSheet();
+                },
+                icon: const Icon(Icons.place, color: Colors.orange),
+                label: const Text(
+                  '가치가게의 추천',
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontWeight: FontWeight.w500,
+                    fontSize: 14,
+                  ),
+                ),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.white,
+                  foregroundColor: Colors.black,
+                  elevation: 3,
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(24),
+                    side: const BorderSide(color: Colors.orange),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+
+  Future<void> _showRecommendationSheet() async {
+    if (_cachedRecommendedStores.isEmpty) {
+      _cachedRecommendedStores = await _markerService.getTopBusinessesByHits(3);
+    }
+
+    if (_cachedRecommendedStores.isNotEmpty) {
+      _activeBottomSheet = _scaffoldKey.currentState?.showBottomSheet(
+        (context) => StoreDetailBottomSheet(
+          name: '추천 맛집',
+          address: '근처',
+          store: null,
+          recommendedStores: _cachedRecommendedStores,
+        ),
+        backgroundColor: Colors.transparent,
+      );
+
+      _activeBottomSheet?.closed.then((_) {
+        if (mounted) {
+          setState(() => _hasClosedRecommendation = true);
+        }
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -174,6 +347,8 @@ class _MapPageState extends State<MapPage> {
               children: [
                 mapview(),
                 _zoomButtons(),
+                _searchBar(),
+                _reopenButton(),
               ],
             ),
           ],

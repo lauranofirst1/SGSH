@@ -5,7 +5,8 @@ import 'package:app/pages/articlepage.dart';
 class DiningMagazineSection extends StatelessWidget {
   final List<article_data> magazineArticles;
 
-  const DiningMagazineSection({Key? key, required this.magazineArticles}) : super(key: key);
+  const DiningMagazineSection({Key? key, required this.magazineArticles})
+    : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -15,15 +16,20 @@ class DiningMagazineSection extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Padding(
-          padding: EdgeInsets.fromLTRB(16, 24, 16, 12),
+          padding: const EdgeInsets.fromLTRB(16, 24, 16, 4),
           child: Text(
             '가치가게 매거진',
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 18,
-            ),
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
         ),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 0, 16, 10),
+          child: Text(
+            '가치가게의 매거진을 모아봤어요',
+            style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+          ),
+        ),
+
         SizedBox(
           height: 240,
           child: ListView.separated(

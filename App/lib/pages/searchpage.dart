@@ -131,81 +131,23 @@ class _SearchPageState extends State<SearchPage> {
           ),
 
           if (!hasSearched) ...[
-            // ✅ 매거진 아티클이 있으면 먼저 보여주기
-            if (magazineArticles.isNotEmpty) ...[
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 12.0),
-                child: Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    '추천 매거진',
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-                  ),
-                ),
-              ),
-              SizedBox(
-                height: 200,
-                child: ListView.separated(
-                  padding: EdgeInsets.symmetric(horizontal: 16),
-                  scrollDirection: Axis.horizontal,
-                  itemCount: magazineArticles.length,
-                  separatorBuilder: (_, __) => SizedBox(width: 12),
-                  itemBuilder: (context, index) {
-                    final article = magazineArticles[index];
-                    return GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => ArticlePage(article: article),
-                          ),
-                        );
-                      },
-                      child: Container(
-                        width: 160,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(12),
-                          image: DecorationImage(
-                            image: NetworkImage(article.image ?? ''),
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                        alignment: Alignment.bottomLeft,
-                        padding: EdgeInsets.all(12),
-                        child: Text(
-                          article.title,
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            shadows: [
-                              Shadow(blurRadius: 4, color: Colors.black),
-                            ],
-                          ),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              ),
-              const SizedBox(height: 16),
-            ],
+            
 
             // ✅ 추천 해시태그는 항상 표시
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                padding: const EdgeInsets.fromLTRB(20,10,12,5),
               child: Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
                   '추천 해시태그',
-                  style: TextStyle(fontWeight: FontWeight.bold),
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
                 ),
               ),
             ),
+            
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
-              padding: EdgeInsets.symmetric(horizontal: 12.0),
+                padding: const EdgeInsets.fromLTRB(20,3,12,5),
               child: Row(
                 children:
                     ['#학생단골', '#춘천맛집', '#스시오마카세', '#강원도맛집', '#감자'].map((tag) {
@@ -236,6 +178,68 @@ class _SearchPageState extends State<SearchPage> {
                     }).toList(),
               ),
             ),
+
+            // ✅ 매거진 아티클이 있으면 먼저 보여주기
+            if (magazineArticles.isNotEmpty) ...[
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20,10,12,5),
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    '추천 매거진',
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                  ),
+                ),
+              ),
+              SizedBox(
+                height: 200,
+                child: ListView.separated(
+                padding: const EdgeInsets.fromLTRB(20,10,12,5),
+                  scrollDirection: Axis.horizontal,
+                  itemCount: magazineArticles.length,
+                  separatorBuilder: (_, __) => SizedBox(width: 12),
+                  itemBuilder: (context, index) {
+                    final article = magazineArticles[index];
+                    return GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => ArticlePage(article: article),
+                          ),
+                        );
+                      },
+                      child: Container(
+                        width: 160,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(12),
+                          image: DecorationImage(
+                            image: NetworkImage(article.image ?? ''),
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                        alignment: Alignment.bottomLeft,
+                        padding: EdgeInsets.all(12),
+                        child: Text(
+                          article.title,
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 17,
+                            shadows: [
+                              Shadow(blurRadius: 4, color: Colors.black),
+                            ],
+                          ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+              const SizedBox(height: 16),
+            ],
           ],
 
           if (hasSearched)

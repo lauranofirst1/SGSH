@@ -3,15 +3,15 @@ import 'package:flutter/material.dart';
 class StoreBottomBar extends StatelessWidget {
   final VoidCallback onReservePressed;
   final VoidCallback onCallPressed;
-  final VoidCallback onBookmarkPressed;
-  final int bookmarkCount;
+  final Function(bool) onBookmarkToggle; // ✅ 북마크 상태 변경 콜백
+  final bool isBookmarked;
 
   const StoreBottomBar({
     super.key,
     required this.onReservePressed,
     required this.onCallPressed,
-    required this.onBookmarkPressed,
-    this.bookmarkCount = 0,
+    required this.onBookmarkToggle,
+    required this.isBookmarked,
   });
 
   @override
@@ -34,16 +34,18 @@ class StoreBottomBar extends StatelessWidget {
         child: Row(
           children: [
             GestureDetector(
-              onTap: onBookmarkPressed,
+              onTap: () {
+                onBookmarkToggle(!isBookmarked); // ✅ 상태 반전 전달
+              },
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Icon(
-                    Icons.bookmark_border,
+                  Icon(
+                    isBookmarked ? Icons.bookmark : Icons.bookmark_border,
                     size: 20,
                     color: Colors.black,
                   ),
-                  Text('$bookmarkCount', style: const TextStyle(fontSize: 12)),
+                  Text('북마크', style: TextStyle(fontSize: 12)),
                 ],
               ),
             ),
@@ -58,12 +60,12 @@ class StoreBottomBar extends StatelessWidget {
                 ],
               ),
             ),
-            SizedBox(width: 20), // ← 딱 적당한 간격 (원하면 8 또는 16으로 조절 가능)
+            const SizedBox(width: 20),
             Expanded(
               child: ElevatedButton(
                 onPressed: onReservePressed,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color.fromARGB(255, 255, 0, 0),
+                  backgroundColor: Colors.red,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),
