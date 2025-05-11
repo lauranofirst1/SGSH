@@ -9,6 +9,8 @@ class business_data {
   final String url;
   final String lat;
   final String lng;
+  final List<String> tags;
+  final String category;
 
   business_data({
     required this.id,
@@ -21,11 +23,24 @@ class business_data {
     required this.url,
     required this.lat,
     required this.lng,
+    required this.tags,
+    required this.category,
   });
 
   factory business_data.fromMap(Map<String, dynamic> data) {
     String clean(String? value, String fallback) =>
         (value != null && value.trim().isNotEmpty) ? value : fallback;
+
+    List<String> parseTags(dynamic tags) {
+      if (tags == null) return [];
+      if (tags is String) {
+        return tags.split(',')
+            .map((e) => e.trim())
+            .where((e) => e.isNotEmpty)
+            .toList();
+      }
+      return [];
+    }
 
     return business_data(
       id: data["id"] ?? 0,
@@ -38,6 +53,8 @@ class business_data {
       url: clean(data["url"], "https://via.placeholder.com/300"),
       lat: (data["lat"] ?? '0.0').toString(),
       lng: (data["lng"] ?? '0.0').toString(),
+      tags: parseTags(data["tags"]),
+      category: clean(data["category"], "카테고리 없음"),
     );
   }
 

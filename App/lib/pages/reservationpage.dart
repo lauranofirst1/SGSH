@@ -4,6 +4,8 @@ import 'package:app/models/reserve_data.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:intl/intl.dart'; // Added import for DateFormat
+import 'package:flutter/services.dart'; // TextInputFormatter 사용을 위해 추가
+import 'dart:math'; // min 함수 사용을 위해 추가
 
 class ReservationConfirmPage extends StatefulWidget {
   final int businessId; // ✅ 추가
@@ -114,6 +116,11 @@ class _ReservationConfirmPageState extends State<ReservationConfirmPage> {
               TextField(
                 controller: phoneController,
                 keyboardType: TextInputType.phone,
+                inputFormatters: [
+                  FilteringTextInputFormatter.digitsOnly,
+                  LengthLimitingTextInputFormatter(11),
+                  _PhoneNumberFormatter(),
+                ],
                 decoration: const InputDecoration(
                   hintText: '전화번호를 입력하세요',
                   hintStyle: TextStyle(color: Colors.grey),
@@ -551,6 +558,35 @@ class _ReservationConfirmPageState extends State<ReservationConfirmPage> {
           Expanded(child: Text(text, style: const TextStyle(fontSize: 14))),
         ],
       ),
+    );
+  }
+}
+
+class _PhoneNumberFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(TextEditingValue oldValue, TextEditingValue newValue) {
+    if (newValue.text.isEmpty) {
+      return newValue;
+    }
+    
+    final text = newValue.text.replaceAll(RegExp(r'[^\d]'), '');
+    final buffer = StringBuffer();
+    
+    if (text.length > 0) {
+      buffer.write(text.substring(0, min(3, text.length)));
+      if (text.length > 3) {
+        buffer.write('-');
+        buffer.write(text.substring(3, min(7, text.length)));
+        if (text.length > 7) {
+          buffer.write('-');
+          buffer.write(text.substring(7, min(11, text.length)));
+        }
+      }
+    }
+    
+    return TextEditingValue(
+      text: buffer.toString(),
+      selection: TextSelection.collapsed(offset: buffer.length),
     );
   }
 }

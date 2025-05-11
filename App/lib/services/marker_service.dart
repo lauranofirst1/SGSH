@@ -4,11 +4,39 @@ import 'package:app/models/hit_data.dart';
 import 'package:collection/collection.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
 
 class MarkerService {
   final Set<Marker> visibleMarkers = {}; // 지도에 실제로 표시될 마커
   final List<Map<String, dynamic>> _savedBusinesses = [];
   final Set<Marker> _allMarkers = {}; // 모든 마커 (필터링 전)
+
+  // 카테고리별 샘플 PNG 경로 매핑
+  final Map<String, String> _categoryIconPaths = {
+    '한식': 'assets/icons/han.png',
+    '중식': 'assets/icons/china.png',
+    '일식': 'assets/icons/japan.png',
+    '카페': 'assets/icons/cafe.png',
+    '버거': 'assets/icons/burger.png',
+    '기타': 'assets/icons/etc.png',
+  };
+
+  // BitmapDescriptor 캐싱
+  final Map<String, BitmapDescriptor> _categoryIcons = {};
+
+  Future<BitmapDescriptor> _getCategoryIcon(String category) async {
+    if (_categoryIcons.containsKey(category)) {
+      return _categoryIcons[category]!;
+    }
+    final path = _categoryIconPaths[category] ?? _categoryIconPaths['기타']!;
+    final icon = await BitmapDescriptor.fromAssetImage(
+      const ImageConfiguration(size: Size(64, 64)),
+      path,
+    );
+    _categoryIcons[category] = icon;
+    return icon;
+  }
 
   List<business_data> get savedBusinessList =>
       _savedBusinesses.map((biz) => business_data.fromMap(biz)).toList();
@@ -24,11 +52,15 @@ class MarkerService {
   }
 
   /// DB에서 가져온 savedBusinesses 데이터로 마커 생성
-  void buildSavedBusinessMarkers(
+  Future<void> buildSavedBusinessMarkers(
     void Function(String, String, business_data?) onMarkerTap,
-  ) {
+  ) async {
     _allMarkers.clear();
 
+    final icon = await BitmapDescriptor.fromAssetImage(
+      const ImageConfiguration(size: Size(64, 64)),
+      'assets/icons/image.png',
+    );
     for (var biz in _savedBusinesses) {
       final lat = double.tryParse(biz['lat'].toString());
       final lng = double.tryParse(biz['lng'].toString());
@@ -42,9 +74,7 @@ class MarkerService {
           markerId: MarkerId('saved-$name'),
           position: LatLng(lat, lng),
           infoWindow: InfoWindow(title: name, snippet: address),
-          icon: BitmapDescriptor.defaultMarkerWithHue(
-            BitmapDescriptor.hueOrange,
-          ),
+          icon: icon,
           onTap: () => onMarkerTap(name, address, business_data.fromMap(biz)),
         ),
       );

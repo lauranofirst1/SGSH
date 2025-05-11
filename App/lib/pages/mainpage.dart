@@ -17,12 +17,12 @@ class Mainpage extends StatefulWidget {
 
 class _MainpageState extends State<Mainpage> {
   final List<Map<String, dynamic>> items = [
-    {'emoji': '🥘', 'label': "한식"},
-    {'emoji': '🍜', 'label': "중식"},
-    {'emoji': '🍱', 'label': "일식"},
-    {'emoji': '☕️', 'label': "카페"},
-    {'emoji': '🍗', 'label': "치킨"},
-    {'emoji': '🍔', 'label': "버거"},
+    {'emoji': '🥘', 'label': "한식", 'category': '한식'},
+    {'emoji': '🍜', 'label': "중식", 'category': '중식'},
+    {'emoji': '🍱', 'label': "일식", 'category': '일식'},
+    {'emoji': '☕️', 'label': "카페", 'category': '카페'},
+    {'emoji': '🍔', 'label': "버거", 'category': '버거'},
+    {'emoji': '🍽️', 'label': "기타", 'category': '기타'},
   ];
 
   // List<article_data> article = [];
@@ -260,7 +260,9 @@ class _MainpageState extends State<Mainpage> {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (context) => StoreListPage(),
+                                      builder: (context) => StoreListPage(
+                                        category: item['category'],
+                                      ),
                                     ),
                                   );
                                 },
