@@ -77,93 +77,101 @@ class _ReservationConfirmPageState extends State<ReservationConfirmPage> {
 
     showModalBottomSheet(
       context: context,
+      isScrollControlled: true,
       backgroundColor: Colors.white,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
       builder: (_) {
         return Padding(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Center(
-                child: Text(
-                  '방문자 정보 입력',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18,
-                    color: Colors.black,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
-              const Text('방문자 성함', style: TextStyle(color: Colors.black)),
-              TextField(
-                controller: nameController,
-                decoration: const InputDecoration(
-                  hintText: '이름을 입력하세요',
-                  hintStyle: TextStyle(color: Colors.grey),
-                  filled: true,
-                  fillColor: Colors.white,
-                  border: OutlineInputBorder(),
-                ),
-                style: const TextStyle(color: Colors.black),
-              ),
-              const SizedBox(height: 12),
-              const Text('방문자 연락체', style: TextStyle(color: Colors.black)),
-              TextField(
-                controller: phoneController,
-                keyboardType: TextInputType.phone,
-                inputFormatters: [
-                  FilteringTextInputFormatter.digitsOnly,
-                  LengthLimitingTextInputFormatter(11),
-                  _PhoneNumberFormatter(),
-                ],
-                decoration: const InputDecoration(
-                  hintText: '전화번호를 입력하세요',
-                  hintStyle: TextStyle(color: Colors.grey),
-                  filled: true,
-                  fillColor: Colors.white,
-                  border: OutlineInputBorder(),
-                ),
-                style: const TextStyle(color: Colors.black),
-              ),
-              const SizedBox(height: 20),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () {
-                    if (nameController.text.isNotEmpty &&
-                        phoneController.text.isNotEmpty) {
-                      setState(() {
-                        visitors.add({
-                          'name': nameController.text,
-                          'phone': phoneController.text,
-                        });
-                      });
-                      Navigator.pop(context);
-                    }
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.black,
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-                  child: const Text(
-                    '저장',
+          padding: EdgeInsets.only(
+            left: 20,
+            right: 20,
+            top: 20,
+            bottom: MediaQuery.of(context).viewInsets.bottom + 20,
+          ),
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Center(
+                  child: Text(
+                    '방문자 정보 입력',
                     style: TextStyle(
-                      color: Colors.white,
                       fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                      color: Colors.black,
                     ),
                   ),
                 ),
-              ),
-              const SizedBox(height: 20),
-            ],
+                const SizedBox(height: 16),
+                const Text('방문자 성함', style: TextStyle(color: Colors.black)),
+                TextField(
+                  controller: nameController,
+                  decoration: const InputDecoration(
+                    hintText: '이름을 입력하세요',
+                    hintStyle: TextStyle(color: Colors.grey),
+                    filled: true,
+                    fillColor: Colors.white,
+                    border: OutlineInputBorder(),
+                  ),
+                  style: const TextStyle(color: Colors.black),
+                ),
+                const SizedBox(height: 12),
+                const Text('방문자 연락체', style: TextStyle(color: Colors.black)),
+                TextField(
+                  controller: phoneController,
+                  keyboardType: TextInputType.phone,
+                  inputFormatters: [
+                    FilteringTextInputFormatter.digitsOnly,
+                    LengthLimitingTextInputFormatter(11),
+                    _PhoneNumberFormatter(),
+                  ],
+                  decoration: const InputDecoration(
+                    hintText: '전화번호를 입력하세요',
+                    hintStyle: TextStyle(color: Colors.grey),
+                    filled: true,
+                    fillColor: Colors.white,
+                    border: OutlineInputBorder(),
+                  ),
+                  style: const TextStyle(color: Colors.black),
+                ),
+                const SizedBox(height: 20),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      if (nameController.text.isNotEmpty &&
+                          phoneController.text.isNotEmpty) {
+                        setState(() {
+                          visitors.add({
+                            'name': nameController.text,
+                            'phone': phoneController.text,
+                          });
+                        });
+                        Navigator.pop(context);
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.black,
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                    child: const Text(
+                      '저장',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 20),
+              ],
+            ),
           ),
         );
       },
@@ -219,299 +227,307 @@ class _ReservationConfirmPageState extends State<ReservationConfirmPage> {
         surfaceTintColor: Colors.white,
         shadowColor: Colors.transparent,
       ),
-      body: Stack(
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(bottom: 90),
-            child: ListView(
-              padding: const EdgeInsets.all(0),
-              children: [
-                // 예약 정보 카드
-                Container(
-                  margin: const EdgeInsets.fromLTRB(16, 20, 16, 20),
-                  padding: const EdgeInsets.symmetric(vertical: 22, horizontal: 22),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(18),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.06),
-                        blurRadius: 16,
-                        offset: Offset(0, 4),
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Icon(Icons.calendar_today, color: Colors.deepOrange, size: 20),
-                          SizedBox(width: 8),
-                          Text(
-                            reservationInfo,
-                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+      body: GestureDetector(
+        onTap: () => FocusScope.of(context).unfocus(), // 바깥 터치 시 키보드 닫기
+        child: Stack(
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(bottom: 90),
+              child: SingleChildScrollView(
+                keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag, // 스크롤 시 키보드 닫기
+                padding: const EdgeInsets.all(0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // 예약 정보 카드
+                    Container(
+                      margin: const EdgeInsets.fromLTRB(16, 20, 16, 20),
+                      padding: const EdgeInsets.symmetric(vertical: 22, horizontal: 22),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(18),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.06),
+                            blurRadius: 16,
+                            offset: Offset(0, 4),
                           ),
                         ],
                       ),
-                      SizedBox(height: 8),
-                      Row(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Icon(Icons.person, color: Colors.blue, size: 20),
-                          SizedBox(width: 8),
-                          Text('${widget.people}명', style: TextStyle(fontSize: 15)),
-                        ],
-                      ),
-                      SizedBox(height: 8),
-                      Row(
-                        children: [
-                          Icon(Icons.access_time, color: Colors.green, size: 20),
-                          SizedBox(width: 8),
-                          Text(widget.time, style: TextStyle(fontSize: 15)),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-                // 방문자 정보
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: OutlinedButton(
-                  onPressed: _showVisitorBottomSheet,
-                  style: OutlinedButton.styleFrom(
-                    backgroundColor: Colors.white,
-                    foregroundColor: Colors.black,
-                      side: const BorderSide(color: Colors.black12),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                    ),
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                        vertical: 14,
-                    ),
-                  ),
-                  child: const Text(
-                    '다른 사람이 방문해요',
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontWeight: FontWeight.w500,
-                        fontSize: 15,
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 24),
-                // 방문 목적
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: _sectionTitle('방문 목적', sub: '복수 선택 가능'),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  child: Wrap(
-                  spacing: 10,
-                  runSpacing: 10,
-                    children: allPurposes.map((purpose) {
-                        final selected = selectedPurposes.contains(purpose);
-                      return GestureDetector(
-                            onTap: () {
-                              setState(() {
-                                if (selected) {
-                                  selectedPurposes.remove(purpose);
-                                } else {
-                                  selectedPurposes.add(purpose);
-                                }
-                              });
-                            },
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
-                          decoration: BoxDecoration(
-                            color: selected ? Colors.black : Colors.white,
-                            border: Border.all(
-                              color: selected ? Colors.black : Color(0xFFD2D2D2),
-                              width: 1.2,
-                            ),
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                            child: Text(
-                              purpose,
-                              style: TextStyle(
-                              color: selected ? Colors.white : Color(0xFF999999),
-                                fontWeight: FontWeight.w500,
-                                fontSize: 14,
+                          Row(
+                            children: [
+                              Icon(Icons.calendar_today, color: Colors.deepOrange, size: 20),
+                              SizedBox(width: 8),
+                              Text(
+                                reservationInfo,
+                                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                               ),
-                            ),
+                            ],
                           ),
-                        );
-                      }).toList(),
-                  ),
-                ),
-                const SizedBox(height: 24),
-                // 유의사항
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: _sectionTitle('메장 유의사항'),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  child: Column(
-                    children: [
-                _checkItem(0, '[필수] 예약해도 대기시간이 발생할 수 있습니다.'),
-                _checkItem(1, '[필수] 룸 예약은 전화로만 가능합니다.'),
-                _checkItem(2, '[필수] 아이용 식기/의자는 요청사항에 적어주세요.'),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 24),
-                // 요청사항
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: _sectionTitle('고객 요청사항'),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  child: TextField(
-                  controller: requestController,
-                  decoration: const InputDecoration(
-                    hintText: '메장에 요청할 내용을 작성해주세요.',
-                    border: OutlineInputBorder(),
-                      filled: true,
-                      fillColor: Color(0xFFF8F8F8),
+                          SizedBox(height: 8),
+                          Row(
+                            children: [
+                              Icon(Icons.person, color: Colors.blue, size: 20),
+                              SizedBox(width: 8),
+                              Text('${widget.people}명', style: TextStyle(fontSize: 15)),
+                            ],
+                          ),
+                          SizedBox(height: 8),
+                          Row(
+                            children: [
+                              Icon(Icons.access_time, color: Colors.green, size: 20),
+                              SizedBox(width: 8),
+                              Text(widget.time, style: TextStyle(fontSize: 15)),
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
-                    maxLines: 3,
-                  ),
-                ),
-                const SizedBox(height: 24),
-                // 개인정보 동의
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: Row(
-                    children: [
-                      SizedBox(
-                        width: 20,
-                        height: 20,
-                        child: Checkbox(
-                          value: agreedPrivacy,
-                          onChanged: (val) {
-                            setState(() => agreedPrivacy = val ?? false);
-                          },
-                          activeColor: Colors.black,
-                          materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                          visualDensity: const VisualDensity(
-                            horizontal: -4,
-                            vertical: -4,
-                          ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(4),
+                    // 방문자 정보
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: OutlinedButton(
+                      onPressed: _showVisitorBottomSheet,
+                      style: OutlinedButton.styleFrom(
+                        backgroundColor: Colors.white,
+                        foregroundColor: Colors.black,
+                          side: const BorderSide(color: Colors.black12),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                        ),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                            vertical: 14,
+                        ),
+                      ),
+                      child: const Text(
+                        '다른 사람이 방문해요',
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontWeight: FontWeight.w500,
+                            fontSize: 15,
                           ),
                         ),
                       ),
-                      const SizedBox(width: 8),
-                      const Text(
-                        '개인정보 제3자 제공 동의',
-                        style: TextStyle(fontSize: 14),
-                      ),
-                    ],
-                  ),
-                ),
-                SizedBox(height: 120),
-              ],
-            ),
-          ),
-          // 하단 예약하기 버튼
-          Positioned(
-            bottom: 0,
-            left: 0,
-            right: 0,
-            child: Container(
-              padding: const EdgeInsets.fromLTRB(20, 20, 20, 48),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(16),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.06),
-                    blurRadius: 12,
-                    offset: Offset(0, 2),
-                  ),
-                ],
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text('예약 정보', style: TextStyle(color: Colors.grey)),
-                  Text(
-                    reservationInfo,
-                    style: const TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 12),
-                  ElevatedButton(
-                    onPressed:
-                        (allCautionsChecked && agreedPrivacy)
-                            ? () async {
-                              final formattedNow = DateFormat(
-                                'yyyy-MM-dd HH:mm:ss',
-                              ).format(DateTime.now());
-                              final formattedTime = convertTo24HourTime(
-                                widget.time,
-                              ); // "오후 2:30" → "14:30"
-
-                              final reserveData = reserve_data(
-                                bId: widget.businessId,
-                                date:
-                                    '${widget.date.year}-${widget.date.month.toString().padLeft(2, '0')}-${widget.date.day.toString().padLeft(2, '0')}',
-                                time: formattedTime, // ✅ 여기 수정
-                                count: widget.people,
-                                rTime: formattedNow, // 현재 시각을 포맷된 문자열로
-                                status: 'standby',
-                                uuid:
-                                    Supabase
-                                        .instance
-                                        .client
-                                        .auth
-                                        .currentUser
-                                        ?.id ??
-                                    '',
-                                comment: requestController.text,
-                              );
-
-                              try {
-                                await Supabase.instance.client
-                                    .from('reserve_data')
-                                    .insert(reserveData.toJson());
-
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(content: Text('예약이 저장되었습니다.')),
-                                );
-                                Navigator.pop(context);
-                              } catch (e) {
-                                print('예약 저장 실패: $e');
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Text('예약 저장에 실패했습니다.'),
+                    ),
+                    const SizedBox(height: 24),
+                    // 방문 목적
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: _sectionTitle('방문 목적', sub: '복수 선택 가능'),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      child: Wrap(
+                      spacing: 10,
+                      runSpacing: 10,
+                        children: allPurposes.map((purpose) {
+                            final selected = selectedPurposes.contains(purpose);
+                          return GestureDetector(
+                                onTap: () {
+                                  setState(() {
+                                    if (selected) {
+                                      selectedPurposes.remove(purpose);
+                                    } else {
+                                      selectedPurposes.add(purpose);
+                                    }
+                                  });
+                                },
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+                              decoration: BoxDecoration(
+                                color: selected ? Colors.black : Colors.white,
+                                border: Border.all(
+                                  color: selected ? Colors.black : Color(0xFFD2D2D2),
+                                  width: 1.2,
+                                ),
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                                child: Text(
+                                  purpose,
+                                  style: TextStyle(
+                                  color: selected ? Colors.white : Color(0xFF999999),
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 14,
                                   ),
-                                );
-                              }
-                            }
-                            : null,
-
-                    style: ElevatedButton.styleFrom(
-                      minimumSize: const Size.fromHeight(50),
-                      backgroundColor: Colors.black,
-                      foregroundColor: Colors.white,
-                      disabledBackgroundColor: Colors.grey.shade300,
-                      disabledForegroundColor: Colors.grey,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
+                                ),
+                              ),
+                            );
+                          }).toList(),
                       ),
                     ),
-                    child: const Text('예약하기'),
-                  ),
-                ],
+                    const SizedBox(height: 24),
+                    // 유의사항
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: _sectionTitle('메장 유의사항'),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      child: Column(
+                        children: [
+                    _checkItem(0, '[필수] 예약해도 대기시간이 발생할 수 있습니다.'),
+                    _checkItem(1, '[필수] 룸 예약은 전화로만 가능합니다.'),
+                    _checkItem(2, '[필수] 아이용 식기/의자는 요청사항에 적어주세요.'),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    // 요청사항
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: _sectionTitle('고객 요청사항'),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      child: TextField(
+                      controller: requestController,
+                      decoration: const InputDecoration(
+                        hintText: '메장에 요청할 내용을 작성해주세요.',
+                        border: OutlineInputBorder(),
+                          filled: true,
+                          fillColor: Color(0xFFF8F8F8),
+                        ),
+                        maxLines: 3,
+                        scrollPadding: EdgeInsets.only(bottom: 200),
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    // 개인정보 동의
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: Row(
+                        children: [
+                          SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: Checkbox(
+                              value: agreedPrivacy,
+                              onChanged: (val) {
+                                setState(() => agreedPrivacy = val ?? false);
+                              },
+                              activeColor: Colors.black,
+                              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                              visualDensity: const VisualDensity(
+                                horizontal: -4,
+                                vertical: -4,
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          const Text(
+                            '개인정보 제3자 제공 동의',
+                            style: TextStyle(fontSize: 14),
+                          ),
+                        ],
+                      ),
+                    ),
+                    SizedBox(height: 120),
+                  ],
+                ),
               ),
             ),
-          ),
-        ],
+            // 하단 예약하기 버튼
+            Positioned(
+              bottom: 0,
+              left: 0,
+              right: 0,
+              child: Container(
+                padding: const EdgeInsets.fromLTRB(20, 20, 20, 48),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.06),
+                      blurRadius: 12,
+                      offset: Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text('예약 정보', style: TextStyle(color: Colors.grey)),
+                    Text(
+                      reservationInfo,
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 12),
+                    ElevatedButton(
+                      onPressed:
+                          (allCautionsChecked && agreedPrivacy)
+                              ? () async {
+                                final formattedNow = DateFormat(
+                                  'yyyy-MM-dd HH:mm:ss',
+                                ).format(DateTime.now());
+                                final formattedTime = convertTo24HourTime(
+                                  widget.time,
+                                ); // "오후 2:30" → "14:30"
+
+                                final reserveData = reserve_data(
+                                  bId: widget.businessId,
+                                  date:
+                                      '${widget.date.year}-${widget.date.month.toString().padLeft(2, '0')}-${widget.date.day.toString().padLeft(2, '0')}',
+                                  time: formattedTime, // ✅ 여기 수정
+                                  count: widget.people,
+                                  rTime: formattedNow, // 현재 시각을 포맷된 문자열로
+                                  status: 'standby',
+                                  uuid:
+                                      Supabase
+                                          .instance
+                                          .client
+                                          .auth
+                                          .currentUser
+                                          ?.id ??
+                                      '',
+                                  comment: requestController.text,
+                                );
+
+                                try {
+                                  await Supabase.instance.client
+                                      .from('reserve_data')
+                                      .insert(reserveData.toJson());
+
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(content: Text('예약이 저장되었습니다.')),
+                                  );
+                                  Navigator.pop(context);
+                                } catch (e) {
+                                  print('예약 저장 실패: $e');
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text('예약 저장에 실패했습니다.'),
+                                    ),
+                                  );
+                                }
+                              }
+                              : null,
+
+                      style: ElevatedButton.styleFrom(
+                        minimumSize: const Size.fromHeight(50),
+                        backgroundColor: Colors.black,
+                        foregroundColor: Colors.white,
+                        disabledBackgroundColor: Colors.grey.shade300,
+                        disabledForegroundColor: Colors.grey,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                      child: const Text('예약하기'),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

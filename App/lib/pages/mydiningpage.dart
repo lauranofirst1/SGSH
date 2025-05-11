@@ -260,12 +260,38 @@ class _MyDiningPageState extends State<MyDiningPage> {
     );
   }
 
+  // 주소에서 시/군/구만 추출 (예: '강원 춘천시 ...' → '춘천')
+  String extractRegion(String address) {
+    final parts = address.split(' ');
+    if (parts.length >= 2) {
+      return parts[1].replaceAll(RegExp(r'시|군|구'), '');
+    }
+    return address;
+  }
+
+  // 태그 최대 2개만 출력, 없으면 빈 문자열
+  String formatTags(dynamic tags) {
+    if (tags == null) return '';
+    if (tags is String) {
+      final tagList = tags.split(',').map((e) => e.trim()).where((e) => e.isNotEmpty).toList();
+      if (tagList.isEmpty) return '';
+      return tagList.take(2).map((t) => '#$t').join(' ');
+    }
+    if (tags is List) {
+      if (tags.isEmpty) return '';
+      return tags.take(2).map((t) => '#$t').join(' ');
+    }
+    return '';
+  }
+
   Widget _buildReservationCard(Map<String, dynamic> data) {
     final storeName = data['storeName'] ?? '가게 이름';
     final imageUrl =
         data['storeImage'] ?? 'https://example.com/default-image.png';
-    final category = data['category'] ?? '중식';
-    final location = data['location'] ?? '코엑스';
+    final address = data['address'] ?? '';
+    final tags = data['tags'] ?? [];
+    final region = extractRegion(address);
+    final tagStr = formatTags(tags);
     final dateStr = data['date'] ?? '';
     final time = data['time'] ?? '';
     final count = data['count']?.toString() ?? '0';
@@ -437,7 +463,7 @@ class _MyDiningPageState extends State<MyDiningPage> {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          '$category · $location',
+                          tagStr.isNotEmpty ? '$region · $tagStr' : region,
                           style: const TextStyle(
                             color: Colors.grey,
                             fontSize: 13,
@@ -496,6 +522,10 @@ class _MyDiningPageState extends State<MyDiningPage> {
     final completedInfo = completedInfos[id] ?? {};
     final int visitCount = completedInfo['visitCount'] ?? 1;
     final businessId = data['b_id'];
+    final address = data['address'] ?? '';
+    final tags = data['tags'] ?? [];
+    final region = extractRegion(address);
+    final tagStr = formatTags(tags);
 
     return GestureDetector(
       onTap: () async {
@@ -573,7 +603,7 @@ class _MyDiningPageState extends State<MyDiningPage> {
             ),
             const SizedBox(height: 4),
                         Text(
-                          '${data['category']} · ${data['location']}',
+                          tagStr.isNotEmpty ? '$region · $tagStr' : region,
                           style: const TextStyle(color: Colors.grey, fontSize: 13),
                         ),
                       ],
@@ -634,6 +664,10 @@ class _MyDiningPageState extends State<MyDiningPage> {
 
   Widget _buildCanceledCard(Map<String, dynamic> data) {
     final businessId = data['b_id'];
+    final address = data['address'] ?? '';
+    final tags = data['tags'] ?? [];
+    final region = extractRegion(address);
+    final tagStr = formatTags(tags);
     
     return GestureDetector(
       onTap: () async {
@@ -710,7 +744,7 @@ class _MyDiningPageState extends State<MyDiningPage> {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        '${data['category']} · ${data['location']}',
+                        tagStr.isNotEmpty ? '$region · $tagStr' : region,
                         style: const TextStyle(color: Colors.grey),
                       ),
                       const SizedBox(height: 4),
