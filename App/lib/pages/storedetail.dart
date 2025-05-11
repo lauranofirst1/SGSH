@@ -440,6 +440,19 @@ class _StoreDetailPageState extends State<StoreDetailPage>
   }
 
   Widget buildStoreHeader() {
+    // 주소에서 시/군/구만 추출 (예: '강원 춘천시 ...' → '춘천')
+    String extractRegion(String address) {
+      final parts = address.split(' ');
+      if (parts.length >= 2) {
+        // 두 번째(시/군/구)만 추출
+        return parts[1].replaceAll(RegExp(r'시|군|구'), '');
+      }
+      return address;
+    }
+    final region = extractRegion(widget.store.address);
+    // 태그 최대 2개만 출력
+    final tags = widget.store.tags.take(2).toList();
+
     return Padding(
       padding: EdgeInsets.only(right: 16.0, left: 16.0, top: 16.0, bottom: 5),
       child: Column(
@@ -454,13 +467,31 @@ class _StoreDetailPageState extends State<StoreDetailPage>
                   color: Colors.grey[100],
                   borderRadius: BorderRadius.circular(6),
                 ),
-                child: Text(
-                  '춘천 | 파스타',
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.grey[700],
-                  ),
+                child: Row(
+                  children: [
+                    Text(
+                      region,
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.grey[700],
+                      ),
+                    ),
+                    if (tags.isNotEmpty) ...[
+                      Text(' | ', style: TextStyle(fontSize: 12, color: Colors.grey[500])),
+                      ...tags.map((tag) => Padding(
+                        padding: const EdgeInsets.only(right: 4),
+                        child: Text(
+                          '#$tag',
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.deepOrange,
+                          ),
+                        ),
+                      )),
+                    ]
+                  ],
                 ),
               ),
               linkbutton(),

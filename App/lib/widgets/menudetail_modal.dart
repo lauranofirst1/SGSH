@@ -19,22 +19,22 @@ class MenuDetailModal extends StatelessWidget {
               color: Colors.black.withOpacity(0.1),
               blurRadius: 20,
               offset: Offset(0, 10),
-            ),
+        ),
           ],
         ),
-        child: Column(
+          child: Column(
           mainAxisSize: MainAxisSize.min,
-          children: [
+            children: [
             // 이미지 섹션
-            ClipRRect(
+              ClipRRect(
               borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
               child: Stack(
                 children: [
                   Image.network(
-                    menu.image,
-                    width: double.infinity,
+                  menu.image,
+                  width: double.infinity,
                     height: 200,
-                    fit: BoxFit.cover,
+                  fit: BoxFit.cover,
                     errorBuilder: (_, __, ___) => Container(
                       height: 200,
                       color: Colors.grey[200],
@@ -79,13 +79,14 @@ class MenuDetailModal extends StatelessWidget {
                     children: [
                       Expanded(
                         child: Text(
-                          menu.name,
+                menu.name,
                           style: TextStyle(
                             fontSize: 22,
                             fontWeight: FontWeight.bold,
                             color: Colors.black,
+                            decoration: TextDecoration.none,
                           ),
-                        ),
+              ),
                       ),
                       Container(
                         padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
@@ -94,17 +95,18 @@ class MenuDetailModal extends StatelessWidget {
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Text(
-                          '${menu.price}원',
+                '${menu.price}원',
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
                             color: Color(0xFFE53935),
+                            decoration: TextDecoration.none,
                           ),
                         ),
                       ),
                     ],
-                  ),
-                  SizedBox(height: 16),
+              ),
+              SizedBox(height: 16),
                   Padding(
                     padding: EdgeInsets.only(top: 0),
                     child: Container(
@@ -116,17 +118,18 @@ class MenuDetailModal extends StatelessWidget {
                         border: Border.all(color: Colors.grey[200]!),
                       ),
                       child: Text(
-                        menu.description,
+                menu.description,
                         style: TextStyle(
                           fontSize: 15,
                           height: 1.5,
                           color: Colors.grey[800],
+                          decoration: TextDecoration.none,
                         ),
                       ),
-                    ),
-                  ),
-                ],
+                ),
               ),
+            ],
+          ),
             ),
           ],
         ),

@@ -90,7 +90,7 @@ void showReservationBottomSheet(BuildContext context, {
                           Container(
                             padding: EdgeInsets.all(16),
                             margin: EdgeInsets.only(bottom: 18),
-                            decoration: BoxDecoration(
+                              decoration: BoxDecoration(
                               color: Colors.grey[50],
                               borderRadius: BorderRadius.circular(16),
                               border: Border.all(color: Colors.grey[200]!),
@@ -98,50 +98,50 @@ void showReservationBottomSheet(BuildContext context, {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                const Text(
-                                  '날짜 선택',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 15,
-                                  ),
-                                ),
+                          const Text(
+                            '날짜 선택',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 15,
+                            ),
+                          ),
                                 SizedBox(height: 8),
-                                TableCalendar(
+                          TableCalendar(
                                   firstDay: DateTime.now(),
-                                  lastDay: DateTime.utc(2030, 12, 31),
-                                  focusedDay: focusedDay,
-                                  selectedDayPredicate:
-                                      (day) => isSameDay(selectedDay, day),
-                                  onDaySelected: (selected, focused) {
-                                    setState(() {
-                                      selectedDay = selected;
-                                      focusedDay = focused;
-                                    });
-                                  },
-                                  enabledDayPredicate: (day) {
-                                    final now = DateTime.now();
-                                    final today = DateTime(
-                                      now.year,
-                                      now.month,
-                                      now.day,
-                                    );
-                                    return !day.isBefore(today);
-                                  },
-                                  calendarStyle: const CalendarStyle(
-                                    todayDecoration: BoxDecoration(
-                                      color: Color.fromARGB(255, 183, 183, 183),
-                                      shape: BoxShape.circle,
-                                    ),
-                                    selectedDecoration: BoxDecoration(
-                                      color: Colors.black,
-                                      shape: BoxShape.circle,
-                                    ),
-                                  ),
-                                  headerStyle: const HeaderStyle(
-                                    formatButtonVisible: false,
-                                    titleCentered: true,
-                                  ),
-                                ),
+                            lastDay: DateTime.utc(2030, 12, 31),
+                            focusedDay: focusedDay,
+                            selectedDayPredicate:
+                                (day) => isSameDay(selectedDay, day),
+                            onDaySelected: (selected, focused) {
+                              setState(() {
+                                selectedDay = selected;
+                                focusedDay = focused;
+                              });
+                            },
+                            enabledDayPredicate: (day) {
+                              final now = DateTime.now();
+                              final today = DateTime(
+                                now.year,
+                                now.month,
+                                now.day,
+                              );
+                              return !day.isBefore(today);
+                            },
+                            calendarStyle: const CalendarStyle(
+                              todayDecoration: BoxDecoration(
+                                color: Color.fromARGB(255, 183, 183, 183),
+                                shape: BoxShape.circle,
+                              ),
+                              selectedDecoration: BoxDecoration(
+                                color: Colors.black,
+                                shape: BoxShape.circle,
+                              ),
+                            ),
+                            headerStyle: const HeaderStyle(
+                              formatButtonVisible: false,
+                              titleCentered: true,
+                            ),
+                          ),
                               ],
                             ),
                           ),
@@ -157,47 +157,47 @@ void showReservationBottomSheet(BuildContext context, {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                const Text(
-                                  '인원 선택',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 15,
-                                  ),
-                                ),
+                          const Text(
+                            '인원 선택',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 15,
+                            ),
+                          ),
                                 SizedBox(height: 12),
-                                SingleChildScrollView(
-                                  scrollDirection: Axis.horizontal,
-                                  child: Row(
-                                    children: List.generate(7, (index) {
-                                      final int people = index + 1;
-                                      return Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 6,
-                                        ),
-                                        child: ChoiceChip(
-                                          label: Text(
-                                            '$people명',
-                                            style: TextStyle(
-                                              color:
-                                                  selectedPeople == people
-                                                      ? Colors.white
-                                                      : Colors.black,
-                                            ),
-                                          ),
-                                          selected: selectedPeople == people,
-                                          selectedColor: Colors.black,
-                                          backgroundColor: Colors.white,
-                                          checkmarkColor: Colors.white,
-                                          onSelected: (_) {
-                                            setState(() {
-                                              selectedPeople = people;
-                                            });
-                                          },
-                                        ),
-                                      );
-                                    }),
+                          SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            child: Row(
+                              children: List.generate(7, (index) {
+                                final int people = index + 1;
+                                return Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 6,
                                   ),
-                                ),
+                                  child: ChoiceChip(
+                                    label: Text(
+                                      '$people명',
+                                      style: TextStyle(
+                                        color:
+                                            selectedPeople == people
+                                                ? Colors.white
+                                                : Colors.black,
+                                      ),
+                                    ),
+                                    selected: selectedPeople == people,
+                                    selectedColor: Colors.black,
+                                    backgroundColor: Colors.white,
+                                    checkmarkColor: Colors.white,
+                                    onSelected: (_) {
+                                      setState(() {
+                                        selectedPeople = people;
+                                      });
+                                    },
+                                  ),
+                                );
+                              }),
+                            ),
+                          ),
                               ],
                             ),
                           ),
@@ -213,79 +213,79 @@ void showReservationBottomSheet(BuildContext context, {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                const Text(
-                                  '시간 선택',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 15,
-                                  ),
-                                ),
+                          const Text(
+                            '시간 선택',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 15,
+                            ),
+                          ),
                                 SizedBox(height: 12),
-                                SingleChildScrollView(
-                                  scrollDirection: Axis.horizontal,
-                                  child: Row(
-                                    children:
-                                        [
-                                          '오전 11:00',
-                                          '오전 11:30',
-                                          '오후 12:00',
-                                          '오후 12:30',
-                                          '오후 1:00',
-                                          '오후 2:00',
-                                        ].map((time) {
-                                          final isSelected = selectedTime == time;
-                                          final isDisabled =
-                                              selectedDay != null &&
-                                              isPastTime(time, selectedDay!);
+                          SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            child: Row(
+                              children:
+                                  [
+                                    '오전 11:00',
+                                    '오전 11:30',
+                                    '오후 12:00',
+                                    '오후 12:30',
+                                    '오후 1:00',
+                                    '오후 2:00',
+                                  ].map((time) {
+                                    final isSelected = selectedTime == time;
+                                    final isDisabled =
+                                        selectedDay != null &&
+                                        isPastTime(time, selectedDay!);
 
-                                          return Padding(
-                                            padding: const EdgeInsets.symmetric(
-                                              horizontal: 4.0,
+                                    return Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 4.0,
+                                      ),
+                                      child: ElevatedButton(
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor:
+                                              isSelected
+                                                  ? Colors.black
+                                                  : Colors.white,
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 16,
+                                            vertical: 10,
+                                          ),
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(
+                                              10,
                                             ),
-                                            child: ElevatedButton(
-                                              style: ElevatedButton.styleFrom(
-                                                backgroundColor:
-                                                    isSelected
-                                                        ? Colors.black
-                                                        : Colors.white,
-                                                padding: const EdgeInsets.symmetric(
-                                                  horizontal: 16,
-                                                  vertical: 10,
-                                                ),
-                                                shape: RoundedRectangleBorder(
-                                                  borderRadius: BorderRadius.circular(
-                                                    10,
-                                                  ),
-                                                  side: BorderSide(
-                                                    color: Colors.black12,
-                                                  ),
-                                                ),
-                                                elevation: 0,
-                                              ),
-                                              onPressed:
-                                                  isDisabled
-                                                      ? null
-                                                      : () {
-                                                        setState(() {
-                                                          selectedTime = time;
-                                                        });
-                                                      },
-                                              child: Text(
-                                                time,
-                                                style: TextStyle(
-                                                  color:
-                                                      isDisabled
-                                                          ? Colors.grey
-                                                          : (isSelected
-                                                              ? Colors.white
-                                                              : Colors.black),
-                                                ),
-                                              ),
+                                            side: BorderSide(
+                                              color: Colors.black12,
                                             ),
-                                          );
-                                        }).toList(),
-                                  ),
-                                ),
+                                          ),
+                                          elevation: 0,
+                                        ),
+                                        onPressed:
+                                            isDisabled
+                                                ? null
+                                                : () {
+                                                  setState(() {
+                                                    selectedTime = time;
+                                                  });
+                                                },
+                                        child: Text(
+                                          time,
+                                          style: TextStyle(
+                                            color:
+                                                isDisabled
+                                                    ? Colors.grey
+                                                    : (isSelected
+                                                        ? Colors.white
+                                                        : Colors.black),
+                                          ),
+                                        ),
+                                      ),
+                                    );
+                                  }).toList(),
+                            ),
+                          ),
                               ],
                             ),
                           ),

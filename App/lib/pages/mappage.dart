@@ -156,8 +156,8 @@ class _MapPageState extends State<MapPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
-              children: [
-                Container(
+          children: [
+            Container(
                   width: 38,
                   height: 38,
                   margin: EdgeInsets.only(right: 8),
@@ -187,8 +187,8 @@ class _MapPageState extends State<MapPage> {
                   child: Container(
                     height: 48,
                     padding: const EdgeInsets.symmetric(horizontal: 16),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
+              decoration: BoxDecoration(
+                color: Colors.white,
                       borderRadius: BorderRadius.circular(16),
                       boxShadow: [
                         BoxShadow(
@@ -197,42 +197,42 @@ class _MapPageState extends State<MapPage> {
                           offset: const Offset(0, 4),
                         ),
                       ],
-                    ),
-                    child: Row(
-                      children: [
+              ),
+              child: Row(
+                children: [
                         const Icon(Icons.search, color: Colors.grey, size: 20),
                         const SizedBox(width: 12),
-                        Expanded(
-                          child: TextField(
-                            controller: _searchController,
+                  Expanded(
+                    child: TextField(
+                      controller: _searchController,
                             style: const TextStyle(
                               fontSize: 15,
                               color: Colors.black87,
                             ),
-                            decoration: const InputDecoration(
-                              hintText: '가게 이름 검색',
+                      decoration: const InputDecoration(
+                        hintText: '가게 이름 검색',
                               hintStyle: TextStyle(
                                 color: Colors.grey,
                                 fontSize: 15,
                               ),
-                              border: InputBorder.none,
+                        border: InputBorder.none,
                               contentPadding: EdgeInsets.symmetric(vertical: 12),
-                            ),
-                            onSubmitted: (query) => _searchAndMove(query),
-                          ),
-                        ),
+                      ),
+                      onSubmitted: (query) => _searchAndMove(query),
+                    ),
+                  ),
                         if (_searchController.text.isNotEmpty)
-                        IconButton(
+                  IconButton(
                             icon: const Icon(Icons.close, size: 20),
                             color: Colors.grey,
                             onPressed: () {
                               _searchController.clear();
                               setState(() {});
                             },
-                        ),
-                      ],
-                    ),
                   ),
+                ],
+              ),
+            ),
                 ),
               ],
             ),
@@ -296,9 +296,13 @@ class _MapPageState extends State<MapPage> {
     );
   }
 
-  void _searchAndMove(String name) {
+  void _searchAndMove(String query) {
     final matched = _markerService.savedBusinessList.firstWhereOrNull(
-      (b) => b.name.toLowerCase().contains(name.toLowerCase()),
+      (b) =>
+        b.name.toLowerCase().contains(query.toLowerCase()) ||
+        b.address.toLowerCase().contains(query.toLowerCase()) ||
+        (b.description.toLowerCase().contains(query.toLowerCase())) ||
+        (b.tags.any((tag) => tag.toLowerCase().contains(query.toLowerCase()))),
     );
 
     if (matched != null && matched.latDouble != null && matched.lngDouble != null) {

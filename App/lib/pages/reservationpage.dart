@@ -277,24 +277,24 @@ class _ReservationConfirmPageState extends State<ReservationConfirmPage> {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: OutlinedButton(
-                    onPressed: _showVisitorBottomSheet,
-                    style: OutlinedButton.styleFrom(
-                      backgroundColor: Colors.white,
-                      foregroundColor: Colors.black,
+                  onPressed: _showVisitorBottomSheet,
+                  style: OutlinedButton.styleFrom(
+                    backgroundColor: Colors.white,
+                    foregroundColor: Colors.black,
                       side: const BorderSide(color: Colors.black12),
-                      shape: RoundedRectangleBorder(
+                    shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),
-                      ),
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 14,
-                      ),
                     ),
-                    child: const Text(
-                      '다른 사람이 방문해요',
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontWeight: FontWeight.w500,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                        vertical: 14,
+                    ),
+                  ),
+                  child: const Text(
+                    '다른 사람이 방문해요',
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontWeight: FontWeight.w500,
                         fontSize: 15,
                       ),
                     ),
@@ -309,20 +309,20 @@ class _ReservationConfirmPageState extends State<ReservationConfirmPage> {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   child: Wrap(
-                    spacing: 10,
-                    runSpacing: 10,
+                  spacing: 10,
+                  runSpacing: 10,
                     children: allPurposes.map((purpose) {
-                      final selected = selectedPurposes.contains(purpose);
+                        final selected = selectedPurposes.contains(purpose);
                       return GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            if (selected) {
-                              selectedPurposes.remove(purpose);
-                            } else {
-                              selectedPurposes.add(purpose);
-                            }
-                          });
-                        },
+                            onTap: () {
+                              setState(() {
+                                if (selected) {
+                                  selectedPurposes.remove(purpose);
+                                } else {
+                                  selectedPurposes.add(purpose);
+                                }
+                              });
+                            },
                         child: Container(
                           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
                           decoration: BoxDecoration(
@@ -333,17 +333,17 @@ class _ReservationConfirmPageState extends State<ReservationConfirmPage> {
                             ),
                             borderRadius: BorderRadius.circular(20),
                           ),
-                          child: Text(
-                            purpose,
-                            style: TextStyle(
+                            child: Text(
+                              purpose,
+                              style: TextStyle(
                               color: selected ? Colors.white : Color(0xFF999999),
-                              fontWeight: FontWeight.w500,
-                              fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                                fontSize: 14,
+                              ),
                             ),
                           ),
-                        ),
-                      );
-                    }).toList(),
+                        );
+                      }).toList(),
                   ),
                 ),
                 const SizedBox(height: 24),
@@ -356,9 +356,9 @@ class _ReservationConfirmPageState extends State<ReservationConfirmPage> {
                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   child: Column(
                     children: [
-                      _checkItem(0, '[필수] 예약해도 대기시간이 발생할 수 있습니다.'),
-                      _checkItem(1, '[필수] 룸 예약은 전화로만 가능합니다.'),
-                      _checkItem(2, '[필수] 아이용 식기/의자는 요청사항에 적어주세요.'),
+                _checkItem(0, '[필수] 예약해도 대기시간이 발생할 수 있습니다.'),
+                _checkItem(1, '[필수] 룸 예약은 전화로만 가능합니다.'),
+                _checkItem(2, '[필수] 아이용 식기/의자는 요청사항에 적어주세요.'),
                     ],
                   ),
                 ),
@@ -371,10 +371,10 @@ class _ReservationConfirmPageState extends State<ReservationConfirmPage> {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   child: TextField(
-                    controller: requestController,
-                    decoration: const InputDecoration(
-                      hintText: '메장에 요청할 내용을 작성해주세요.',
-                      border: OutlineInputBorder(),
+                  controller: requestController,
+                  decoration: const InputDecoration(
+                    hintText: '메장에 요청할 내용을 작성해주세요.',
+                    border: OutlineInputBorder(),
                       filled: true,
                       fillColor: Color(0xFFF8F8F8),
                     ),

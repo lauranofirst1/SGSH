@@ -78,8 +78,12 @@ class _SearchPageState extends State<SearchPage> {
             storeList.where((store) {
               final name = store.name.toLowerCase();
               final address = store.address.toLowerCase();
+              final description = store.description.toLowerCase();
+              final tags = (store.tags).join(' ').toLowerCase();
               return name.contains(query.toLowerCase()) ||
-                  address.contains(query.toLowerCase());
+                  address.contains(query.toLowerCase()) ||
+                  description.contains(query.toLowerCase()) ||
+                  tags.contains(query.toLowerCase());
             }).toList();
       }
     });

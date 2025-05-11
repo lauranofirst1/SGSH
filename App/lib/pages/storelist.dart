@@ -91,7 +91,7 @@ class _StoreListPageState extends State<StoreListPage> {
                 ],
               ),
             )
-          : ListView.builder(
+              : ListView.builder(
                 itemCount: storeList.length,
                 itemBuilder: (context, index) {
                   return StoreCard(

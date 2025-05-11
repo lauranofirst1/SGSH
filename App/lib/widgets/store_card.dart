@@ -32,6 +32,7 @@ void loadBookmarkStatus() async {
   @override
   Widget build(BuildContext context) {
     final store = widget.store;
+    final tags = store.tags.take(2).toList();
 
     return GestureDetector(
       onTap: widget.onTap,
@@ -55,14 +56,32 @@ void loadBookmarkStatus() async {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text(
-                              store.name,
-                              style: TextStyle(
-                                fontSize: 22,
-                                fontWeight: FontWeight.w700,
-                              ),
-                              overflow: TextOverflow.ellipsis,
-                              maxLines: 1,
+                            Row(
+                              children: [
+                                Text(
+                                  store.name,
+                                  style: TextStyle(
+                                    fontSize: 22,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
+                                  maxLines: 1,
+                                ),
+                                if (tags.isNotEmpty) ...[
+                                  SizedBox(width: 8),
+                                  ...tags.map((tag) => Padding(
+                                    padding: const EdgeInsets.only(right: 4),
+                                    child: Text(
+                                      '#$tag',
+                                      style: TextStyle(
+                                        fontSize: 13,
+                                        fontWeight: FontWeight.w500,
+                                        color: Colors.deepOrange,
+                                      ),
+                                    ),
+                                  )),
+                                ]
+                              ],
                             ),
                             IconButton(
                               icon: Icon(
@@ -146,7 +165,7 @@ void loadBookmarkStatus() async {
                         Icon(Icons.access_time, color: Colors.grey, size: 16),
                         SizedBox(width: 4),
                         Text(
-                          getStoreStatus(store.time),
+                          store.time,
                           style: TextStyle(fontSize: 12),
                         ),
                       ],
