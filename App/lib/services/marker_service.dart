@@ -31,7 +31,7 @@ class MarkerService {
     }
     final path = _categoryIconPaths[category] ?? _categoryIconPaths['기타']!;
     final icon = await BitmapDescriptor.fromAssetImage(
-      const ImageConfiguration(size: Size(64, 64)),
+      const ImageConfiguration(size: Size(36, 36)),
       path,
     );
     _categoryIcons[category] = icon;
@@ -58,7 +58,7 @@ class MarkerService {
     _allMarkers.clear();
 
     final icon = await BitmapDescriptor.fromAssetImage(
-      const ImageConfiguration(size: Size(64, 64)),
+      const ImageConfiguration(size: Size(36, 36)),
       'assets/icons/image.png',
     );
     for (var biz in _savedBusinesses) {
