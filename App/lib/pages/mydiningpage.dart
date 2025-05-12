@@ -24,6 +24,15 @@ class _MyDiningPageState extends State<MyDiningPage> {
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // 페이지가 포커스될 때마다 예약 목록 새로고침
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _fetchReservations();
+    });
+  }
+
+  @override
   void dispose() {
     _pageController.dispose();
     super.dispose();
@@ -203,30 +212,33 @@ class _MyDiningPageState extends State<MyDiningPage> {
       return false;
     }).toList();
 
-    return ListView(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-      children: [
+    return RefreshIndicator(
+      onRefresh: _fetchReservations,
+      child: ListView(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+        children: [
           if (filtered.isEmpty)
             const Center(
               child: Padding(
-              padding: EdgeInsets.only(top: 60),
+                padding: EdgeInsets.only(top: 60),
                 child: Text(
                   '예약 내역이 없습니다.',
-                style: TextStyle(fontSize: 15, color: Color(0xFFB0B0B0)),
+                  style: TextStyle(fontSize: 15, color: Color(0xFFB0B0B0)),
                 ),
               ),
             )
           else
             ...filtered.map((data) {
-            if (category == 2) {
+              if (category == 2) {
                 return _buildCanceledCard(data);
               } else {
-              return category == 1
+                return category == 1
                     ? _buildCompletedCard(data)
                     : _buildReservationCard(data);
               }
             }).toList(),
         ],
+      ),
     );
   }
 
@@ -301,6 +313,13 @@ class _MyDiningPageState extends State<MyDiningPage> {
     final date = DateTime.tryParse(dateStr);
     final dDay = (date != null) ? date.difference(now).inDays : null;
 
+    String getDdayText(int? days) {
+      if (days == null) return '';
+      if (days == 0) return 'D-day';
+      if (days < 0) return 'D+${-days}';
+      return 'D-$days';
+    }
+
     return GestureDetector(
       onTap: () async {
         final business =
@@ -343,7 +362,7 @@ class _MyDiningPageState extends State<MyDiningPage> {
             children: [
               Row(
                 children: [
-                  if (dDay != null) _buildBadge('D-$dDay', color: Colors.red),
+                  if (dDay != null) _buildBadge(getDdayText(dDay), color: Colors.red),
                   const SizedBox(width: 6),
                   _buildBadge(
                     '예약',
