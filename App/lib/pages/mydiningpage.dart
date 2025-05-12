@@ -71,13 +71,13 @@ class _MyDiningPageState extends State<MyDiningPage> {
             '\uD83C\uDFE2 b_id: $bId -> 사업체: ${business?['name']} (${business?['id']})',
           );
 
-          final enrichedReservation = Map<String, dynamic>.from(
-            reservation,
-          ); // ✅ 깊은 복사
+          final enrichedReservation = Map<String, dynamic>.from(reservation);
           enrichedReservation['storeName'] = business?['name'];
           enrichedReservation['storeImage'] = business?['image'];
           enrichedReservation['category'] = business?['category'];
           enrichedReservation['location'] = business?['location'];
+          enrichedReservation['address'] = business?['address'];
+          enrichedReservation['tags'] = business?['tags'];
 
           return enrichedReservation;
         }),
@@ -463,7 +463,7 @@ class _MyDiningPageState extends State<MyDiningPage> {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          tagStr.isNotEmpty ? '$region · $tagStr' : region,
+                          tagStr.isNotEmpty ? '$region | $tagStr' : region,
                           style: const TextStyle(
                             color: Colors.grey,
                             fontSize: 13,
@@ -603,7 +603,7 @@ class _MyDiningPageState extends State<MyDiningPage> {
             ),
             const SizedBox(height: 4),
                         Text(
-                          tagStr.isNotEmpty ? '$region · $tagStr' : region,
+                          tagStr.isNotEmpty ? '$region | $tagStr' : region,
                           style: const TextStyle(color: Colors.grey, fontSize: 13),
                         ),
                       ],
@@ -744,7 +744,7 @@ class _MyDiningPageState extends State<MyDiningPage> {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        tagStr.isNotEmpty ? '$region · $tagStr' : region,
+                        tagStr.isNotEmpty ? '$region | $tagStr' : region,
                         style: const TextStyle(color: Colors.grey),
                       ),
                       const SizedBox(height: 4),
