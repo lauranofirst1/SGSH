@@ -482,7 +482,7 @@ class _MyDiningPageState extends State<MyDiningPage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          storeName,
+                        storeName,
                           style: const TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 16,
@@ -491,7 +491,9 @@ class _MyDiningPageState extends State<MyDiningPage> {
                         const SizedBox(height: 4),
                         Text(
                           (() {
+                            final address = data['address'] ?? '';
                             final region = extractRegion(address);
+                            final tags = data['tags'] ?? [];
                             final tagList = (tags is String)
                                 ? tags.split(',').map((e) => e.trim()).where((e) => e.isNotEmpty).toList()
                                 : (tags is List ? tags : []);
@@ -640,7 +642,9 @@ class _MyDiningPageState extends State<MyDiningPage> {
             const SizedBox(height: 4),
                         Text(
                           (() {
+                            final address = data['address'] ?? '';
                             final region = extractRegion(address);
+                            final tags = data['tags'] ?? [];
                             final tagList = (tags is String)
                                 ? tags.split(',').map((e) => e.trim()).where((e) => e.isNotEmpty).toList()
                                 : (tags is List ? tags : []);
@@ -790,7 +794,9 @@ class _MyDiningPageState extends State<MyDiningPage> {
                       const SizedBox(height: 4),
                       Text(
                         (() {
+                          final address = data['address'] ?? '';
                           final region = extractRegion(address);
+                          final tags = data['tags'] ?? [];
                           final tagList = (tags is String)
                               ? tags.split(',').map((e) => e.trim()).where((e) => e.isNotEmpty).toList()
                               : (tags is List ? tags : []);
