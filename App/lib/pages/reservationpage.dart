@@ -119,7 +119,7 @@ class _ReservationConfirmPageState extends State<ReservationConfirmPage> {
                   style: const TextStyle(color: Colors.black),
                 ),
                 const SizedBox(height: 12),
-                const Text('방문자 연락체', style: TextStyle(color: Colors.black)),
+                const Text('방문자 연락처', style: TextStyle(color: Colors.black)),
                 TextField(
                   controller: phoneController,
                   keyboardType: TextInputType.phone,
@@ -363,15 +363,52 @@ class _ReservationConfirmPageState extends State<ReservationConfirmPage> {
                     // 유의사항
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: _sectionTitle('메장 유의사항'),
+                      child: _sectionTitle('매장 유의사항'),
                     ),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                       child: Column(
                         children: [
-                    _checkItem(0, '[필수] 예약해도 대기시간이 발생할 수 있습니다.'),
-                    _checkItem(1, '[필수] 룸 예약은 전화로만 가능합니다.'),
-                    _checkItem(2, '[필수] 아이용 식기/의자는 요청사항에 적어주세요.'),
+                          
+                          _checkItem(0, '[필수] 예약해도 대기시간이 발생할 수 있습니다.'),
+                          _checkItem(1, '[필수] 룸 예약은 전화로만 가능합니다.'),
+                          _checkItem(2, '[필수] 아이용 식기/의자는 요청사항에 적어주세요.'),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 4.0).copyWith(left: 10),
+                            child: Row(
+                              children: [
+                                SizedBox(
+                                  width: 20,
+                                  height: 20,
+                                  child: Checkbox(
+                                    value: checkedCautions.every((c) => c),
+                                    onChanged: (val) {
+                                      setState(() {
+                                        final newValue = val ?? false;
+                                        for (int i = 0; i < checkedCautions.length; i++) {
+                                          checkedCautions[i] = newValue;
+                                        }
+                                      });
+                                    },
+                                    activeColor: Colors.black,
+                                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                    visualDensity: const VisualDensity(horizontal: -4, vertical: -4),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(4),
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                const Text(
+                                  '모두 동의하기',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
                         ],
                       ),
                     ),
@@ -386,7 +423,7 @@ class _ReservationConfirmPageState extends State<ReservationConfirmPage> {
                       child: TextField(
                       controller: requestController,
                       decoration: const InputDecoration(
-                        hintText: '메장에 요청할 내용을 작성해주세요.',
+                        hintText: '매장에 요청할 내용을 작성해주세요.',
                         border: OutlineInputBorder(),
                           filled: true,
                           fillColor: Color(0xFFF8F8F8),
