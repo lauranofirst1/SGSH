@@ -93,7 +93,7 @@ class DiningMagazineSection extends StatelessWidget {
                             color: Colors.white70,
                             fontSize: 12,
                           ),
-                          maxLines: 2,
+                          maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
                       ],

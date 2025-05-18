@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:app/models/menu.dart';
 
 class Mainpage extends StatefulWidget {
   @override
@@ -17,11 +18,11 @@ class Mainpage extends StatefulWidget {
 
 class _MainpageState extends State<Mainpage> {
   final List<Map<String, dynamic>> items = [
-    {'emoji': '🥘', 'label': "한식", 'category': '한식'},
-    {'emoji': '🍜', 'label': "중식", 'category': '중식'},
-    {'emoji': '🍱', 'label': "일식", 'category': '일식'},
-    {'emoji': '☕️', 'label': "카페", 'category': '카페'},
-    {'emoji': '🍔', 'label': "버거", 'category': '버거'},
+    {'emoji': '🥘', 'label': "한식", 'category': '1'},
+    {'emoji': '🍜', 'label': "중식", 'category': '2'},
+    {'emoji': '🍱', 'label': "일식", 'category': '3'},
+    {'emoji': '🍔', 'label': "양식", 'category': '4'},
+    {'emoji': '☕️', 'label': "카페", 'category': '5'},
     {'emoji': '🍽️', 'label': "기타", 'category': '기타'},
   ];
 
@@ -35,12 +36,14 @@ class _MainpageState extends State<Mainpage> {
 
   List<business_data> recommendedStores = [];
   String userName = '';
+  List<menu_data> menuList = [];
 
   @override
   void initState() {
     super.initState();
     prefsFuture = SharedPreferences.getInstance();
     fetchStores();
+    fetchMenuList();
 
     SupabaseService().getUserProfile().then((profile) {
       final email = profile?.email;
@@ -54,6 +57,10 @@ class _MainpageState extends State<Mainpage> {
       setState(() {
         recommendedStores = stores;
       });
+      // 디버깅: 추천 매장 카테고리명 출력
+      for (var store in stores) {
+        print('가게명: \\${store.name}, 카테고리: \\${store.category}');
+      }
     });
   }
 
@@ -150,6 +157,20 @@ class _MainpageState extends State<Mainpage> {
     }
   }
 
+  void fetchMenuList() async {
+    try {
+      var response = await supabase
+          .from("menu_data")
+          .select()
+          .order("id", ascending: true);
+      setState(() {
+        menuList = response.map<menu_data>((data) => menu_data.fromMap(data)).toList();
+      });
+    } catch (e) {
+      print("❌ 메뉴 데이터 불러오기 실패: $e");
+    }
+  }
+
   // Future<List<business_data>> fetchRandomStores() async {
   //   try {
   //     final response = await supabase.from('business_data').select();
@@ -216,97 +237,109 @@ class _MainpageState extends State<Mainpage> {
         surfaceTintColor: Colors.white,
         shadowColor: Colors.transparent,
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: <Widget>[
-            Article(article: bannerArticles),
-            Padding(
-              padding: EdgeInsets.all(16).copyWith(top: 24),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    '카테고리',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w700,
-                      color: Colors.black87,
+      body: RefreshIndicator(
+        onRefresh: () async {
+          fetchStores();
+          final stores = await fetchTopViewedStores();
+          setState(() {
+            recommendedStores = stores;
+          });
+        },
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          child: Column(
+            children: <Widget>[
+              Article(article: bannerArticles),
+              Padding(
+                padding: EdgeInsets.all(16).copyWith(top: 24),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '카테고리',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.black87,
+                      ),
                     ),
-                  ),
-                  SizedBox(height: 16),
-                  Container(
-                    padding: EdgeInsets.symmetric(vertical: 24, horizontal: 8),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(24),
-                      border: Border.all(color: Colors.grey[200]!),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.06),
-                          blurRadius: 16,
-                          offset: Offset(0, 4),
-                        ),
-                      ],
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: items.map((item) {
-                        return Expanded(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              GestureDetector(
-                                onTap: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => StoreListPage(
-                                        category: item['category'],
-                                      ),
-                                    ),
-                                  );
-                                },
-                                child: Column(
-                                  children: [
-                                    Text(
-                                      item['emoji'],
-                                      style: const TextStyle(
-                                        fontFamily: 'TossFace',
-                                        fontSize: 36,
-                                      ),
-                                    ),
-                                    SizedBox(height: 10),
-                                    Text(
-                                      item['label'],
-                                      textAlign: TextAlign.center,
-                                      style: TextStyle(
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.w600,
-                                        color: Colors.black87,
-                                        height: 1.2,
-                                      ),
-                                      maxLines: 2,
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
+                    SizedBox(height: 16),
+                    Container(
+                      padding: EdgeInsets.symmetric(vertical: 24, horizontal: 8),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(24),
+                        border: Border.all(color: Colors.grey[200]!),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.06),
+                            blurRadius: 16,
+                            offset: Offset(0, 4),
                           ),
-                        );
-                      }).toList(),
+                        ],
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: items.map((item) {
+                          return Expanded(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                GestureDetector(
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => StoreListPage(
+                                          category: item['category'],
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                  child: Column(
+                                    children: [
+                                      Text(
+                                        item['emoji'],
+                                        style: const TextStyle(
+                                          fontFamily: 'TossFace',
+                                          fontSize: 36,
+                                        ),
+                                      ),
+                                      SizedBox(height: 10),
+                                      Text(
+                                        item['label'],
+                                        textAlign: TextAlign.center,
+                                        style: TextStyle(
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.w600,
+                                          color: Colors.black87,
+                                          height: 1.2,
+                                        ),
+                                        maxLines: 2,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        }).toList(),
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-            buildRecentItems(),
-            RecommendedStoreSection(
-              userName: userName.isNotEmpty ? userName : '회원',
-              stores: recommendedStores,
-            ),
-            DummyArticleList(newsArticles: newsArticles),
-            DiningMagazineSection(magazineArticles: magazineArticles),
-          ],
+              buildRecentItems(),
+              RecommendedStoreSection(
+                userName: userName.isNotEmpty ? userName : '회원',
+                stores: recommendedStores,
+              ),
+             
+            
+              PriceTabMenuList(menus: menuList, stores: recommendedStores),
+              DiningMagazineSection(magazineArticles: magazineArticles),
+            ],
+          ),
         ),
       ),
     );
@@ -760,3 +793,186 @@ class RecommendedStoreSection extends StatelessWidget {
     );
   }
 }
+
+class PriceTabMenuList extends StatefulWidget {
+  final List<menu_data> menus; // 메뉴 리스트
+  final List<business_data> stores; // 가게 리스트
+
+  const PriceTabMenuList({super.key, required this.menus, required this.stores});
+
+  @override
+  State<PriceTabMenuList> createState() => _PriceTabMenuListState();
+}
+
+class _PriceTabMenuListState extends State<PriceTabMenuList> with SingleTickerProviderStateMixin {
+  late TabController _tabController;
+  final List<String> priceTabs = ['1만원 이하', '3만원 이하', '그 이상'];
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: priceTabs.length, vsync: this);
+  }
+
+  List<menu_data> getMenusByPrice(int tabIndex) {
+    List<menu_data> filtered;
+    switch (tabIndex) {
+      case 0:
+        filtered = widget.menus.where((m) => m.price <= 10000).toList();
+        break;
+      case 1:
+        filtered = widget.menus.where((m) => m.price > 10000 && m.price <= 30000).toList();
+        break;
+      case 2:
+        filtered = widget.menus.where((m) => m.price > 30000).toList();
+        break;
+      default:
+        filtered = widget.menus;
+    }
+    filtered.shuffle();
+    return filtered.take(5).toList();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Padding(
+          padding: EdgeInsets.fromLTRB(16, 24, 16, 4),
+          child: Text(
+            '가격대별 BEST',
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 0, 16, 5),
+          child: Text(
+            '가격대별 인기 메뉴를 모아봤어요',
+            style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+          ),
+        ),
+        TabBar(
+          controller: _tabController,
+          labelColor: Colors.black,
+          unselectedLabelColor: Colors.grey,
+          indicatorColor: Colors.black,
+          tabs: priceTabs.map((t) => Tab(text: t)).toList(),
+        ),
+        SizedBox(
+          height: 460, // 원하는 높이로 조정
+          child: TabBarView(
+            controller: _tabController,
+            children: List.generate(priceTabs.length, (index) {
+              final menus = getMenusByPrice(index);
+              if (menus.isEmpty) {
+                return Center(child: Text('해당 가격대의 메뉴가 없습니다.'));
+              }
+              return SizedBox(
+                height: 460,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: List.generate(menus.length > 5 ? 5 : menus.length, (i) {
+                    final menu = menus[i];
+                    return GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => StoreDetailPage(store: widget.stores.firstWhere((s) => s.id == menu.b_id, orElse: () => business_data(
+                              id: menu.b_id,
+                              name: menu.name,
+                              address: '',
+                              time: '',
+                              number: '',
+                              description: '',
+                              image: menu.image,
+                              url: '',
+                              lat: '0.0',
+                              lng: '0.0',
+                              tags: [],
+                              category: '',
+                            ))),
+                          ),
+                        );
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(12),
+                              child: Image.network(
+                                menu.image,
+                                width: 60,
+                                height: 60,
+                                fit: BoxFit.cover,
+                                errorBuilder: (_, __, ___) => Container(
+                                  width: 60,
+                                  height: 60,
+                                  color: Colors.grey[200],
+                                  child: Icon(Icons.image, color: Colors.grey, size: 28),
+                                ),
+                              ),
+                            ),
+                            SizedBox(width: 16),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    menu.name,
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black87,
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  SizedBox(height: 6),
+                                  Text(
+                                    menu.description,
+                                    style: TextStyle(
+                                      fontSize: 13,
+                                      color: Colors.grey[700],
+                                    ),
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  SizedBox(height: 8),
+                                  Text(
+                                    '${menu.price.toString()}원',
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  }),
+                ),
+              );
+            }),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+// 예시용 메뉴 데이터 (실제 데이터 연동 시 삭제)
+final List<menu_data> sampleMenus = [
+  menu_data(id: 1, b_id: 1, name: '디핀 옥수', price: 25000, description: '아시안 터치의 파스타', image: 'https://via.placeholder.com/56'),
+  menu_data(id: 2, b_id: 2, name: '그리노 성수', price: 47000, description: '이색적인 요리와 분위기', image: 'https://via.placeholder.com/56'),
+  menu_data(id: 3, b_id: 3, name: '중앙감속기', price: 32000, description: '스타셰프의 퓨전음식', image: 'https://via.placeholder.com/56'),
+  menu_data(id: 4, b_id: 4, name: '부베트 서울', price: 53000, description: '프렌치 레스토랑', image: 'https://via.placeholder.com/56'),
+  menu_data(id: 5, b_id: 5, name: '히키니쿠토코메 도산', price: 120000, description: '숯불구이와 함박스테이크', image: 'https://via.placeholder.com/56'),
+];

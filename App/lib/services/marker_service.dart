@@ -14,27 +14,30 @@ class MarkerService {
 
   // 카테고리별 샘플 PNG 경로 매핑
   final Map<String, String> _categoryIconPaths = {
-    '한식': 'assets/icons/han.png',
-    '중식': 'assets/icons/china.png',
-    '일식': 'assets/icons/japan.png',
-    '카페': 'assets/icons/cafe.png',
-    '버거': 'assets/icons/burger.png',
-    '기타': 'assets/icons/etc.png',
+    '1': 'assets/icons/1.png', // 한식
+    '2': 'assets/icons/2.png', // 중식
+    '3': 'assets/icons/3.png', // 일식
+    '4': 'assets/icons/4.png', // 양식/버거
+    '5': 'assets/icons/5.png', // 카페
+    '기타': 'assets/icons/6.png',
   };
 
   // BitmapDescriptor 캐싱
   final Map<String, BitmapDescriptor> _categoryIcons = {};
 
-  Future<BitmapDescriptor> _getCategoryIcon(String category) async {
-    if (_categoryIcons.containsKey(category)) {
-      return _categoryIcons[category]!;
+  Future<BitmapDescriptor> _getCategoryIcon(String? category) async {
+    final String iconKey = (category != null && category.isNotEmpty && _categoryIconPaths.containsKey(category))
+        ? category
+        : '기타';
+    if (_categoryIcons.containsKey(iconKey)) {
+      return _categoryIcons[iconKey]!;
     }
-    final path = _categoryIconPaths[category] ?? _categoryIconPaths['기타']!;
+    final path = _categoryIconPaths[iconKey]!;
     final icon = await BitmapDescriptor.fromAssetImage(
       const ImageConfiguration(size: Size(36, 36)),
       path,
     );
-    _categoryIcons[category] = icon;
+    _categoryIcons[iconKey] = icon;
     return icon;
   }
 
@@ -59,7 +62,7 @@ class MarkerService {
 
     final icon = await BitmapDescriptor.fromAssetImage(
       const ImageConfiguration(size: Size(36, 36)),
-      'assets/icons/image.png',
+      'assets/icons/6.png',
     );
     for (var biz in _savedBusinesses) {
       final lat = double.tryParse(biz['lat'].toString());
