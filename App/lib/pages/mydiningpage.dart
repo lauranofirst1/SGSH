@@ -23,13 +23,17 @@ class _MyDiningPageState extends State<MyDiningPage> {
     _fetchReservations();
   }
 
+  bool _didFetchOnDependencies = false;
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    // 페이지가 포커스될 때마다 예약 목록 새로고침
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _fetchReservations();
-    });
+    if (!_didFetchOnDependencies) {
+      _didFetchOnDependencies = true;
+      return;
+    }
+    print('[디버그] didChangeDependencies에서 _fetchReservations 호출!');
+    // 화면에 다시 진입할 때마다 새로고침
+    _fetchReservations();
   }
 
   @override
@@ -53,6 +57,7 @@ class _MyDiningPageState extends State<MyDiningPage> {
   }
 
   Future<void> _fetchReservations() async {
+    print('[디버그] _fetchReservations 실행');
     try {
       final uuid = Supabase.instance.client.auth.currentUser?.id;
       if (uuid == null) return;
@@ -62,6 +67,7 @@ class _MyDiningPageState extends State<MyDiningPage> {
           .select()
           .eq('uuid', uuid);
 
+      print('[디버그] Supabase에서 받아온 예약 데이터: $response');
       final List<Map<String, dynamic>> fetched =
           List<Map<String, dynamic>>.from(response);
 
@@ -80,13 +86,13 @@ class _MyDiningPageState extends State<MyDiningPage> {
             '\uD83C\uDFE2 b_id: $bId -> 사업체: ${business?['name']} (${business?['id']})',
           );
 
-          final enrichedReservation = Map<String, dynamic>.from(reservation);
+          final enrichedReservation = Map<String, dynamic>.from(
+            reservation,
+          ); // ✅ 깊은 복사
           enrichedReservation['storeName'] = business?['name'];
           enrichedReservation['storeImage'] = business?['image'];
           enrichedReservation['category'] = business?['category'];
           enrichedReservation['location'] = business?['location'];
-          enrichedReservation['address'] = business?['address'];
-          enrichedReservation['tags'] = business?['tags'];
 
           return enrichedReservation;
         }),
@@ -109,6 +115,7 @@ class _MyDiningPageState extends State<MyDiningPage> {
 
       setState(() {
         reservations = enriched;
+        print('[디버그] setState로 reservations 갱신: ${reservations.length}개');
       });
     } catch (e) {
       print('❌ 예약 가져오기 실패: $e');
@@ -212,33 +219,30 @@ class _MyDiningPageState extends State<MyDiningPage> {
       return false;
     }).toList();
 
-    return RefreshIndicator(
-      onRefresh: _fetchReservations,
-      child: ListView(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-        children: [
+    return ListView(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+      children: [
           if (filtered.isEmpty)
             const Center(
               child: Padding(
-                padding: EdgeInsets.only(top: 60),
+              padding: EdgeInsets.only(top: 60),
                 child: Text(
                   '예약 내역이 없습니다.',
-                  style: TextStyle(fontSize: 15, color: Color(0xFFB0B0B0)),
+                style: TextStyle(fontSize: 15, color: Color(0xFFB0B0B0)),
                 ),
               ),
             )
           else
             ...filtered.map((data) {
-              if (category == 2) {
+            if (category == 2) {
                 return _buildCanceledCard(data);
               } else {
-                return category == 1
+              return category == 1
                     ? _buildCompletedCard(data)
                     : _buildReservationCard(data);
               }
             }).toList(),
         ],
-      ),
     );
   }
 
@@ -313,13 +317,6 @@ class _MyDiningPageState extends State<MyDiningPage> {
     final date = DateTime.tryParse(dateStr);
     final dDay = (date != null) ? date.difference(now).inDays : null;
 
-    String getDdayText(int? days) {
-      if (days == null) return '';
-      if (days == 0) return 'D-day';
-      if (days < 0) return 'D+${-days}';
-      return 'D-$days';
-    }
-
     return GestureDetector(
       onTap: () async {
         final business =
@@ -362,7 +359,7 @@ class _MyDiningPageState extends State<MyDiningPage> {
             children: [
               Row(
                 children: [
-                  if (dDay != null) _buildBadge(getDdayText(dDay), color: Colors.red),
+                  if (dDay != null) _buildBadge('D-$dDay', color: Colors.red),
                   const SizedBox(width: 6),
                   _buildBadge(
                     '예약',
@@ -482,7 +479,7 @@ class _MyDiningPageState extends State<MyDiningPage> {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          tagStr.isNotEmpty ? '$region | $tagStr' : region,
+                          tagStr.isNotEmpty ? '$region · $tagStr' : region,
                           style: const TextStyle(
                             color: Colors.grey,
                             fontSize: 13,
@@ -622,7 +619,7 @@ class _MyDiningPageState extends State<MyDiningPage> {
             ),
             const SizedBox(height: 4),
                         Text(
-                          tagStr.isNotEmpty ? '$region | $tagStr' : region,
+                          tagStr.isNotEmpty ? '$region · $tagStr' : region,
                           style: const TextStyle(color: Colors.grey, fontSize: 13),
                         ),
                       ],
@@ -763,7 +760,7 @@ class _MyDiningPageState extends State<MyDiningPage> {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        tagStr.isNotEmpty ? '$region | $tagStr' : region,
+                        tagStr.isNotEmpty ? '$region · $tagStr' : region,
                         style: const TextStyle(color: Colors.grey),
                       ),
                       const SizedBox(height: 4),

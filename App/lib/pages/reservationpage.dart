@@ -498,7 +498,7 @@ class _ReservationConfirmPageState extends State<ReservationConfirmPage> {
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     const SnackBar(content: Text('예약이 저장되었습니다.')),
                                   );
-                                  Navigator.pop(context);
+                                  Navigator.pop(context, true);
                                 } catch (e) {
                                   print('예약 저장 실패: $e');
                                   ScaffoldMessenger.of(context).showSnackBar(

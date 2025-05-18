@@ -15,6 +15,8 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load(fileName: ".env");
 
+
+  
   await Supabase.initialize(
     url: dotenv.env['PROJECT_URL'] ?? '',
     anonKey: dotenv.env['PROJECT_API_KEY'] ?? '',
@@ -27,12 +29,13 @@ void main() async {
   } else {
     print("❌ 로그인 안됨. LoginPage로 이동.");
   }
+
   runApp(
     MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        fontFamily: 'Pretendard', // ✅ 여기만 추가하면 앱 전체에 적용됨!
-      ),
+      fontFamily: 'Pretendard', // ✅ 여기만 추가하면 앱 전체에 적용됨!
+    ),
       home: user == null ? LoginPage() : MyApp(),
     ),
   );
@@ -70,6 +73,20 @@ class _MyAppState extends State<MyApp> {
     });
   }
 
+  // void _handleMarkerTap(String name, String address, business_data? store) {
+  //   setState(() => _isBottomNavVisible = false);
+
+  //   final controller = _scaffoldKey.currentState!.showBottomSheet(
+  //     (context) =>
+  //         StoreDetailBottomSheet(name: name, address: address, store: store),
+  //     backgroundColor: Colors.transparent,
+  //   );
+
+  //   controller.closed.then((_) {
+  //     setState(() => _isBottomNavVisible = true);
+  //   });
+  // }
+
   void _onItemTapped(int index) {
     setState(() => _selectedIndex = index);
   }
@@ -97,32 +114,33 @@ class _MyAppState extends State<MyApp> {
       key: _scaffoldKey,
       backgroundColor: Color(0xFFF2F2F7),
       body: IndexedStack(index: _selectedIndex, children: _pages),
-      bottomNavigationBar: _isBottomNavVisible
-          ? BottomNavigationBar(
-              currentIndex: _selectedIndex,
-              onTap: _onItemTapped,
-              backgroundColor: Colors.white,
-              selectedItemColor: Colors.black,
-              unselectedItemColor: Colors.grey,
-              type: BottomNavigationBarType.fixed,
-              items: const [
-                BottomNavigationBarItem(icon: Icon(Icons.home), label: '홈'),
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.search),
-                  label: '검색',
-                ),
-                BottomNavigationBarItem(icon: Icon(Icons.map), label: '지도'),
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.event_note),
-                  label: '나의 예약',
-                ),
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.person),
-                  label: '나의페이지',
-                ),
-              ],
-            )
-          : null,
+      bottomNavigationBar:
+          _isBottomNavVisible
+              ? BottomNavigationBar(
+                currentIndex: _selectedIndex,
+                onTap: _onItemTapped,
+                backgroundColor: Colors.white,
+                selectedItemColor: Colors.black,
+                unselectedItemColor: Colors.grey,
+                type: BottomNavigationBarType.fixed,
+                items: const [
+                  BottomNavigationBarItem(icon: Icon(Icons.home), label: '홈'),
+                  BottomNavigationBarItem(
+                    icon: Icon(Icons.search),
+                    label: '검색',
+                  ),
+                  BottomNavigationBarItem(icon: Icon(Icons.map), label: '지도'),
+                  BottomNavigationBarItem(
+                    icon: Icon(Icons.event_note),
+                    label: '나의 예약',
+                  ),
+                  BottomNavigationBarItem(
+                    icon: Icon(Icons.person),
+                    label: '나의페이지',
+                  ),
+                ],
+              )
+              : null,
     );
   }
 }
