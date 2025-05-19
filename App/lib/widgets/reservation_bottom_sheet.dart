@@ -226,12 +226,23 @@ void showReservationBottomSheet(BuildContext context, {
                             child: Row(
                               children:
                                   [
+                                     '오전 8:00',
+                                      '오전 9:00',
+                                       '오전 10:00',
                                     '오전 11:00',
                                     '오전 11:30',
                                     '오후 12:00',
                                     '오후 12:30',
                                     '오후 1:00',
                                     '오후 2:00',
+                                     '오후 3:00',
+                                    '오후 4:00',
+                                     '오후 5:00',
+                                    '오후 6:00',
+                                     '오후 7:00',
+                                    '오후 8:00',
+                                     '오후 9:00',
+                                    
                                   ].map((time) {
                                     final isSelected = selectedTime == time;
                                     final isDisabled =

@@ -297,12 +297,14 @@ class _MapPageState extends State<MapPage> {
   }
 
   void _searchAndMove(String query) {
+    final cleanQuery = query.replaceAll('#', '').toLowerCase();
+    
     final matched = _markerService.savedBusinessList.firstWhereOrNull(
       (b) =>
-        b.name.toLowerCase().contains(query.toLowerCase()) ||
-        b.address.toLowerCase().contains(query.toLowerCase()) ||
-        (b.description.toLowerCase().contains(query.toLowerCase())) ||
-        (b.tags.any((tag) => tag.toLowerCase().contains(query.toLowerCase()))),
+        b.name.toLowerCase().contains(cleanQuery) ||
+        b.address.toLowerCase().contains(cleanQuery) ||
+        (b.description.toLowerCase().contains(cleanQuery)) ||
+        (b.tags.any((tag) => tag.toLowerCase().contains(cleanQuery))),
     );
 
     if (matched != null && matched.latDouble != null && matched.lngDouble != null) {

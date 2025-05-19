@@ -338,6 +338,7 @@ class _MainpageState extends State<Mainpage> {
             
               PriceTabMenuList(menus: menuList, stores: recommendedStores),
               DiningMagazineSection(magazineArticles: magazineArticles),
+              SizedBox(height: 30,)
             ],
           ),
         ),
@@ -968,11 +969,4 @@ class _PriceTabMenuListState extends State<PriceTabMenuList> with SingleTickerPr
   }
 }
 
-// 예시용 메뉴 데이터 (실제 데이터 연동 시 삭제)
-final List<menu_data> sampleMenus = [
-  menu_data(id: 1, b_id: 1, name: '디핀 옥수', price: 25000, description: '아시안 터치의 파스타', image: 'https://via.placeholder.com/56'),
-  menu_data(id: 2, b_id: 2, name: '그리노 성수', price: 47000, description: '이색적인 요리와 분위기', image: 'https://via.placeholder.com/56'),
-  menu_data(id: 3, b_id: 3, name: '중앙감속기', price: 32000, description: '스타셰프의 퓨전음식', image: 'https://via.placeholder.com/56'),
-  menu_data(id: 4, b_id: 4, name: '부베트 서울', price: 53000, description: '프렌치 레스토랑', image: 'https://via.placeholder.com/56'),
-  menu_data(id: 5, b_id: 5, name: '히키니쿠토코메 도산', price: 120000, description: '숯불구이와 함박스테이크', image: 'https://via.placeholder.com/56'),
-];
+

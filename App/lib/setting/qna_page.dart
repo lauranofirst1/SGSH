@@ -21,7 +21,7 @@ class QnAPage extends StatelessWidget {
       ),
       body: ListView(
         children: const [
-          ListTile(title: Text('문의하기'), subtitle: Text('support@example.com')),
+          ListTile(title: Text('문의하기'), subtitle: Text('lauran1@naver.com')),
         ],
       ),
     );

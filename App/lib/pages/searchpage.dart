@@ -41,8 +41,9 @@ class _SearchPageState extends State<SearchPage> {
           .eq('type', 4); // 타입 4만 가져오기
 
       setState(() {
-        magazineArticles =
-            response.map((e) => article_data.fromMap(e)).toList();
+        magazineArticles = response.map((e) => article_data.fromMap(e)).toList();
+        // 랜덤으로 섞기
+        magazineArticles.shuffle();
       });
     } catch (e) {
       print('❌ 매거진 로딩 실패: $e');
@@ -71,20 +72,23 @@ class _SearchPageState extends State<SearchPage> {
     setState(() {
       if (query.trim().isEmpty) {
         hasSearched = false;
-        filteredList = List.from(storeList); // 또는 []
+        filteredList = List.from(storeList);
       } else {
         hasSearched = true;
-        filteredList =
-            storeList.where((store) {
-              final name = store.name.toLowerCase();
-              final address = store.address.toLowerCase();
-              final description = store.description.toLowerCase();
-              final tags = (store.tags).join(' ').toLowerCase();
-              return name.contains(query.toLowerCase()) ||
-                  address.contains(query.toLowerCase()) ||
-                  description.contains(query.toLowerCase()) ||
-                  tags.contains(query.toLowerCase());
-            }).toList();
+        // 검색어에서 '#' 제거
+        final cleanQuery = query.replaceAll('#', '').toLowerCase();
+        
+        filteredList = storeList.where((store) {
+          final name = store.name.toLowerCase();
+          final address = store.address.toLowerCase();
+          final description = store.description.toLowerCase();
+          final tags = store.tags.join(' ').toLowerCase();
+          
+          return name.contains(cleanQuery) ||
+              address.contains(cleanQuery) ||
+              description.contains(cleanQuery) ||
+              tags.contains(cleanQuery);
+        }).toList();
       }
     });
   }
@@ -207,7 +211,7 @@ class _SearchPageState extends State<SearchPage> {
                     ),
                   ),
                   SizedBox(
-                    height: 200,
+                    height: 240,
                     child: ListView.separated(
                       padding: const EdgeInsets.fromLTRB(20, 0, 12, 8),
                       scrollDirection: Axis.horizontal,
@@ -225,7 +229,7 @@ class _SearchPageState extends State<SearchPage> {
                             );
                           },
                           child: Container(
-                            width: 170,
+                            width: 210,
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(18),
                               image: DecorationImage(
@@ -242,18 +246,38 @@ class _SearchPageState extends State<SearchPage> {
                             ),
                             alignment: Alignment.bottomLeft,
                             padding: EdgeInsets.all(16),
-                            child: Text(
-                              article.title,
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 17,
-                                shadows: [
-                                  Shadow(blurRadius: 8, color: Colors.black),
-                                ],
-                              ),
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  article.desc,
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w500,
+                                    shadows: [
+                                      Shadow(blurRadius: 8, color: Colors.black),
+                                    ],
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                SizedBox(height: 4),
+                                Text(
+                                  article.title,
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 17,
+                                    shadows: [
+                                      Shadow(blurRadius: 8, color: Colors.black),
+                                    ],
+                                  ),
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ],
                             ),
                           ),
                         );

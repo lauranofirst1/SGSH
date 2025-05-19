@@ -74,6 +74,19 @@ class _MyDiningPageState extends State<MyDiningPage> {
       final enriched = await Future.wait(
         fetched.map((reservation) async {
           final bId = reservation['b_id'];
+          final now = DateTime.now();
+          final reservationDate = DateTime.tryParse(reservation['date'] ?? '');
+          
+          // 예약 날짜가 지났고 상태가 'standby'인 경우 'cancel'로 업데이트
+          if (reservationDate != null && 
+              reservationDate.isBefore(now) && 
+              reservation['status'] == 'standby') {
+            await Supabase.instance.client
+                .from('reserve_data')
+                .update({'status': 'cancel'})
+                .eq('id', reservation['id']);
+            reservation['status'] = 'cancel';
+          }
 
           final business =
               await Supabase.instance.client

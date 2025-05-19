@@ -2,9 +2,7 @@ import 'package:app/auth/loginpage.dart';
 import 'package:app/setting/qna_page.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'account_page.dart';
-import 'reservation_settings_page.dart';
-import 'service_settings_page.dart';
+
 
 class SettingsPage extends StatelessWidget {
   @override
@@ -31,21 +29,90 @@ class SettingsPage extends StatelessWidget {
       ),
       body: ListView(
         children: [
-          _buildSectionTitle('계정'),
-          _buildTile(context, '내 정보 수정', AccountPage()),
-
-          _buildSectionTitle('예약 정보'),
-          _buildTile(context, '캘린더 자동 등록', ReservationSettingsPage()),
-
           _buildSectionTitle('서비스 이용'),
-          _buildTile(context, '알림 설정', ServiceSettingsPage()),
-          _buildTile(context, '문의하기', QnAPage()),
+          _buildSettingTile(
+            context,
+            '문의하기',
+            Icons.help_outline,
+            () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => QnAPage()),
+            ),
+          ),
+          _buildSettingTile(
+            context,
+            '최근 본 기록 지우기',
+            Icons.history,
+            () {
+              showDialog(
+                context: context,
+                builder: (context) => AlertDialog(
+                  backgroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  title: const Text(
+                    '최근 본 기록 지우기',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
+                  ),
+                  content: const Text(
+                    '최근 본 기록을 모두 지우시겠습니까?',
+                    style: TextStyle(
+                      fontSize: 15,
+                      color: Colors.black87,
+                    ),
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: const Text(
+                        '취소',
+                        style: TextStyle(
+                          color: Colors.black54,
+                          fontSize: 14,
+                        ),
+                      ),
+                    ),
+                    TextButton(
+                      onPressed: () {
+                        // TODO: 최근 본 기록 지우기 로직 구현
+                        Navigator.pop(context);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: const Text('최근 본 기록이 삭제되었습니다'),
+                            backgroundColor: Colors.black87,
+                            behavior: SnackBarBehavior.floating,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                        );
+                      },
+                      child: const Text(
+                        '확인',
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
 
-          const Divider(),
-          ListTile(
-            leading: const Icon(Icons.logout, color: Colors.red),
-            title: const Text('로그아웃', style: TextStyle(color: Colors.red)),
-            onTap: () async {
+          const Divider(height: 32),
+          _buildSettingTile(
+            context,
+            '로그아웃',
+            Icons.logout,
+            () async {
               await Supabase.instance.client.auth.signOut();
 
               if (context.mounted) {
@@ -55,10 +122,18 @@ class SettingsPage extends StatelessWidget {
                 );
               }
 
-              ScaffoldMessenger.of(
-                context,
-              ).showSnackBar(const SnackBar(content: Text('로그아웃 되었습니다')));
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: const Text('로그아웃 되었습니다'),
+                  backgroundColor: Colors.black87,
+                  behavior: SnackBarBehavior.floating,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+              );
             },
+            textColor: Colors.black,
           ),
         ],
       ),
@@ -68,19 +143,37 @@ class SettingsPage extends StatelessWidget {
   Widget _buildSectionTitle(String title) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 24, 16, 8),
-      child: Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
+      child: Text(
+        title,
+        style: const TextStyle(
+          fontWeight: FontWeight.bold,
+          fontSize: 15,
+          color: Colors.black87,
+        ),
+      ),
     );
   }
 
-  Widget _buildTile(BuildContext context, String title, Widget page) {
+  Widget _buildSettingTile(
+    BuildContext context,
+    String title,
+    IconData icon,
+    VoidCallback onTap, {
+    Color textColor = Colors.black87,
+  }) {
     return ListTile(
-      title: Text(title),
-      trailing: const Icon(Icons.chevron_right),
-      onTap:
-          () => Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => page),
-          ),
+      leading: Icon(icon, color: textColor, size: 22),
+      title: Text(
+        title,
+        style: TextStyle(
+          color: textColor,
+          fontSize: 15,
+        ),
+      ),
+      trailing: title == '로그아웃'
+          ? null
+          : const Icon(Icons.chevron_right, color: Colors.black54, size: 20),
+      onTap: onTap,
     );
   }
 }

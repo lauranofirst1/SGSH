@@ -724,16 +724,32 @@ class _StoreDetailPageState extends State<StoreDetailPage>
           builder: (context) => MenuDetailModal(menu: menu),
         );
       },
-
       child: Column(
         children: [
           Container(
-            decoration: BoxDecoration(color: Colors.white),
-
+            color: Colors.white,
+            // padding: EdgeInsets.symmetric(vertical: 12, horizontal: 12),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // 왼쪽 텍스트 정보
+                // 이미지 (왼쪽)
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(16),
+                  child: Image.network(
+                    menu.image,
+                    width: 80,
+                    height: 80,
+                    fit: BoxFit.cover,
+                    errorBuilder: (_, __, ___) => Container(
+                      width: 80,
+                      height: 80,
+                      color: Colors.grey[200],
+                      child: Icon(Icons.image, color: Colors.grey),
+                    ),
+                  ),
+                ),
+                SizedBox(width: 16),
+                // 텍스트 (가운데)
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -743,6 +759,7 @@ class _StoreDetailPageState extends State<StoreDetailPage>
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w700,
+                          color: Colors.black,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -754,41 +771,19 @@ class _StoreDetailPageState extends State<StoreDetailPage>
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                       ),
-                      SizedBox(height: 8),
-                      Text(
-                        '${menu.price}원',
-                        style: TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.deepOrange,
-                        ),
-                      ),
                     ],
                   ),
                 ),
-
                 SizedBox(width: 12),
-
-                Padding(
-                  padding: EdgeInsets.only(left: 8),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(12),
-                    child: Stack(
-                      children: [
-                        Image.network(
-                          menu.image,
-                          width: 80,
-                          height: 80,
-                          fit: BoxFit.cover,
-                          errorBuilder:
-                              (_, __, ___) => Container(
-                                width: 80,
-                                height: 80,
-                                color: Colors.grey[200],
-                                child: Icon(Icons.image, color: Colors.grey),
-                              ),
-                        ),
-                      ],
+                // 가격 (오른쪽)
+                Align(
+                  alignment: Alignment.topRight,
+                  child: Text(
+                    '${menu.price}원',
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
                     ),
                   ),
                 ),
