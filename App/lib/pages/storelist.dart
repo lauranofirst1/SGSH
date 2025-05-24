@@ -22,6 +22,18 @@ class _StoreListPageState extends State<StoreListPage> {
   List<business_data> storeList = []; // 📌 Store 객체 리스트
   final supabase = Supabase.instance.client;
   late Future<SharedPreferences> prefsFuture; // ✅ 추가
+String getCategoryLabel(String code) {
+  const labels = {
+    '1': '한식',
+    '2': '중식',
+    '3': '일식',
+    '4': '양식',
+    '5': '카페',
+    '6': '기타',
+  };
+  return labels[code] ?? '카테고리';
+}
+
 
   @override
   void initState() {
@@ -30,28 +42,39 @@ class _StoreListPageState extends State<StoreListPage> {
   }
 
   void fetchStores() async {
-    try {
-      var response = await supabase
-          .from("business_data")
-          .select()
-          .order("id", ascending: true);
+  try {
+    var response = await supabase
+        .from("business_data")
+        .select()
+        .order("id", ascending: true);
 
-      setState(() {
-        final allStores = response.map<business_data>((data) => business_data.fromMap(data)).toList();
-        
-        // 카테고리별 필터링
-        if (widget.category == '기타') {
-          // 기타 카테고리에는 모든 매장 포함
-          storeList = allStores;
-        } else {
-          // 특정 카테고리에 해당하는 매장만 필터링
-          storeList = allStores.where((store) => store.category == widget.category).toList();
-        }
-      });
-    } catch (e) {
-      print("❌ 오류 발생: $e");
-    }
+    final allStores = response.map<business_data>((data) => business_data.fromMap(data)).toList();
+
+    setState(() {
+      if (widget.category == '6') {
+        // '기타'는 모든 1~5 카테고리를 의미
+        storeList = allStores
+            .where((store) => [1, 2, 3, 4, 5].contains(store.category))
+            .toList();
+      } else {
+        final int selectedCategory = int.tryParse(widget.category) ?? -1;
+        storeList = allStores
+            .where((store) => store.category == selectedCategory)
+            .toList();
+      }
+
+      storeList.shuffle(); // ✅ 항상 셔플 (모든 카테고리에 적용)
+
+      print("📊 최종 필터링된 가게 수: ${storeList.length}");
+    });
+  } catch (e) {
+    print("❌ 오류 발생: $e");
   }
+}
+
+
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -62,7 +85,7 @@ class _StoreListPageState extends State<StoreListPage> {
         elevation: 0.5,
         centerTitle: false,
         title: Text(
-          widget.category,
+  getCategoryLabel(widget.category),
           style: TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.bold,

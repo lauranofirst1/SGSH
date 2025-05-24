@@ -10,7 +10,7 @@ class business_data {
   final String lat;
   final String lng;
   final List<String> tags;
-  final String category;
+  final int category;
 
   business_data({
     required this.id,
@@ -34,7 +34,8 @@ class business_data {
     List<String> parseTags(dynamic tags) {
       if (tags == null) return [];
       if (tags is String) {
-        return tags.split(',')
+        return tags
+            .split(',')
             .map((e) => e.trim())
             .where((e) => e.isNotEmpty)
             .toList();
@@ -54,7 +55,10 @@ class business_data {
       lat: (data["lat"] ?? '0.0').toString(),
       lng: (data["lng"] ?? '0.0').toString(),
       tags: parseTags(data["tags"]),
-      category: clean(data["category"], "카테고리 없음"),
+      category:
+          data["category"] is int
+              ? data["category"]
+              : int.tryParse(data["category"].toString()) ?? 0, // ✅ 이 라인 수정
     );
   }
 

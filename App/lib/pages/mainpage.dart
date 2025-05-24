@@ -18,12 +18,12 @@ class Mainpage extends StatefulWidget {
 
 class _MainpageState extends State<Mainpage> {
   final List<Map<String, dynamic>> items = [
-    {'emoji': '🥘', 'label': "한식", 'category': '1'},
-    {'emoji': '🍜', 'label': "중식", 'category': '2'},
-    {'emoji': '🍱', 'label': "일식", 'category': '3'},
-    {'emoji': '🍔', 'label': "양식", 'category': '4'},
-    {'emoji': '☕️', 'label': "카페", 'category': '5'},
-    {'emoji': '🍽️', 'label': "기타", 'category': '기타'},
+    {'emoji': '🥘', 'label': "한식", 'category': 1},
+    {'emoji': '🍜', 'label': "중식", 'category': 2},
+    {'emoji': '🍱', 'label': "일식", 'category': 3},
+    {'emoji': '🍔', 'label': "양식", 'category': 4},
+    {'emoji': '☕️', 'label': "카페", 'category': 5},
+    {'emoji': '🍽️', 'label': "기타", 'category': 6},
   ];
 
   // List<article_data> article = [];
@@ -286,16 +286,19 @@ class _MainpageState extends State<Mainpage> {
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 GestureDetector(
-                                  onTap: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => StoreListPage(
-                                          category: item['category'],
-                                        ),
-                                      ),
-                                    );
-                                  },
+                                 onTap: () {
+  print("👉 선택된 카테고리: ${item['category']} (${item['category'].runtimeType})");
+
+  Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (context) => StoreListPage(
+        category: item['category'].toString(), // category: '1' 등으로 전달
+      ),
+    ),
+  );
+},
+
                                   child: Column(
                                     children: [
                                       Text(
@@ -892,7 +895,7 @@ class _PriceTabMenuListState extends State<PriceTabMenuList> with SingleTickerPr
                               lat: '0.0',
                               lng: '0.0',
                               tags: [],
-                              category: '',
+                              category: 6,
                             ))),
                           ),
                         );
