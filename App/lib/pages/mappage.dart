@@ -128,11 +128,8 @@ class _MapPageState extends State<MapPage> {
 
     if (store != null) {
       _activeBottomSheet = _scaffoldKey.currentState!.showBottomSheet(
-        (context) => StoreDetailBottomSheet(
-          name: name,
-          address: address,
-          store: store,
-        ),
+        (context) =>
+            StoreDetailBottomSheet(name: name, address: address, store: store),
         backgroundColor: Colors.transparent,
       );
     } else {
@@ -149,134 +146,134 @@ class _MapPageState extends State<MapPage> {
   }
 
   Widget _searchBar() => Positioned(
-        top: 16,
-        left: 16,
-        right: 16,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
+    top: 16,
+    left: 16,
+    right: 16,
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
           children: [
             Container(
-                  width: 38,
-                  height: 38,
-                  margin: EdgeInsets.only(right: 8),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.07),
-                        blurRadius: 8,
-                        offset: Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  child: IconButton(
-                    icon: Icon(Icons.my_location, color: Colors.blue, size: 22),
-                    onPressed: () async {
-                      final position = await _locationService.getCurrentLocation();
-                      if (position != null) {
-                        _moveToLocation(position);
-                      }
-                    },
-                    tooltip: '내 위치로 이동',
-                  ),
-                ),
-                Expanded(
-                  child: Container(
-                    height: 48,
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
+              width: 38,
+              height: 38,
+              margin: EdgeInsets.only(right: 8),
               decoration: BoxDecoration(
                 color: Colors.white,
-                      borderRadius: BorderRadius.circular(16),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.05),
-                          blurRadius: 10,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.07),
+                    blurRadius: 8,
+                    offset: Offset(0, 2),
+                  ),
+                ],
               ),
-              child: Row(
-                children: [
-                        const Icon(Icons.search, color: Colors.grey, size: 20),
-                        const SizedBox(width: 12),
-                  Expanded(
-                    child: TextField(
-                      controller: _searchController,
-                            style: const TextStyle(
-                              fontSize: 15,
-                              color: Colors.black87,
-                            ),
-                      decoration: const InputDecoration(
-                        hintText: '가게 이름 검색',
-                              hintStyle: TextStyle(
-                                color: Colors.grey,
-                                fontSize: 15,
-                              ),
-                        border: InputBorder.none,
-                              contentPadding: EdgeInsets.symmetric(vertical: 12),
-                      ),
-                      onSubmitted: (query) => _searchAndMove(query),
+              child: IconButton(
+                icon: Icon(Icons.my_location, color: Colors.blue, size: 22),
+                onPressed: () async {
+                  final position = await _locationService.getCurrentLocation();
+                  if (position != null) {
+                    _moveToLocation(position);
+                  }
+                },
+                tooltip: '내 위치로 이동',
+              ),
+            ),
+            Expanded(
+              child: Container(
+                height: 48,
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.05),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
                     ),
-                  ),
-                        if (_searchController.text.isNotEmpty)
-                  IconButton(
-                            icon: const Icon(Icons.close, size: 20),
-                            color: Colors.grey,
-                            onPressed: () {
-                              _searchController.clear();
-                              setState(() {});
-                            },
-                  ),
-                ],
-              ),
-            ),
+                  ],
                 ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children: [
-                  const SizedBox(width: 4),
-                  _tagChip('가치가게의 추천'),
-                  _tagChip('육면'),
-                  _tagChip('카페'),
-                  _tagChip('한식'),
-                  _tagChip('분식'),
-                  _tagChip('디저트'),
-                  _tagChip('중식'),
-                  _tagChip('고기'),
-                  _tagChip('샐러드'),
-                  _tagChip('베이커리'),
-                  const SizedBox(width: 4),
-                ],
+                child: Row(
+                  children: [
+                    const Icon(Icons.search, color: Colors.grey, size: 20),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: TextField(
+                        controller: _searchController,
+                        style: const TextStyle(
+                          fontSize: 15,
+                          color: Colors.black87,
+                        ),
+                        decoration: const InputDecoration(
+                          hintText: '가게 이름 검색',
+                          hintStyle: TextStyle(
+                            color: Colors.grey,
+                            fontSize: 15,
+                          ),
+                          border: InputBorder.none,
+                          contentPadding: EdgeInsets.symmetric(vertical: 12),
+                        ),
+                        onSubmitted: (query) => _searchAndMove(query),
+                      ),
+                    ),
+                    if (_searchController.text.isNotEmpty)
+                      IconButton(
+                        icon: const Icon(Icons.close, size: 20),
+                        color: Colors.grey,
+                        onPressed: () {
+                          _searchController.clear();
+                          setState(() {});
+                        },
+                      ),
+                  ],
+                ),
               ),
             ),
           ],
         ),
-      );
+        const SizedBox(height: 12),
+        SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(
+            children: [
+              const SizedBox(width: 4),
+              _tagChip('가치가게의_추천'),
+              _tagChip('전문점'),
+              _tagChip('막국수'),
+              _tagChip('전통'),
+              _tagChip('춘천'),
+              _tagChip('닭갈비'),
+              _tagChip('숯불'),
+              _tagChip('메밀'),
+              _tagChip('맛집'),
+              _tagChip('아름다운'),
+              const SizedBox(width: 4),
+            ],
+          ),
+        ),
+      ],
+    ),
+  );
 
   Widget _tagChip(String label) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 4),
       child: GestureDetector(
         onTap: () {
-          if (label == '가치가게의 추천') {
+          if (label == '가치가게의_추천') {
             _showRecommendationSheet();
           } else {
-          _searchController.text = label;
-          _searchAndMove(label);
+            _searchController.text = label;
+            _searchAndMove(label);
           }
         },
         child: Chip(
           label: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              if (label == '가치가게의 추천') ...[
+              if (label == '가치가게의_추천') ...[
                 const Icon(Icons.place, color: Colors.orange, size: 16),
                 const SizedBox(width: 4),
               ],
@@ -285,7 +282,7 @@ class _MapPageState extends State<MapPage> {
           ),
           backgroundColor: Colors.white,
           side: BorderSide(
-            color: label == '가치가게의 추천' ? Colors.orange : Colors.black12,
+            color: label == '가치가게의_추천' ? Colors.orange : Colors.black12,
           ),
           labelStyle: const TextStyle(color: Colors.black),
           shape: RoundedRectangleBorder(
@@ -298,23 +295,25 @@ class _MapPageState extends State<MapPage> {
 
   void _searchAndMove(String query) {
     final cleanQuery = query.replaceAll('#', '').toLowerCase();
-    
+
     final matched = _markerService.savedBusinessList.firstWhereOrNull(
       (b) =>
-        b.name.toLowerCase().contains(cleanQuery) ||
-        b.address.toLowerCase().contains(cleanQuery) ||
-        (b.description.toLowerCase().contains(cleanQuery)) ||
-        (b.tags.any((tag) => tag.toLowerCase().contains(cleanQuery))),
+          b.name.toLowerCase().contains(cleanQuery) ||
+          b.address.toLowerCase().contains(cleanQuery) ||
+          (b.description.toLowerCase().contains(cleanQuery)) ||
+          (b.tags.any((tag) => tag.toLowerCase().contains(cleanQuery))),
     );
 
-    if (matched != null && matched.latDouble != null && matched.lngDouble != null) {
+    if (matched != null &&
+        matched.latDouble != null &&
+        matched.lngDouble != null) {
       final latLng = LatLng(matched.latDouble!, matched.lngDouble!);
       _mapController?.animateCamera(CameraUpdate.newLatLngZoom(latLng, 17));
       _onMarkerTap(matched.name, matched.address, matched);
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('검색 결과가 없습니다')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('검색 결과가 없습니다')));
     }
   }
 
@@ -352,12 +351,7 @@ class _MapPageState extends State<MapPage> {
           index: _initialPosition == null ? 0 : 1,
           children: [
             const Center(child: CircularProgressIndicator()),
-            Stack(
-              children: [
-                mapview(),
-                _searchBar(),
-              ],
-            ),
+            Stack(children: [mapview(), _searchBar()]),
           ],
         ),
       ),

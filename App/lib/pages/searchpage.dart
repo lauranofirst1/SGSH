@@ -161,7 +161,17 @@ class _SearchPageState extends State<SearchPage> {
                   padding: const EdgeInsets.fromLTRB(20, 0, 12, 8),
                   child: Row(
                     children:
-                        ['#학생단골', '#춘천맛집', '#스시오마카세', '#강원도맛집', '#감자'].map((tag) {
+                       [
+  '#전문점',
+  '#막국수',
+  '#전통',
+  '#춘천',
+  '#닭갈비',
+  '#숯불',
+  '#메밀',
+  '#맛집',
+  '#아름다운',
+].map((tag) {
                       return Padding(
                         padding: const EdgeInsets.only(right: 12),
                         child: GestureDetector(

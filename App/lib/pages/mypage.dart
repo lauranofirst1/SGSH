@@ -190,14 +190,12 @@ class _MyPageState extends State<MyPage> with AutomaticKeepAliveClientMixin, Wid
           IconButton(
               icon: const Icon(Icons.notifications_none, color: Color(0xFF222222)),
               onPressed: () {
-                _showSnackbar('알림 설정 이동');
                 loadBookmarkedStores();  // 알림 버튼 클릭 시에도 새로고침
               },
           ),
           IconButton(
               icon: const Icon(Icons.settings, color: Color(0xFF222222)),
               onPressed: () async {
-              _showSnackbar('설정 이동');
                 await Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => SettingsPage()),
@@ -291,47 +289,8 @@ class _MyPageState extends State<MyPage> with AutomaticKeepAliveClientMixin, Wid
                     ),
                   ],
                 ),
-                const SizedBox(height: 16),
-            Row(
-              children: [
-                Expanded(
-                  child: OutlinedButton(
-                    onPressed: () => _showSnackbar('프로필 수정 눌림'),
-                        style: OutlinedButton.styleFrom(
-                          foregroundColor: Color(0xFF222222),
-                          side: BorderSide(color: Color(0xFFE0E0E0)),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          padding: EdgeInsets.symmetric(vertical: 12),
-                        ),
-                        child: const Text(
-                          '프로필 수정',
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: OutlinedButton(
-                    onPressed: () => _showSnackbar('쿠폰함 열기'),
-                        style: OutlinedButton.styleFrom(
-                          foregroundColor: Color(0xFF222222),
-                          side: BorderSide(color: Color(0xFFE0E0E0)),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          padding: EdgeInsets.symmetric(vertical: 12),
-                        ),
-                        child: const Text(
-                          '쿠폰함',
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                  ),
-                ),
-              ],
-            ),
-                const SizedBox(height: 32),
+                const SizedBox(height: 20),
+            
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
                   child: Row(
