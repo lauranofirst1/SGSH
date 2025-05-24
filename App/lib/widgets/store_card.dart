@@ -50,56 +50,67 @@ class _StoreCardState extends State<StoreCard> {
                 children: [
                   // 제목 + 북마크
                   Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // 이름과 태그 묶음
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              store.name,
-                              style: const TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                              ),
-                              overflow: TextOverflow.ellipsis,
-                              maxLines: 1,
-                            ),
-                            const SizedBox(height: 4),
-                            Wrap(
-                              spacing: 6,
-                              runSpacing: 4,
-                              children: tags.map((tag) => Text(
-                                '#$tag',
-                                style: const TextStyle(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w500,
-                                  color: Colors.deepOrange,
-                                ),
-                              )).toList(),
-                            ),
-                          ],
-                        ),
-                      ),
-                      IconButton(
-                        icon: Icon(
-                          isBookmarked ? Icons.bookmark : Icons.bookmark_border,
-                          color: isBookmarked
-                              ? const Color.fromARGB(255, 255, 85, 0)
-                              : Colors.grey,
-                        ),
-                        onPressed: () async {
-                          await BookmarkService.toggleBookmark(store.id.toString());
-                          setState(() {
-                            isBookmarked = !isBookmarked;
-                          });
-                        },
-                      ),
-                    ],
-                  ),
+  crossAxisAlignment: CrossAxisAlignment.start,
+  children: [
+    // ⬅️ 이름 + 태그 묶음
+    Expanded(
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          // 가게 이름
+          Flexible(
+            child: Text(
+              store.name,
+              style: const TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+              overflow: TextOverflow.ellipsis,
+              maxLines: 1,
+            ),
+          ),
+          const SizedBox(width: 6),
+          // 태그들
+          Flexible(
+            child: Wrap(
+              spacing: 4,
+              runSpacing: 0,
+              children: tags.map((tag) => Text(
+                '#$tag',
+                style: const TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.deepOrange,
+                ),
+              )).toList(),
+            ),
+          ),
+        ],
+      ),
+    ),
 
-                  const SizedBox(height: 8),
+    // ➡️ 북마크
+    Align(
+      alignment: Alignment.topRight,
+      child: IconButton(
+        icon: Icon(
+          isBookmarked ? Icons.bookmark : Icons.bookmark_border,
+          color: isBookmarked
+              ? const Color.fromARGB(255, 255, 85, 0)
+              : Colors.grey,
+        ),
+        onPressed: () async {
+          await BookmarkService.toggleBookmark(store.id.toString());
+          setState(() {
+            isBookmarked = !isBookmarked;
+          });
+        },
+      ),
+    ),
+  ],
+),
+
+
 
                   // 평점 및 주소
                   Row(
