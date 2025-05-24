@@ -25,21 +25,26 @@ class MarkerService {
   // BitmapDescriptor 캐싱
   final Map<String, BitmapDescriptor> _categoryIcons = {};
 
-  Future<BitmapDescriptor> _getCategoryIcon(String? category) async {
-    final String iconKey = (category != null && category.isNotEmpty && _categoryIconPaths.containsKey(category))
-        ? category
-        : '기타';
-    if (_categoryIcons.containsKey(iconKey)) {
-      return _categoryIcons[iconKey]!;
-    }
-    final path = _categoryIconPaths[iconKey]!;
-    final icon = await BitmapDescriptor.fromAssetImage(
-      const ImageConfiguration(size: Size(36, 36)),
-      path,
-    );
-    _categoryIcons[iconKey] = icon;
-    return icon;
+  Future<BitmapDescriptor> _getCategoryIcon(dynamic categoryRaw) async {
+  final categoryKey = categoryRaw?.toString(); // int든 null이든 안전하게 처리
+  final String iconKey = (_categoryIconPaths.containsKey(categoryKey))
+      ? categoryKey!
+      : '기타';
+
+  if (_categoryIcons.containsKey(iconKey)) {
+    return _categoryIcons[iconKey]!;
   }
+
+  final path = _categoryIconPaths[iconKey]!;
+  final icon = await BitmapDescriptor.fromAssetImage(
+    const ImageConfiguration(size: Size(36, 36)),
+    path,
+  );
+
+  _categoryIcons[iconKey] = icon;
+  return icon;
+}
+
 
   List<business_data> get savedBusinessList =>
       _savedBusinesses.map((biz) => business_data.fromMap(biz)).toList();
@@ -56,33 +61,34 @@ class MarkerService {
 
   /// DB에서 가져온 savedBusinesses 데이터로 마커 생성
   Future<void> buildSavedBusinessMarkers(
-    void Function(String, String, business_data?) onMarkerTap,
-  ) async {
-    _allMarkers.clear();
+  void Function(String, String, business_data?) onMarkerTap,
+) async {
+  _allMarkers.clear();
 
-    final icon = await BitmapDescriptor.fromAssetImage(
-      const ImageConfiguration(size: Size(36, 36)),
-      'assets/icons/6.png',
+  for (var biz in _savedBusinesses) {
+    final lat = double.tryParse(biz['lat'].toString());
+    final lng = double.tryParse(biz['lng'].toString());
+    if (lat == null || lng == null) continue;
+
+    final name = biz['name'] ?? '이름 없음';
+    final address = biz['address'] ?? '주소 없음';
+
+    final icon = await _getCategoryIcon(biz['category']); // ✅ 여기에서 카테고리별 아이콘 사용
+
+    print('🧭 마커 생성: $name | category: ${biz['category']}');
+
+    _allMarkers.add(
+      Marker(
+        markerId: MarkerId('saved-$name'),
+        position: LatLng(lat, lng),
+        infoWindow: InfoWindow(title: name, snippet: address),
+        icon: icon,
+        onTap: () => onMarkerTap(name, address, business_data.fromMap(biz)),
+      ),
     );
-    for (var biz in _savedBusinesses) {
-      final lat = double.tryParse(biz['lat'].toString());
-      final lng = double.tryParse(biz['lng'].toString());
-      if (lat == null || lng == null) continue;
-
-      final name = biz['name'] ?? '이름 없음';
-      final address = biz['address'] ?? '주소 없음';
-
-      _allMarkers.add(
-        Marker(
-          markerId: MarkerId('saved-$name'),
-          position: LatLng(lat, lng),
-          infoWindow: InfoWindow(title: name, snippet: address),
-          icon: icon,
-          onTap: () => onMarkerTap(name, address, business_data.fromMap(biz)),
-        ),
-      );
-    }
   }
+}
+
 
   /// 지도 뷰포트 내 마커만 필터링
   void updateVisibleMarkers(LatLngBounds bounds) {
@@ -116,31 +122,36 @@ class MarkerService {
   }
 
   Future<List<business_data>> getTopBusinessesByHits(int limit) async {
-  final supabase = Supabase.instance.client;
-  final hitResult = await supabase.from('business_hits').select('*');
-  final List<HitData> hits = hitResult.map((e) => HitData.fromMap(e)).toList();
+    final supabase = Supabase.instance.client;
+    final hitResult = await supabase.from('business_hits').select('*');
+    final List<HitData> hits =
+        hitResult.map((e) => HitData.fromMap(e)).toList();
 
-  // 🔁 1. bId 기준으로 조회수 합산
-  final Map<int, int> hitCountMap = {};
-  for (final hit in hits) {
-    hitCountMap.update(hit.bId, (value) => value + hit.hits, ifAbsent: () => hit.hits);
-  }
-
-  // 🔢 2. 조회수 높은 순으로 bId 정렬
-  final sortedBIds = hitCountMap.entries.toList()
-    ..sort((a, b) => b.value.compareTo(a.value));
-  final topBIds = sortedBIds.map((e) => e.key).take(limit).toList();
-
-  // 🏪 3. bId로 business_data 매칭
-  final List<business_data> topStores = [];
-  for (final bId in topBIds) {
-    final matched = _savedBusinesses.firstWhereOrNull((b) => b['id'] == bId);
-    if (matched != null) {
-      topStores.add(business_data.fromMap(matched));
+    // 🔁 1. bId 기준으로 조회수 합산
+    final Map<int, int> hitCountMap = {};
+    for (final hit in hits) {
+      hitCountMap.update(
+        hit.bId,
+        (value) => value + hit.hits,
+        ifAbsent: () => hit.hits,
+      );
     }
+
+    // 🔢 2. 조회수 높은 순으로 bId 정렬
+    final sortedBIds =
+        hitCountMap.entries.toList()
+          ..sort((a, b) => b.value.compareTo(a.value));
+    final topBIds = sortedBIds.map((e) => e.key).take(limit).toList();
+
+    // 🏪 3. bId로 business_data 매칭
+    final List<business_data> topStores = [];
+    for (final bId in topBIds) {
+      final matched = _savedBusinesses.firstWhereOrNull((b) => b['id'] == bId);
+      if (matched != null) {
+        topStores.add(business_data.fromMap(matched));
+      }
+    }
+
+    return topStores;
   }
-
-  return topStores;
-}
-
 }
