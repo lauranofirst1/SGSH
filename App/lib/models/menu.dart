@@ -13,6 +13,7 @@ class menu_data {
   final int price;
   final String description;
   final String image;
+  final int category;
 
   menu_data({
     required this.id,
@@ -21,6 +22,7 @@ class menu_data {
     required this.price,
     required this.description,
     required this.image,
+    required this.category
   });
 
   factory menu_data.fromMap(Map<String, dynamic> data) {
@@ -31,6 +33,7 @@ class menu_data {
       price: data["price"] as int, //
       description: data["description"] ?? "설명 없음",
       image: data["image"] ?? "이미지 없음",
+      category: data["category"] ?? 0
     );
   }
 }

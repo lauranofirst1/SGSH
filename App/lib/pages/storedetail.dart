@@ -690,29 +690,43 @@ class _StoreDetailPageState extends State<StoreDetailPage>
   }
 
   Widget buildMenuTab(List<menu_data> menus) {
-    if (menus.isEmpty) {
-      return Center(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 40),
-          child: Text(
-            '메뉴가 등록되지 않았습니다.',
-            style: TextStyle(fontSize: 16, color: Colors.grey),
-          ),
-        ),
-      );
-    }
+  final foodMenus = menus.where((m) => m.category == 1).toList();
+  final drinkMenus = menus.where((m) => m.category == 2).toList();
+  final orderMenus = menus.where((m) => m.category == 3).toList();
 
-    return ListView.separated(
-      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-      itemCount: menus.length,
-      shrinkWrap: true, // ✅ 자식들 크기만큼만 렌더링
-      physics: NeverScrollableScrollPhysics(), // ✅ NestedScrollView와의 스크롤 충돌 방지
-      separatorBuilder: (_, __) => SizedBox(height: 12),
-      itemBuilder: (context, index) {
-        return _buildMenuCard(menus[index]);
-      },
+  if (menus.isEmpty) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 40),
+        child: Text('메뉴가 등록되지 않았습니다.', style: TextStyle(fontSize: 16, color: Colors.grey)),
+      ),
     );
   }
+
+  return ListView(
+    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+    children: [
+      if (foodMenus.isNotEmpty) ...[
+        Text('🍱 음식', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
+        const SizedBox(height: 15),
+        ...foodMenus.map((m) => _buildMenuCard(m)),
+        const SizedBox(height: 20),
+      ],
+      if (drinkMenus.isNotEmpty) ...[
+        Text('🥤 음료', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
+        const SizedBox(height: 15),
+        ...drinkMenus.map((m) => _buildMenuCard(m)),
+        const SizedBox(height: 20),
+      ],
+      if (orderMenus.isNotEmpty) ...[
+        Text('🛍️ 주문', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
+        const SizedBox(height: 15),
+        ...orderMenus.map((m) => _buildMenuCard(m)),
+      ],
+    ],
+  );
+}
+
 
   Widget _buildMenuCard(menu_data menu) {
     return GestureDetector(
