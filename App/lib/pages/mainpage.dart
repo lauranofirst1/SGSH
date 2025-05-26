@@ -864,7 +864,7 @@ class _PriceTabMenuListState extends State<PriceTabMenuList> with SingleTickerPr
           tabs: priceTabs.map((t) => Tab(text: t)).toList(),
         ),
         SizedBox(
-          height: 460, // 원하는 높이로 조정
+          height: 440, // 5개 메뉴가 스크롤 없이 들어갈 수 있도록 높이 조정 (overflow 방지)
           child: TabBarView(
             controller: _tabController,
             children: List.generate(priceTabs.length, (index) {
@@ -872,97 +872,94 @@ class _PriceTabMenuListState extends State<PriceTabMenuList> with SingleTickerPr
               if (menus.isEmpty) {
                 return Center(child: Text('해당 가격대의 메뉴가 없습니다.'));
               }
-              return SizedBox(
-                height: 460,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: List.generate(menus.length > 5 ? 5 : menus.length, (i) {
-                    final menu = menus[i];
-                    return GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => StoreDetailPage(store: widget.stores.firstWhere((s) => s.id == menu.b_id, orElse: () => business_data(
-                              id: menu.b_id,
-                              name: menu.name,
-                              address: '',
-                              time: '',
-                              number: '',
-                              description: '',
-                              image: menu.image,
-                              url: '',
-                              lat: '0.0',
-                              lng: '0.0',
-                              tags: [],
-                              category: 6,
-                            ))),
-                          ),
-                        );
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(12),
-                              child: Image.network(
-                                menu.image,
-                                width: 60,
-                                height: 60,
-                                fit: BoxFit.cover,
-                                errorBuilder: (_, __, ___) => Container(
-                                  width: 60,
-                                  height: 60,
-                                  color: Colors.grey[200],
-                                  child: Icon(Icons.image, color: Colors.grey, size: 28),
-                                ),
-                              ),
-                            ),
-                            SizedBox(width: 16),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    menu.name,
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.black87,
-                                    ),
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                  SizedBox(height: 6),
-                                  Text(
-                                    menu.description,
-                                    style: TextStyle(
-                                      fontSize: 13,
-                                      color: Colors.grey[700],
-                                    ),
-                                    maxLines: 2,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                  SizedBox(height: 8),
-                                  Text(
-                                    '${menu.price.toString()}원',
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.black,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
+              return Column(
+                mainAxisSize: MainAxisSize.min,
+                children: List.generate(menus.length > 5 ? 5 : menus.length, (i) {
+                  final menu = menus[i];
+                  return GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => StoreDetailPage(store: widget.stores.firstWhere((s) => s.id == menu.b_id, orElse: () => business_data(
+                            id: menu.b_id,
+                            name: menu.name,
+                            address: '',
+                            time: '',
+                            number: '',
+                            description: '',
+                            image: menu.image,
+                            url: '',
+                            lat: '0.0',
+                            lng: '0.0',
+                            tags: [],
+                            category: 6,
+                          ))),
                         ),
+                      );
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(10),
+                            child: Image.network(
+                              menu.image,
+                              width: 52,
+                              height: 52,
+                              fit: BoxFit.cover,
+                              errorBuilder: (_, __, ___) => Container(
+                                width: 52,
+                                height: 52,
+                                color: Colors.grey[200],
+                                child: Icon(Icons.image, color: Colors.grey, size: 24),
+                              ),
+                            ),
+                          ),
+                          SizedBox(width: 10),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  menu.name,
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black87,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                SizedBox(height: 3),
+                                Text(
+                                  menu.description,
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                    color: Colors.grey[700],
+                                  ),
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                SizedBox(height: 4),
+                                Text(
+                                  '${menu.price.toString()}원',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
                       ),
-                    );
-                  }),
-                ),
+                    ),
+                  );
+                }),
               );
             }),
           ),

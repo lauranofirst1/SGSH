@@ -450,8 +450,8 @@ class _StoreDetailPageState extends State<StoreDetailPage>
       return address;
     }
     final region = extractRegion(widget.store.address);
-    // 태그 최대 2개만 출력
-    final tags = widget.store.tags.take(2).toList();
+    // 태그 전체 출력
+    final tags = widget.store.tags;
 
     return Padding(
       padding: EdgeInsets.only(right: 16.0, left: 16.0, top: 16.0, bottom: 5),

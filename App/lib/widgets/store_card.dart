@@ -31,7 +31,7 @@ class _StoreCardState extends State<StoreCard> {
   @override
   Widget build(BuildContext context) {
     final store = widget.store;
-    final tags = store.tags.take(2).toList();
+    final tags = store.tags;
 
     return GestureDetector(
       onTap: widget.onTap,
