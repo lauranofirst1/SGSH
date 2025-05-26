@@ -210,7 +210,10 @@ class _MyPageState extends State<MyPage> with AutomaticKeepAliveClientMixin, Wid
       ),
       body: SafeArea(
           child: RefreshIndicator(  // 당겨서 새로고침 기능 추가
-            onRefresh: loadBookmarkedStores,
+            onRefresh: () async {
+              await loadUserProfile();
+              await loadBookmarkedStores();
+            },
         child: ListView(
           padding: const EdgeInsets.all(20),
           children: [

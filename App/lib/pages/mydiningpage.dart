@@ -56,6 +56,9 @@ class _MyDiningPageState extends State<MyDiningPage> {
     );
   }
 
+  // 날짜만 남기는 함수 추가
+  DateTime onlyDate(DateTime dt) => DateTime(dt.year, dt.month, dt.day);
+
   Future<void> _fetchReservations() async {
     print('[디버그] _fetchReservations 실행');
     try {
@@ -71,15 +74,33 @@ class _MyDiningPageState extends State<MyDiningPage> {
       final List<Map<String, dynamic>> fetched =
           List<Map<String, dynamic>>.from(response);
 
+      final nowDate = onlyDate(DateTime.now()); // 오늘 날짜(시간 제외)
+      final nowDateTime = DateTime.now(); // 현재 시각
       final enriched = await Future.wait(
         fetched.map((reservation) async {
           final bId = reservation['b_id'];
-          final now = DateTime.now();
-          final reservationDate = DateTime.tryParse(reservation['date'] ?? '');
-          
-          // 예약 날짜가 지났고 상태가 'standby'인 경우 'cancel'로 업데이트
-          if (reservationDate != null && 
-              reservationDate.isBefore(now) && 
+          final reservationDateStr = reservation['date'] ?? '';
+          final reservationTimeStr = reservation['time'] ?? '';
+          DateTime? reservationDateTime;
+          if (reservationDateStr.isNotEmpty && reservationTimeStr.isNotEmpty) {
+            // date: '2024-06-07', time: '10:00' 형식 가정
+            final dateTimeStr = '${reservationDateStr} ${reservationTimeStr}';
+            reservationDateTime = DateTime.tryParse(dateTimeStr);
+            // 만약 date가 '2024.06.07' 형식이면, '-'로 변환
+            if (reservationDateTime == null && reservationDateStr.contains('.')) {
+              final fixedDate = reservationDateStr.replaceAll('.', '-');
+              reservationDateTime = DateTime.tryParse('$fixedDate $reservationTimeStr');
+            }
+          } else if (reservationDateStr.isNotEmpty) {
+            reservationDateTime = DateTime.tryParse(reservationDateStr);
+            if (reservationDateTime == null && reservationDateStr.contains('.')) {
+              reservationDateTime = DateTime.tryParse(reservationDateStr.replaceAll('.', '-'));
+            }
+          }
+
+          // 예약 날짜+시간이 현재 시각보다 이전이고 상태가 'standby'인 경우 'cancel'로 업데이트
+          if (reservationDateTime != null &&
+              reservationDateTime.isBefore(nowDateTime) &&
               reservation['status'] == 'standby') {
             await Supabase.instance.client
                 .from('reserve_data')
@@ -96,7 +117,7 @@ class _MyDiningPageState extends State<MyDiningPage> {
                   .maybeSingle();
 
           print(
-            '\uD83C\uDFE2 b_id: $bId -> 사업체: ${business?['name']} (${business?['id']})',
+            '\uD83C\uDFE2 b_id: $bId -> 사업체: [32m${business?['name']}[0m (${business?['id']})',
           );
 
           final enrichedReservation = Map<String, dynamic>.from(
@@ -329,9 +350,9 @@ class _MyDiningPageState extends State<MyDiningPage> {
     final count = data['count']?.toString() ?? '0';
     final businessId = data['b_id'];
 
-    final now = DateTime.now();
+    final nowDate = onlyDate(DateTime.now());
     final date = DateTime.tryParse(dateStr);
-    final dDay = (date != null) ? date.difference(now).inDays : null;
+    final dDay = (date != null) ? onlyDate(date).difference(nowDate).inDays : null;
 
     return GestureDetector(
       onTap: () async {
