@@ -507,24 +507,24 @@ class _StoreDetailPageState extends State<StoreDetailPage>
             ),
           ),
           SizedBox(height: 2),
-          Row(
-            children: [
-              Icon(
-                Icons.star,
-                color: Color.fromARGB(255, 238, 200, 49),
-                size: 22,
-              ),
-              SizedBox(width: 2),
-              Text(
-                "4.7",
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-            ],
-          ),
-          SizedBox(height: 10),
+          // Row(
+          //   children: [
+          //     Icon(
+          //       Icons.star,
+          //       color: Color.fromARGB(255, 238, 200, 49),
+          //       size: 22,
+          //     ),
+          //     SizedBox(width: 2),
+          //     Text(
+          //       "4.7",
+          //       style: TextStyle(
+          //         fontSize: 16,
+          //         fontWeight: FontWeight.w700,
+          //       ),
+          //     ),
+          //   ],
+          // ),
+          // SizedBox(height: 10),
           Text(
             widget.store.description,
             style: TextStyle(

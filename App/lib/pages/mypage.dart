@@ -10,14 +10,15 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:app/pages/storedetail.dart'; // ✅ StoreDetailPage import 추가
 import 'package:flutter/rendering.dart';
 import 'package:flutter/foundation.dart';
-import 'dart:async';  // StreamSubscription을 위한 import 추가
+import 'dart:async'; // StreamSubscription을 위한 import 추가
 
 class MyPage extends StatefulWidget {
   @override
   _MyPageState createState() => _MyPageState();
 }
 
-class _MyPageState extends State<MyPage> with AutomaticKeepAliveClientMixin, WidgetsBindingObserver {
+class _MyPageState extends State<MyPage>
+    with AutomaticKeepAliveClientMixin, WidgetsBindingObserver {
   // final String userName = '화려한 식객_84866';
   List<business_data> bookmarkedStores = [];
   UserProfile? currentUserProfile;
@@ -79,7 +80,7 @@ class _MyPageState extends State<MyPage> with AutomaticKeepAliveClientMixin, Wid
   void _subscribeToBookmarkChanges() {
     _bookmarkSubscription = BookmarkService.bookmarkStream.listen((ids) {
       print('📱 북마크 변경 감지: $ids');
-    loadBookmarkedStores();
+      loadBookmarkedStores();
     });
   }
 
@@ -125,16 +126,17 @@ class _MyPageState extends State<MyPage> with AutomaticKeepAliveClientMixin, Wid
   Future<void> loadBookmarkedStores() async {
     print('🔄 북마크 목록 새로고침 중...');
     try {
-    final allStores = await fetchAllStores();
-    final ids = await BookmarkService.getBookmarkedIds();
+      final allStores = await fetchAllStores();
+      final ids = await BookmarkService.getBookmarkedIds();
       print('📚 북마크된 ID 목록: $ids');
 
       if (mounted) {
-    setState(() {
-          bookmarkedStores = allStores
-              .where((store) => ids.contains(store.id.toString()))
-              .toList();
-    });
+        setState(() {
+          bookmarkedStores =
+              allStores
+                  .where((store) => ids.contains(store.id.toString()))
+                  .toList();
+        });
         print('✅ 북마크 목록 업데이트 완료: ${bookmarkedStores.length}개');
       }
     } catch (e) {
@@ -176,49 +178,53 @@ class _MyPageState extends State<MyPage> with AutomaticKeepAliveClientMixin, Wid
           automaticallyImplyLeading: false,
           backgroundColor: Colors.white,
           elevation: 0,
-        centerTitle: false,
-        title: const Text(
-          '마이페이지',
-          style: TextStyle(
+          centerTitle: false,
+          title: const Text(
+            '마이페이지',
+            style: TextStyle(
               fontSize: 24,
-            fontWeight: FontWeight.bold,
+              fontWeight: FontWeight.bold,
               color: Color(0xFF222222),
               letterSpacing: -1.1,
+            ),
           ),
-        ),
-        actions: [
-          IconButton(
-              icon: const Icon(Icons.notifications_none, color: Color(0xFF222222)),
+          actions: [
+            IconButton(
+              icon: const Icon(
+                Icons.notifications_none,
+                color: Color(0xFF222222),
+              ),
               onPressed: () {
-                loadBookmarkedStores();  // 알림 버튼 클릭 시에도 새로고침
+                loadBookmarkedStores(); // 알림 버튼 클릭 시에도 새로고침
               },
-          ),
-          IconButton(
+            ),
+            IconButton(
               icon: const Icon(Icons.settings, color: Color(0xFF222222)),
               onPressed: () async {
                 await Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => SettingsPage()),
-              );
-                loadBookmarkedStores();  // 설정 페이지에서 돌아올 때 새로고침
-            },
-          ),
-        ],
+                  context,
+                  MaterialPageRoute(builder: (context) => SettingsPage()),
+                );
+                loadBookmarkedStores(); // 설정 페이지에서 돌아올 때 새로고침
+              },
+            ),
+          ],
           foregroundColor: Color(0xFF222222),
-        surfaceTintColor: Colors.white,
-        shadowColor: Colors.transparent,
-      ),
-      body: SafeArea(
-          child: RefreshIndicator(  // 당겨서 새로고침 기능 추가
+          surfaceTintColor: Colors.white,
+          shadowColor: Colors.transparent,
+        ),
+        body: SafeArea(
+          child: RefreshIndicator(
+            // 당겨서 새로고침 기능 추가
             onRefresh: () async {
               await loadUserProfile();
               await loadBookmarkedStores();
             },
-        child: ListView(
-          padding: const EdgeInsets.all(20),
-          children: [
-            Row(
+            child: ListView(
+              padding: const EdgeInsets.all(20),
               children: [
+                Row(
+                  children: [
                     Container(
                       width: 80,
                       height: 80,
@@ -227,24 +233,31 @@ class _MyPageState extends State<MyPage> with AutomaticKeepAliveClientMixin, Wid
                         borderRadius: BorderRadius.circular(40),
                         border: Border.all(color: Color(0xFFF0F0F0), width: 1),
                       ),
-                      child: Icon(Icons.person, size: 40, color: Colors.grey[400]),
-                ),
+                      child: Icon(
+                        Icons.person,
+                        size: 40,
+                        color: Colors.grey[400],
+                      ),
+                    ),
                     const SizedBox(width: 16),
                     Expanded(
                       child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      currentUserProfile?.email ?? '로그인 유저 없음',
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            currentUserProfile?.email ?? '로그인 유저 없음',
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
                               fontSize: 18,
                               color: Color(0xFF222222),
-                      ),
-                    ),
+                            ),
+                          ),
                           const SizedBox(height: 8),
                           Container(
-                            padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 6,
+                            ),
                             decoration: BoxDecoration(
                               color: Color(0xFFF8F8F8),
                               borderRadius: BorderRadius.circular(20),
@@ -252,9 +265,13 @@ class _MyPageState extends State<MyPage> with AutomaticKeepAliveClientMixin, Wid
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                Icon(Icons.stars, size: 16, color: Color(0xFFFFB800)),
+                                Icon(
+                                  Icons.stars,
+                                  size: 16,
+                                  color: Color(0xFFFFB800),
+                                ),
                                 SizedBox(width: 4),
-                    Text(
+                                Text(
                                   '${currentUserProfile?.point ?? 0}p',
                                   style: TextStyle(
                                     fontSize: 14,
@@ -267,18 +284,25 @@ class _MyPageState extends State<MyPage> with AutomaticKeepAliveClientMixin, Wid
                           ),
                           const SizedBox(height: 8),
                           Container(
-                            padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 6,
+                            ),
                             decoration: BoxDecoration(
                               color: Color(0xFFF8F8F8),
                               borderRadius: BorderRadius.circular(20),
-                    ),
+                            ),
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                Icon(Icons.qr_code, size: 16, color: Color(0xFF666666)),
+                                Icon(
+                                  Icons.qr_code,
+                                  size: 16,
+                                  color: Color(0xFF666666),
+                                ),
                                 SizedBox(width: 4),
-                    Text(
-                      '코드: ${currentUserProfile?.code ?? '없음'}',
+                                Text(
+                                  '코드: ${currentUserProfile?.code ?? '없음'}',
                                   style: TextStyle(
                                     fontSize: 14,
                                     color: Color(0xFF666666),
@@ -293,25 +317,31 @@ class _MyPageState extends State<MyPage> with AutomaticKeepAliveClientMixin, Wid
                   ],
                 ),
                 const SizedBox(height: 20),
-            
+
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 4,
+                    vertical: 8,
+                  ),
                   child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  '저장한 레스토랑 ${bookmarkedStores.length}',
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        '저장한 레스토랑 ${bookmarkedStores.length}',
                         style: const TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 18,
                           color: Color(0xFF222222),
                         ),
-                ),
-                TextButton(
-                  onPressed: _navigateToLikePage,
+                      ),
+                      TextButton(
+                        onPressed: _navigateToLikePage,
                         style: TextButton.styleFrom(
                           foregroundColor: Color(0xFF666666),
-                          padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 8,
+                          ),
                         ),
                         child: const Text(
                           '전체보기',
@@ -320,25 +350,25 @@ class _MyPageState extends State<MyPage> with AutomaticKeepAliveClientMixin, Wid
                             fontWeight: FontWeight.bold,
                           ),
                         ),
+                      ),
+                    ],
+                  ),
                 ),
-              ],
-            ),
-                ),
-            ...bookmarkedStores.map((store) {
-              return GestureDetector(
+                ...bookmarkedStores.map((store) {
+                  return GestureDetector(
                     onTap: () async {
                       final result = await Navigator.push(
-                    context,
-                    MaterialPageRoute(
+                        context,
+                        MaterialPageRoute(
                           builder: (context) => StoreDetailPage(store: store),
-                    ),
-                  );
+                        ),
+                      );
                       if (result == true) loadBookmarkedStores();
-                },
-                child: Container(
-                  margin: const EdgeInsets.only(bottom: 16),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
+                    },
+                    child: Container(
+                      margin: const EdgeInsets.only(bottom: 16),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
                         borderRadius: BorderRadius.circular(16),
                         border: Border.all(color: Color(0xFFF0F0F0), width: 1),
                         boxShadow: [
@@ -348,24 +378,28 @@ class _MyPageState extends State<MyPage> with AutomaticKeepAliveClientMixin, Wid
                             offset: Offset(0, 2),
                           ),
                         ],
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
                           Padding(
                             padding: const EdgeInsets.all(16),
                             child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          ClipRRect(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                ClipRRect(
                                   borderRadius: BorderRadius.circular(12),
-                            child: Image.network(
-                              store.image,
+                                  child: Image.network(
+                                    store.image,
                                     width: 80,
                                     height: 100,
-                              fit: BoxFit.cover,
-                                    loadingBuilder: (context, child, loadingProgress) {
-                                if (loadingProgress == null) return child;
+                                    fit: BoxFit.cover,
+                                    loadingBuilder: (
+                                      context,
+                                      child,
+                                      loadingProgress,
+                                    ) {
+                                      if (loadingProgress == null) return child;
                                       return Container(
                                         width: 80,
                                         height: 100,
@@ -373,92 +407,103 @@ class _MyPageState extends State<MyPage> with AutomaticKeepAliveClientMixin, Wid
                                         child: Center(
                                           child: CircularProgressIndicator(
                                             strokeWidth: 2,
-                                            valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF666666)),
+                                            valueColor:
+                                                AlwaysStoppedAnimation<Color>(
+                                                  Color(0xFF666666),
+                                                ),
                                           ),
                                         ),
-                                );
-                              },
-                              errorBuilder: (context, error, stackTrace) {
-                                return Container(
+                                      );
+                                    },
+                                    errorBuilder: (context, error, stackTrace) {
+                                      return Container(
                                         width: 80,
                                         height: 100,
                                         color: Colors.grey[100],
-                                        child: Icon(Icons.image, color: Colors.grey[400]),
-                                );
-                              },
-                            ),
-                          ),
+                                        child: Icon(
+                                          Icons.image,
+                                          color: Colors.grey[400],
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                ),
                                 const SizedBox(width: 16),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  store.name,
-                                  style: const TextStyle(
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        store.name,
+                                        style: const TextStyle(
                                           fontSize: 18,
-                                    fontWeight: FontWeight.bold,
+                                          fontWeight: FontWeight.bold,
                                           color: Color(0xFF222222),
-                                  ),
-                                ),
+                                        ),
+                                      ),
                                       const SizedBox(height: 6),
-                                Text(
-                                  store.description,
-                                  style: const TextStyle(
-                                          fontSize: 13,
-                                    color: Color(0xFF666666),
-                                          height: 1.4,
-                                  ),
-                                ),
-                                      const SizedBox(height: 8),
-                                      Row(
-                                        children: [
-                                          Container(
-                                            padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                                            decoration: BoxDecoration(
-                                              color: Color(0xFFFFF8E1),
-                                              borderRadius: BorderRadius.circular(6),
-                                            ),
-                                            child: Row(
-                                              mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Icon(
-                                      Icons.star,
-                                                  color: Color(0xFFFFB800),
-                                                  size: 14,
-                                    ),
-                                    SizedBox(width: 4),
-                                    Text(
-                                      '4.7',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                                    fontSize: 13,
-                                                    color: Color(0xFF222222),
-                                      ),
-                                    ),
-                                    Text(
-                                                  ' (220)',
-                                      style: TextStyle(
-                                                    fontSize: 12,
-                                                    color: Color(0xFF666666),
-                                                  ),
-                                                ),
-                                              ],
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                      const SizedBox(height: 8),
-                                Text(
-                                  store.address,
-                                  style: const TextStyle(
+                                      Text(
+                                        store.description,
+                                        style: const TextStyle(
                                           fontSize: 13,
                                           color: Color(0xFF666666),
-                                  ),
-                                ),
+                                          height: 1.4,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 8),
+                                      // Row(
+                                      //   children: [
+                                      //     // Container(
+                                      //     //   padding: EdgeInsets.symmetric(
+                                      //     //     horizontal: 8,
+                                      //     //     vertical: 4,
+                                      //     //   ),
+                                      //     //   decoration: BoxDecoration(
+                                      //     //     color: Color(0xFFFFF8E1),
+                                      //     //     borderRadius:
+                                      //     //         BorderRadius.circular(6),
+                                      //     //   ),
+                                      //     //   // child: Row(
+                                      //       //   mainAxisSize: MainAxisSize.min,
+                                      //       //   children: [
+                                      //       //     Icon(
+                                      //       //       Icons.star,
+                                      //       //       color: Color(0xFFFFB800),
+                                      //       //       size: 14,
+                                      //       //     ),
+                                      //       //     SizedBox(width: 4),
+                                      //       //     Text(
+                                      //       //       '4.7',
+                                      //       //       style: TextStyle(
+                                      //       //         fontWeight: FontWeight.bold,
+                                      //       //         fontSize: 13,
+                                      //       //         color: Color(0xFF222222),
+                                      //       //       ),
+                                      //       //     ),
+                                      //       //     Text(
+                                      //       //       ' (220)',
+                                      //       //       style: TextStyle(
+                                      //       //         fontSize: 12,
+                                      //       //         color: Color(0xFF666666),
+                                      //       //       ),
+                                      //       //     ),
+                                      //       //   ],
+                                      //       // ),
+                                      //     ),
+                                      //   ],
+                                      // ),
+                                      const SizedBox(height: 8),
+                                      Text(
+                                        store.address,
+                                        style: const TextStyle(
+                                          fontSize: 13,
+                                          color: Color(0xFF666666),
+                                        ),
+                                      ),
                                       const SizedBox(height: 4),
                                       Text(
-                                  '점심 1.5만원 · 저녁 2.5만원',
+                                        '점심 1.5만원 · 저녁 2.5만원',
                                         style: const TextStyle(
                                           fontSize: 13,
                                           color: Color(0xFF666666),
@@ -468,7 +513,10 @@ class _MyPageState extends State<MyPage> with AutomaticKeepAliveClientMixin, Wid
                                   ),
                                 ),
                                 IconButton(
-                                  icon: const Icon(Icons.bookmark, color: Color(0xFFE53935)),
+                                  icon: const Icon(
+                                    Icons.bookmark,
+                                    color: Color(0xFFE53935),
+                                  ),
                                   onPressed: () async {
                                     await BookmarkService.toggleBookmark(
                                       store.id.toString(),
@@ -485,12 +533,12 @@ class _MyPageState extends State<MyPage> with AutomaticKeepAliveClientMixin, Wid
                             padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
                             child: MemoInputCard(memoKey: store.name),
                           ),
-                    ],
-                  ),
-                ),
-              );
-            }).toList(),
-          ],
+                        ],
+                      ),
+                    ),
+                  );
+                }).toList(),
+              ],
             ),
           ),
         ),
@@ -498,4 +546,3 @@ class _MyPageState extends State<MyPage> with AutomaticKeepAliveClientMixin, Wid
     );
   }
 }
-

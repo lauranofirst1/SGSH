@@ -702,42 +702,42 @@ class _MyDiningPageState extends State<MyDiningPage> {
                 fontWeight: FontWeight.w600,
               ),
             ),
-            const Divider(
-              height: 24,
-              color: Color.fromARGB(255, 229, 229, 229),
-            ),
-            const Center(
-              child: Text(
-                '별점으로 평가해주세요',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: List.generate(5, (index) {
-                return IconButton(
-                  icon: Icon(
-                    index < (starRatings[id] ?? 0)
-                        ? Icons.star
-                        : Icons.star_border,
-                    size: 32,
-                    color: Colors.grey[600],
-                  ),
-                  onPressed: () {
-                    setState(() {
-                      starRatings[id] = index + 1;
-                    });
-                  },
-                );
-              }),
-            ),
-            Center(
-              child: _buildBadge(
-                '잊기 전에 남겨보세요',
-                color: const Color.fromARGB(255, 238, 238, 238),
-                textColor: Colors.black,
-              ),
-            ),
+            // const Divider(
+            //   height: 24,
+            //   color: Color.fromARGB(255, 229, 229, 229),
+            // ),
+            // const Center(
+            //   child: Text(
+            //     '별점으로 평가해주세요',
+            //     style: TextStyle(fontWeight: FontWeight.bold),
+            //   ),
+            // ),
+            // Row(
+            //   mainAxisAlignment: MainAxisAlignment.center,
+            //   children: List.generate(5, (index) {
+            //     return IconButton(
+            //       icon: Icon(
+            //         index < (starRatings[id] ?? 0)
+            //             ? Icons.star
+            //             : Icons.star_border,
+            //         size: 32,
+            //         color: Colors.grey[600],
+            //       ),
+            //       onPressed: () {
+            //         setState(() {
+            //           starRatings[id] = index + 1;
+            //         });
+            //       },
+            //     );
+            //   }),
+            // ),
+            // Center(
+            //   child: _buildBadge(
+            //     '잊기 전에 남겨보세요',
+            //     color: const Color.fromARGB(255, 238, 238, 238),
+            //     textColor: Colors.black,
+            //   ),
+            // ),
           ],
           ),
         ),

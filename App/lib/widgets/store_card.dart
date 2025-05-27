@@ -115,24 +115,23 @@ class _StoreCardState extends State<StoreCard> {
                   // 평점 및 주소
                   Row(
                     children: [
-                      const Icon(Icons.star, color: Color(0xFFeec831), size: 18),
-                      const SizedBox(width: 2),
-                      const Text(
-                        "4.7",
-                        style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700),
-                      ),
-                      const SizedBox(width: 4),
-                      const Text(
-                        "(220) • ",
-                        style: TextStyle(fontSize: 12, fontWeight: FontWeight.w300),
-                      ),
-                      Expanded(
-                        child: Text(
+                      // const Icon(Icons.star, color: Color(0xFFeec831), size: 18),
+                      // const SizedBox(width: 2),
+                      // const Text(
+                      //   "4.7",
+                      //   style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700),
+                      // ),
+                      // const SizedBox(width: 4),
+                      // const Text(
+                      //   "(220) • ",
+                      //   style: TextStyle(fontSize: 12, fontWeight: FontWeight.w300),
+                      // ),
+                       Text(
                           store.address,
                           style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w300),
                           overflow: TextOverflow.ellipsis,
                         ),
-                      ),
+                      
                     ],
                   ),
                 ],
