@@ -1,5 +1,4 @@
 import 'package:app/models/userprofile.dart';
-import 'package:app/pages/likepage.dart';
 import 'package:app/setting/settings_page.dart';
 import 'package:app/services/bookmark_service.dart';
 import 'package:app/models/business.dart';
@@ -70,12 +69,12 @@ class _MyPageState extends State<MyPage>
     ).showSnackBar(SnackBar(content: Text(message)));
   }
 
-  void _navigateToLikePage() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => LikesPage()),
-    );
-  }
+  // void _navigateToLikePage() {
+  //   Navigator.push(
+  //     context,
+  //     MaterialPageRoute(builder: (context) => LikesPage()),
+  //   );
+  // }
 
   void _subscribeToBookmarkChanges() {
     _bookmarkSubscription = BookmarkService.bookmarkStream.listen((ids) {
@@ -334,23 +333,23 @@ class _MyPageState extends State<MyPage>
                           color: Color(0xFF222222),
                         ),
                       ),
-                      TextButton(
-                        onPressed: _navigateToLikePage,
-                        style: TextButton.styleFrom(
-                          foregroundColor: Color(0xFF666666),
-                          padding: EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 8,
-                          ),
-                        ),
-                        child: const Text(
-                          '전체보기',
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
+                      // TextButton(
+                      //   onPressed: _navigateToLikePage,
+                      //   style: TextButton.styleFrom(
+                      //     foregroundColor: Color(0xFF666666),
+                      //     padding: EdgeInsets.symmetric(
+                      //       horizontal: 12,
+                      //       vertical: 8,
+                      //     ),
+                      //   ),
+                      //   child: const Text(
+                      //     '전체보기',
+                      //     style: TextStyle(
+                      //       fontSize: 14,
+                      //       fontWeight: FontWeight.bold,
+                      //     ),
+                      //   ),
+                      // ),
                     ],
                   ),
                 ),

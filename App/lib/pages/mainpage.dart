@@ -873,93 +873,93 @@ class _PriceTabMenuListState extends State<PriceTabMenuList> with SingleTickerPr
                 return Center(child: Text('해당 가격대의 메뉴가 없습니다.'));
               }
               return Column(
-                mainAxisSize: MainAxisSize.min,
-                children: List.generate(menus.length > 5 ? 5 : menus.length, (i) {
-                  final menu = menus[i];
-                  return GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => StoreDetailPage(store: widget.stores.firstWhere((s) => s.id == menu.b_id, orElse: () => business_data(
-                            id: menu.b_id,
-                            name: menu.name,
-                            address: '',
-                            time: '',
-                            number: '',
-                            description: '',
-                            image: menu.image,
-                            url: '',
-                            lat: '0.0',
-                            lng: '0.0',
-                            tags: [],
-                            category: 6,
-                          ))),
-                        ),
-                      );
-                    },
-                    child: Padding(
+                  mainAxisSize: MainAxisSize.min,
+                  children: List.generate(menus.length > 5 ? 5 : menus.length, (i) {
+                    final menu = menus[i];
+                    return GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => StoreDetailPage(store: widget.stores.firstWhere((s) => s.id == menu.b_id, orElse: () => business_data(
+                              id: menu.b_id,
+                              name: menu.name,
+                              address: '',
+                              time: '',
+                              number: '',
+                              description: '',
+                              image: menu.image,
+                              url: '',
+                              lat: '0.0',
+                              lng: '0.0',
+                              tags: [],
+                              category: 6,
+                            ))),
+                          ),
+                        );
+                      },
+                      child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          ClipRRect(
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            ClipRRect(
                             borderRadius: BorderRadius.circular(10),
-                            child: Image.network(
-                              menu.image,
+                              child: Image.network(
+                                menu.image,
                               width: 52,
                               height: 52,
-                              fit: BoxFit.cover,
-                              errorBuilder: (_, __, ___) => Container(
+                                fit: BoxFit.cover,
+                                errorBuilder: (_, __, ___) => Container(
                                 width: 52,
                                 height: 52,
-                                color: Colors.grey[200],
+                                  color: Colors.grey[200],
                                 child: Icon(Icons.image, color: Colors.grey, size: 24),
+                                ),
                               ),
                             ),
-                          ),
                           SizedBox(width: 10),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  menu.name,
-                                  style: TextStyle(
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    menu.name,
+                                    style: TextStyle(
                                     fontSize: 14,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.black87,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black87,
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
                                   ),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
                                 SizedBox(height: 3),
-                                Text(
-                                  menu.description,
-                                  style: TextStyle(
+                                  Text(
+                                    menu.description,
+                                    style: TextStyle(
                                     fontSize: 11,
-                                    color: Colors.grey[700],
+                                      color: Colors.grey[700],
+                                    ),
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
                                   ),
-                                  maxLines: 2,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
                                 SizedBox(height: 4),
-                                Text(
-                                  '${menu.price.toString()}원',
-                                  style: TextStyle(
+                                  Text(
+                                    '${menu.price.toString()}원',
+                                    style: TextStyle(
                                     fontSize: 12,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.black,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black,
+                                    ),
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
-                    ),
-                  );
-                }),
+                    );
+                  }),
               );
             }),
           ),

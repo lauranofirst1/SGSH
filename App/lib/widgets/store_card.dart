@@ -50,19 +50,24 @@ class _StoreCardState extends State<StoreCard> {
                 children: [
                   // 제목 + 북마크
                   Row(
-  crossAxisAlignment: CrossAxisAlignment.start,
-  children: [
-    // ⬅️ 이름 + 태그 묶음
-    Expanded(
-      child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // ⬅️ 이름 + 태그 묶음
+                      Expanded(
+  child: Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      SizedBox(height: 8),
+      Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           // 가게 이름
-          Flexible(
+          Expanded(
+            flex: 1,
             child: Text(
               store.name,
               style: const TextStyle(
-                fontSize: 20,
+                fontSize: 22,
                 fontWeight: FontWeight.bold,
               ),
               overflow: TextOverflow.ellipsis,
@@ -71,67 +76,74 @@ class _StoreCardState extends State<StoreCard> {
           ),
           const SizedBox(width: 6),
           // 태그들
-          Flexible(
-            child: Wrap(
-              spacing: 4,
-              runSpacing: 0,
-              children: tags.map((tag) => Text(
-                '#$tag',
-                style: const TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.deepOrange,
-                ),
-              )).toList(),
-            ),
-          ),
+          // Expanded(
+          //   flex: 2,
+          //   child: Wrap(
+          //     spacing: 4,
+          //     runSpacing: 0,
+          //     children: tags.map((tag) => Text(
+          //       '#$tag',
+          //       style: const TextStyle(
+          //         fontSize: 13,
+          //         fontWeight: FontWeight.w500,
+          //         color: Colors.deepOrange,
+          //       ),
+          //     )).toList(),
+          //   ),
+          // ),
         ],
       ),
-    ),
-
-    // ➡️ 북마크
-    Align(
-      alignment: Alignment.topRight,
-      child: IconButton(
-        icon: Icon(
-          isBookmarked ? Icons.bookmark : Icons.bookmark_border,
-          color: isBookmarked
-              ? const Color.fromARGB(255, 255, 85, 0)
-              : Colors.grey,
-        ),
-        onPressed: () async {
-          await BookmarkService.toggleBookmark(store.id.toString());
-          setState(() {
-            isBookmarked = !isBookmarked;
-          });
-        },
-      ),
-    ),
-  ],
+    ],
+  ),
 ),
 
-
+                      // ➡️ 북마크
+                      Align(
+                        alignment: Alignment.topRight,
+                        child: IconButton(
+                          icon: Icon(
+                            isBookmarked ? Icons.bookmark : Icons.bookmark_border,
+                            color: isBookmarked
+                                ? const Color.fromARGB(255, 255, 85, 0)
+                                : Colors.grey,
+                          ),
+                          padding: EdgeInsets.all(0),
+                          constraints: BoxConstraints(),
+                          onPressed: () async {
+                            await BookmarkService.toggleBookmark(store.id.toString());
+                            setState(() {
+                              isBookmarked = !isBookmarked;
+                            });
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
 
                   // 평점 및 주소
                   Row(
                     children: [
-                      // const Icon(Icons.star, color: Color(0xFFeec831), size: 18),
-                      // const SizedBox(width: 2),
-                      // const Text(
-                      //   "4.7",
-                      //   style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700),
-                      // ),
-                      // const SizedBox(width: 4),
-                      // const Text(
-                      //   "(220) • ",
-                      //   style: TextStyle(fontSize: 12, fontWeight: FontWeight.w300),
-                      // ),
-                       Text(
+                      Icon(Icons.phone, color: Colors.grey, size: 18),
+                      SizedBox(width: 6),
+                      Text(
+                        store.number,
+                        style: const TextStyle(fontSize: 13, color: Colors.black87),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 4),
+                  Row(
+                    children: [
+                      Icon(Icons.location_on, color: Colors.grey, size: 18),
+                      SizedBox(width: 6),
+                      Expanded(
+                        child: Text(
                           store.address,
-                          style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w300),
+                          style: const TextStyle(fontSize: 13, color: Colors.black87),
                           overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
                         ),
-                      
+                      ),
                     ],
                   ),
                 ],
